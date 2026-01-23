@@ -1066,3 +1066,6 @@ export function useData() {
     getMonthlyStats,
   };
 }
+
+// Export default come fallback per compatibilità
+export default useData;
