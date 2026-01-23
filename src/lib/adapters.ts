@@ -164,6 +164,7 @@ export function typeCheeseToDb(cheese: Omit<CheeseType, "id" | "createdAt"> & { 
   } : null);
 
   return {
+    ...(cheese.id && { id: cheese.id }), // Includi l'ID se fornito (per insert con UUID pre-generato)
     name: cheese.name,
     color: cheese.color,
     protocol: cheese.protocol || [],
@@ -181,6 +182,7 @@ export function typeProductionToDb(production: Omit<Production, "id" | "createdA
   const totalLiters = production.totalLiters ?? production.cheeses.reduce((sum, c) => sum + c.liters, 0);
   
   return {
+    ...(production.id && { id: production.id }), // Includi l'ID se fornito (per insert con UUID pre-generato)
     production_number: production.productionNumber,
     production_date: production.date.toISOString().split('T')[0], // YYYY-MM-DD
     total_liters: totalLiters,

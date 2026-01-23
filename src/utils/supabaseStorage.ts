@@ -91,33 +91,63 @@ export async function saveCheese(cheese: Omit<CheeseType, "id" | "createdAt"> & 
     const dbData = typeCheeseToDb(cheese)
     
     if (!cheese.id || cheese.id.startsWith('temp-')) {
-      // Nuovo formaggio
+      // Nuovo formaggio - assicurati che l'ID sia incluso se fornito
+      const insertData = cheese.id ? { ...dbData, id: cheese.id } : dbData;
+      
+      console.log('[saveCheese] Inserting new cheese:', { 
+        hasId: !!cheese.id, 
+        id: cheese.id,
+        name: cheese.name
+      });
+      
       const { data, error } = await supabase
         .from('formaggi')
-        .insert(dbData)
+        .insert(insertData)
         .select()
-        .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('[saveCheese] Insert error:', error);
+        throw error;
+      }
 
-      await logAction('create', 'formaggio', data.id, { name: cheese.name })
-      return dbCheeseToType(data as any)
+      if (!data || data.length === 0) {
+        throw new Error('Insert completed but no data returned');
+      }
+
+      // Prendi il primo risultato (dovrebbe essere l'unico)
+      const inserted = data[0];
+      console.log('[saveCheese] ✅ Cheese inserted successfully:', inserted.id);
+
+      await logAction('create', 'formaggio', inserted.id, { name: cheese.name })
+      return dbCheeseToType(inserted as any)
     } else {
       // Update formaggio esistente
+      console.log('[saveCheese] Updating cheese:', cheese.id);
+      
       const { data, error } = await supabase
         .from('formaggi')
         .update(dbData)
         .eq('id', cheese.id)
         .select()
-        .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('[saveCheese] Update error:', error);
+        throw error;
+      }
+
+      if (!data || data.length === 0) {
+        throw new Error(`Cheese with id ${cheese.id} not found for update`);
+      }
+
+      // Prendi il primo risultato
+      const updated = data[0];
+      console.log('[saveCheese] ✅ Cheese updated successfully:', updated.id);
 
       await logAction('update', 'formaggio', cheese.id, { name: cheese.name })
-      return dbCheeseToType(data as any)
+      return dbCheeseToType(updated as any)
     }
   } catch (error) {
-    console.error('Error saving cheese:', error)
+    console.error('[saveCheese] ❌ Error saving cheese:', error)
     throw error
   }
 }
@@ -179,37 +209,67 @@ export async function saveProduction(
     const dbData = typeProductionToDb(production)
     
     if (!production.id || production.id.startsWith('temp-')) {
-      // Nuova produzione
+      // Nuova produzione - assicurati che l'ID sia incluso se fornito
+      const insertData = production.id ? { ...dbData, id: production.id } : dbData;
+      
+      console.log('[saveProduction] Inserting new production:', { 
+        hasId: !!production.id, 
+        id: production.id,
+        productionNumber: production.productionNumber
+      });
+      
       const { data, error } = await supabase
         .from('produzioni')
-        .insert(dbData)
+        .insert(insertData)
         .select()
-        .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('[saveProduction] Insert error:', error);
+        throw error;
+      }
 
-      await logAction('create', 'produzione', data.id, { 
+      if (!data || data.length === 0) {
+        throw new Error('Insert completed but no data returned');
+      }
+
+      // Prendi il primo risultato (dovrebbe essere l'unico)
+      const inserted = data[0];
+      console.log('[saveProduction] ✅ Production inserted successfully:', inserted.id);
+
+      await logAction('create', 'produzione', inserted.id, { 
         production_number: production.productionNumber 
       })
-      return dbProductionToType(data as any)
+      return dbProductionToType(inserted as any)
     } else {
       // Update produzione esistente
+      console.log('[saveProduction] Updating production:', production.id);
+      
       const { data, error } = await supabase
         .from('produzioni')
         .update(dbData)
         .eq('id', production.id)
         .select()
-        .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('[saveProduction] Update error:', error);
+        throw error;
+      }
+
+      if (!data || data.length === 0) {
+        throw new Error(`Production with id ${production.id} not found for update`);
+      }
+
+      // Prendi il primo risultato
+      const updated = data[0];
+      console.log('[saveProduction] ✅ Production updated successfully:', updated.id);
 
       await logAction('update', 'produzione', production.id, { 
         production_number: production.productionNumber 
       })
-      return dbProductionToType(data as any)
+      return dbProductionToType(updated as any)
     }
   } catch (error) {
-    console.error('Error saving production:', error)
+    console.error('[saveProduction] ❌ Error saving production:', error)
     throw error
   }
 }
