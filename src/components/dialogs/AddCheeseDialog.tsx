@@ -50,8 +50,8 @@ export function AddCheeseDialog({
 }: AddCheeseDialogProps) {
   const [name, setName] = useState("");
   const [color, setColor] = useState(CHEESE_COLORS[0].value);
-  const [yieldPercentage, setYieldPercentage] = useState("20");
-  const [price1, setPrice1] = useState("15.00");
+  const [yieldPercentage, setYieldPercentage] = useState("");
+  const [price1, setPrice1] = useState("");
   const [price2, setPrice2] = useState("0");
   const [price3, setPrice3] = useState("0");
   const [salesPercentage1, setSalesPercentage1] = useState("100");
@@ -72,8 +72,8 @@ export function AddCheeseDialog({
   const resetForm = () => {
     setName("");
     setColor(CHEESE_COLORS[0].value);
-    setYieldPercentage("20");
-    setPrice1("15.00");
+    setYieldPercentage("");
+    setPrice1("");
     setPrice2("0");
     setPrice3("0");
     setSalesPercentage1("100");

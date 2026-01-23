@@ -52,8 +52,8 @@ export function EditCheeseDialog({
 }: EditCheeseDialogProps) {
   const [name, setName] = useState("");
   const [color, setColor] = useState(CHEESE_COLORS[0].value);
-  const [yieldPercentage, setYieldPercentage] = useState("20");
-  const [price1, setPrice1] = useState("15.00");
+  const [yieldPercentage, setYieldPercentage] = useState("");
+  const [price1, setPrice1] = useState("");
   const [price2, setPrice2] = useState("0");
   const [price3, setPrice3] = useState("0");
   const [salesPercentage1, setSalesPercentage1] = useState("100");
@@ -82,7 +82,7 @@ export function EditCheeseDialog({
         // Convert from kg/L to % (0.12 kg/L = 12%)
         setYieldPercentage((cheese.yieldPerLiter * 100).toString());
       } else {
-        setYieldPercentage("20");
+        setYieldPercentage("");
       }
       // Support legacy pricePerKg or new prices
       if (cheese.prices) {
@@ -100,7 +100,7 @@ export function EditCheeseDialog({
         setSalesPercentage2("0");
         setSalesPercentage3("0");
       } else {
-        setPrice1("15.00");
+        setPrice1("");
         setPrice2("0");
         setPrice3("0");
         setSalesPercentage1("100");
