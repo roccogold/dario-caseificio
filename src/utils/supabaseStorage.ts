@@ -388,32 +388,60 @@ export async function saveActivity(
     throw new Error('Supabase non configurato')
   }
   try {
+    // Verifica autenticazione prima di procedere
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      console.error('[saveActivity] ❌ Authentication error:', authError);
+      throw new Error(`User not authenticated. RLS policies require auth.uid() IS NOT NULL. Error: ${authError?.message || 'No user found'}`);
+    }
+    console.log('[saveActivity] ✅ User authenticated:', user.id);
+    
+    // Valida campi obbligatori
+    if (!activity.title || activity.title.trim() === '') {
+      throw new Error('Title is required (NOT NULL constraint)');
+    }
+    if (!activity.date) {
+      throw new Error('Date is required (NOT NULL constraint)');
+    }
+    
     const dbData = typeActivityToDb(activity)
     
+    // Verifica che i dati convertiti siano validi
+    if (!dbData.title || !dbData.date) {
+      console.error('[saveActivity] ❌ Invalid data after conversion:', dbData);
+      throw new Error('Invalid data: title or date missing after conversion');
+    }
+    
     if (!activity.id || activity.id.startsWith('temp-')) {
-      // Nuova attività - Prova prima senza ID, se fallisce prova con ID
+      // Nuova attività
       const { id: _, ...dbDataWithoutId } = dbData;
       
       console.log('[saveActivity] 🔵 Starting insert:', { 
         title: activity.title,
+        date: activity.date,
         type: activity.type,
         hasId: !!activity.id,
         id: activity.id,
-        insertDataKeys: Object.keys(dbDataWithoutId)
+        userId: user.id,
+        insertDataKeys: Object.keys(dbDataWithoutId),
+        insertData: dbDataWithoutId
       });
       
-      // Strategia: Usa sempre UUID generato (il DB potrebbe non avere default UUID)
-      // Questo evita problemi con database senza default UUID generator
+      // Strategia: Usa sempre UUID generato
       const generatedId = activity.id && !activity.id.startsWith('temp-') 
         ? activity.id 
         : crypto.randomUUID();
       
       console.log('[saveActivity] Using UUID for insert:', generatedId);
       
-      // Insert con UUID esplicito (più affidabile)
-      const { error: insertError } = await supabase
+      const insertPayload = { ...dbDataWithoutId, id: generatedId };
+      console.log('[saveActivity] Insert payload:', JSON.stringify(insertPayload, null, 2));
+      
+      // Insert con UUID esplicito
+      const { error: insertError, data: insertData } = await supabase
         .from('attività')
-        .insert({ ...dbDataWithoutId, id: generatedId });
+        .insert(insertPayload)
+        .select();
       
       if (insertError) {
         console.error('[saveActivity] ❌ Insert error:', insertError);
@@ -421,18 +449,41 @@ export async function saveActivity(
           message: insertError.message,
           code: insertError.code,
           details: insertError.details,
-          hint: insertError.hint
+          hint: insertError.hint,
+          insertPayload: insertPayload
         });
+        
+        // Se è un errore di constraint, fornisci più dettagli
+        if (insertError.code === '23505') {
+          throw new Error(`Unique constraint violation: ${insertError.details || insertError.message}`);
+        }
+        if (insertError.code === '23503') {
+          throw new Error(`Foreign key constraint violation: ${insertError.details || insertError.message}`);
+        }
+        if (insertError.code === '23502') {
+          throw new Error(`NOT NULL constraint violation: ${insertError.details || insertError.message}`);
+        }
+        if (insertError.code === 'PGRST116') {
+          throw new Error(`PostgREST error: Insert returned 0 rows. Possible causes: RLS policy blocking, constraint violation, or missing required fields. Details: ${insertError.details || insertError.message}`);
+        }
+        
         throw insertError;
       }
       
-      const insertedId = generatedId;
-
-      if (!insertedId) {
-        throw new Error('Failed to determine inserted record ID');
+      // Se insert restituisce dati, usali direttamente
+      if (insertData && insertData.length > 0) {
+        console.log('[saveActivity] ✅ Insert returned data directly:', insertData[0].id);
+        const inserted = insertData[0];
+        await logAction('create', 'attività', inserted.id, { title: activity.title })
+        return dbActivityToType(inserted as any);
       }
-
-      console.log('[saveActivity] Insert successful, fetching record with ID:', insertedId);
+      
+      // Se siamo qui, l'insert non ha restituito dati, proviamo fetch separato
+      const insertedId = generatedId;
+      console.log('[saveActivity] Insert completed without return data, fetching record with ID:', insertedId);
+      
+      // Aspetta un momento per assicurarsi che l'insert sia committato
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       // Fetch separato per evitare problemi RLS con SELECT dopo INSERT
       const { data: fetchedData, error: fetchError } = await supabase
@@ -443,12 +494,21 @@ export async function saveActivity(
 
       if (fetchError) {
         console.error('[saveActivity] ❌ Fetch error after insert:', fetchError);
-        throw new Error(`Insert succeeded but failed to fetch record: ${fetchError.message}`);
+        console.error('[saveActivity] Fetch error details:', {
+          message: fetchError.message,
+          code: fetchError.code,
+          details: fetchError.details,
+          hint: fetchError.hint,
+          insertedId: insertedId
+        });
+        throw new Error(`Insert succeeded but failed to fetch record: ${fetchError.message}. This might be an RLS policy issue.`);
       }
 
       if (!fetchedData) {
         console.error('[saveActivity] ❌ Record not found after insert - possible RLS issue');
-        throw new Error(`Insert succeeded but record with ID ${insertedId} not found. Check RLS policies.`);
+        console.error('[saveActivity] Attempted to fetch ID:', insertedId);
+        console.error('[saveActivity] User ID:', user.id);
+        throw new Error(`Insert succeeded but record with ID ${insertedId} not found. This is likely an RLS policy issue - check that SELECT policies allow reading newly inserted records.`);
       }
 
       const inserted = fetchedData;
