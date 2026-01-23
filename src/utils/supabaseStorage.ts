@@ -88,31 +88,54 @@ export async function saveCheese(cheese: Omit<CheeseType, "id" | "createdAt"> & 
     throw new Error('Supabase non configurato')
   }
   try {
+    // Verifica autenticazione prima di procedere
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      console.error('[saveCheese] ❌ Authentication error:', authError);
+      throw new Error(`User not authenticated. RLS policies require auth.uid() IS NOT NULL. Error: ${authError?.message || 'No user found'}`);
+    }
+    console.log('[saveCheese] ✅ User authenticated:', user.id);
+    
+    // Valida campi obbligatori
+    if (!cheese.name || cheese.name.trim() === '') {
+      throw new Error('Name is required (NOT NULL constraint)');
+    }
+    
     const dbData = typeCheeseToDb(cheese)
     
+    // Verifica che i dati convertiti siano validi
+    if (!dbData.name) {
+      console.error('[saveCheese] ❌ Invalid data after conversion:', dbData);
+      throw new Error('Invalid data: name missing after conversion');
+    }
+    
     if (!cheese.id || cheese.id.startsWith('temp-')) {
-      // Nuovo formaggio - Prova prima senza ID, se fallisce prova con ID
+      // Nuovo formaggio
       const { id: _, ...dbDataWithoutId } = dbData;
       
       console.log('[saveCheese] 🔵 Starting insert:', { 
         name: cheese.name,
         hasId: !!cheese.id,
         id: cheese.id,
+        userId: user.id,
         insertDataKeys: Object.keys(dbDataWithoutId)
       });
       
-      // Strategia: Usa sempre UUID generato (il DB potrebbe non avere default UUID)
-      // Questo evita problemi con database senza default UUID generator
+      // Strategia: Usa sempre UUID generato
       const generatedId = cheese.id && !cheese.id.startsWith('temp-') 
         ? cheese.id 
         : crypto.randomUUID();
       
       console.log('[saveCheese] Using UUID for insert:', generatedId);
       
-      // Insert con UUID esplicito (più affidabile)
-      const { error: insertError } = await supabase
+      const insertPayload = { ...dbDataWithoutId, id: generatedId };
+      console.log('[saveCheese] Insert payload:', JSON.stringify(insertPayload, null, 2));
+      
+      // Prova prima con select, poi fallback a fetch separato
+      const { error: insertError, data: insertData } = await supabase
         .from('formaggi')
-        .insert({ ...dbDataWithoutId, id: generatedId });
+        .insert(insertPayload)
+        .select();
       
       if (insertError) {
         console.error('[saveCheese] ❌ Insert error:', insertError);
@@ -120,20 +143,41 @@ export async function saveCheese(cheese: Omit<CheeseType, "id" | "createdAt"> & 
           message: insertError.message,
           code: insertError.code,
           details: insertError.details,
-          hint: insertError.hint
+          hint: insertError.hint,
+          insertPayload: insertPayload
         });
+        
+        // Gestisci errori specifici
+        if (insertError.code === '23505') {
+          throw new Error(`Unique constraint violation (name already exists): ${insertError.details || insertError.message}`);
+        }
+        if (insertError.code === '23503') {
+          throw new Error(`Foreign key constraint violation: ${insertError.details || insertError.message}`);
+        }
+        if (insertError.code === '23502') {
+          throw new Error(`NOT NULL constraint violation: ${insertError.details || insertError.message}`);
+        }
+        if (insertError.code === 'PGRST116') {
+          throw new Error(`PostgREST error: Insert returned 0 rows. Possible causes: RLS policy blocking, constraint violation, or missing required fields. Details: ${insertError.details || insertError.message}`);
+        }
+        
         throw insertError;
       }
       
-      const insertedId = generatedId;
-
-      if (!insertedId) {
-        throw new Error('Failed to determine inserted record ID');
+      // Se insert restituisce dati, usali direttamente
+      if (insertData && insertData.length > 0) {
+        console.log('[saveCheese] ✅ Insert returned data directly:', insertData[0].id);
+        const inserted = insertData[0];
+        await logAction('create', 'formaggio', inserted.id, { name: cheese.name })
+        return dbCheeseToType(inserted as any);
       }
-
-      console.log('[saveCheese] Insert successful, fetching record with ID:', insertedId);
       
-      // Fetch separato per evitare problemi RLS con SELECT dopo INSERT
+      // Fallback: fetch separato
+      const insertedId = generatedId;
+      console.log('[saveCheese] Insert completed without return data, fetching record with ID:', insertedId);
+      
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       const { data: fetchedData, error: fetchError } = await supabase
         .from('formaggi')
         .select('*')
@@ -142,16 +186,15 @@ export async function saveCheese(cheese: Omit<CheeseType, "id" | "createdAt"> & 
 
       if (fetchError) {
         console.error('[saveCheese] ❌ Fetch error after insert:', fetchError);
-        throw new Error(`Insert succeeded but failed to fetch record: ${fetchError.message}`);
+        throw new Error(`Insert succeeded but failed to fetch record: ${fetchError.message}. This might be an RLS policy issue.`);
       }
 
       if (!fetchedData) {
         console.error('[saveCheese] ❌ Record not found after insert - possible RLS issue');
-        throw new Error(`Insert succeeded but record with ID ${insertedId} not found. Check RLS policies.`);
+        throw new Error(`Insert succeeded but record with ID ${insertedId} not found. This is likely an RLS policy issue.`);
       }
 
       const inserted = fetchedData;
-
       console.log('[saveCheese] ✅ Cheese inserted and fetched successfully with ID:', inserted.id);
 
       await logAction('create', 'formaggio', inserted.id, { name: cheese.name })
