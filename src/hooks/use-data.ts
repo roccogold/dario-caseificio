@@ -241,10 +241,11 @@ export function useData() {
   // CHEESE TYPE OPERATIONS
   // ============================================
   const addCheeseType = useCallback(async (cheese: Omit<CheeseType, "id" | "createdAt">) => {
-    const newCheese: CheeseType = {
+    // ✅ NON generare l'ID per Supabase - lascia che lo generi il database
+    const newCheese = {
       ...cheese,
-      id: generateUUID(), // Usa UUID valido per il database
       createdAt: new Date(),
+      // ❌ RIMOSSO: id: generateUUID(),
     };
 
     // In produzione, FORZA l'uso di Supabase
@@ -268,25 +269,23 @@ export function useData() {
           throw new Error('Supabase client non inizializzato');
         }
         
-        const saved = await saveCheese(newCheese);
+        const saved = await saveCheese(newCheese); // Supabase genererà l'UUID
         console.log('[addCheeseType] ✅ Successfully saved to Supabase:', saved.id);
         
-        // Verifica che il formaggio sia stato effettivamente salvato
-        const verify = await loadCheeses();
-        const found = verify.find(c => c.id === saved.id);
-        if (!found) {
-          console.error('[addCheeseType] ❌ WARNING: Formaggio salvato ma non trovato nel DB!');
-          toast.error('⚠️ Formaggio salvato ma verifica fallita. Ricarica la pagina.');
-        }
+        // ❌ RIMOSSO: setCheeseTypes((prev) => [...prev, saved]);
+        // La real-time subscription aggiungerà automaticamente il formaggio
         
-        setCheeseTypes((prev) => [...prev, saved]);
         return saved;
       } else {
-        // Solo in sviluppo locale
+        // Solo in sviluppo locale - qui genera l'ID
+        const cheeseWithId = {
+          ...newCheese,
+          id: generateUUID(),
+        } as CheeseType;
         console.log('[addCheeseType] Using localStorage (development mode)');
-        localCheeses.add(newCheese);
-        setCheeseTypes((prev) => [...prev, newCheese]);
-        return newCheese;
+        localCheeses.add(cheeseWithId);
+        setCheeseTypes((prev) => [...prev, cheeseWithId]);
+        return cheeseWithId;
       }
     } catch (error: any) {
       console.error('[addCheeseType] ❌ Error saving cheese:', error);
@@ -305,10 +304,14 @@ export function useData() {
         throw error; // Rilancia l'errore per impedire il salvataggio
       } else {
         // Solo in sviluppo, fallback a localStorage
+        const cheeseWithId = {
+          ...newCheese,
+          id: generateUUID(),
+        } as CheeseType;
         toast.error(`Errore nel salvataggio su database: ${errorMessage}. Salvato in locale come fallback.`);
-        localCheeses.add(newCheese);
-        setCheeseTypes((prev) => [...prev, newCheese]);
-        return newCheese;
+        localCheeses.add(cheeseWithId);
+        setCheeseTypes((prev) => [...prev, cheeseWithId]);
+        return cheeseWithId;
       }
     }
   }, [useSupabase]);
@@ -352,7 +355,7 @@ export function useData() {
           // Ricrea le attività di protocollo con il nuovo protocollo
           const productionCheese = production.cheeses.find(c => c.cheeseTypeId === id);
           if (productionCheese && updates.protocol && updates.protocol.length > 0) {
-            const newProtocolActivities: Activity[] = [];
+            const newProtocolActivities: Omit<Activity, "id" | "createdAt">[] = [];
             const productionDate = new Date(production.date);
             productionDate.setHours(0, 0, 0, 0);
 
@@ -363,8 +366,10 @@ export function useData() {
               const activityTitle = protocolStep.activity;
               const activityDescription = `Lotto: ${production.productionNumber} | ${productionCheese.liters}L`;
 
-              const protocolActivity: Activity = {
-                id: generateUUID(), // Usa UUID valido per il database
+              // ✅ NON includere id e createdAt - saveActivity li gestirà
+              const protocolActivity: Omit<Activity, "id" | "createdAt"> = {
+                // ❌ RIMOSSO: id: generateUUID(),
+                // ❌ RIMOSSO: createdAt: new Date(),
                 title: activityTitle,
                 description: activityDescription,
                 date: activityDate,
@@ -372,7 +377,6 @@ export function useData() {
                 productionId: production.id,
                 cheeseTypeId: id,
                 completed: false,
-                createdAt: new Date(),
               };
 
               newProtocolActivities.push(protocolActivity);
@@ -383,17 +387,26 @@ export function useData() {
               try {
                 if (useSupabase) {
                   const savedActivity = await saveActivity(protocolActivity);
-                  setActivities((prev) => {
-                    const exists = prev.some(a => a.id === savedActivity.id);
-                    if (exists) return prev;
-                    return [...prev, savedActivity];
-                  });
+                  console.log('[updateCheeseType] ✅ Protocol activity created:', savedActivity.title);
+                  
+                  // ❌ RIMOSSO: setActivities - la subscription lo fa automaticamente
+                  // setActivities((prev) => {
+                  //   const exists = prev.some(a => a.id === savedActivity.id);
+                  //   if (exists) return prev;
+                  //   return [...prev, savedActivity];
+                  // });
                 } else {
-                  localActivities.add(protocolActivity);
+                  // Solo localStorage - qui genera l'ID
+                  const activityWithId = {
+                    ...protocolActivity,
+                    id: generateUUID(),
+                    createdAt: new Date(),
+                  } as Activity;
+                  localActivities.add(activityWithId);
                   setActivities((prev) => {
-                    const exists = prev.some(a => a.id === protocolActivity.id);
+                    const exists = prev.some(a => a.id === activityWithId.id);
                     if (exists) return prev;
-                    return [...prev, protocolActivity];
+                    return [...prev, activityWithId];
                   });
                 }
               } catch (error) {
@@ -488,30 +501,42 @@ export function useData() {
   // ============================================
   const addProduction = useCallback(async (production: Omit<Production, "id" | "createdAt" | "totalLiters">) => {
     const totalLiters = production.cheeses.reduce((sum, c) => sum + c.liters, 0);
-    const newProduction: Production = {
+    
+    // ✅ NON generare l'ID per Supabase - lascia che lo generi il database
+    const newProduction = {
       ...production,
-      id: generateUUID(), // Usa UUID valido per il database
       totalLiters,
       createdAt: new Date(),
+      // ❌ RIMOSSO: id: generateUUID(),
     };
 
     try {
       let savedProduction: Production;
       if (useSupabase) {
-        console.log('[addProduction] Attempting to save to Supabase:', { productionNumber: newProduction.productionNumber, totalLiters: newProduction.totalLiters });
-        savedProduction = await saveProduction(newProduction);
+        console.log('[addProduction] Attempting to save to Supabase:', { 
+          productionNumber: newProduction.productionNumber, 
+          totalLiters: newProduction.totalLiters 
+        });
+        
+        savedProduction = await saveProduction(newProduction); // Supabase genererà l'UUID
         console.log('[addProduction] ✅ Successfully saved to Supabase:', savedProduction.id);
-        setProductions((prev) => [...prev, savedProduction]);
+        
+        // ❌ RIMOSSO: setProductions((prev) => [...prev, savedProduction]);
+        // La real-time subscription aggiungerà automaticamente la produzione
       } else {
-        // Solo in sviluppo locale
+        // Solo in sviluppo locale - qui genera l'ID
+        const productionWithId = {
+          ...newProduction,
+          id: generateUUID(),
+        } as Production;
         console.log('[addProduction] Using localStorage (development mode)');
-        localProductions.add(newProduction);
-        setProductions((prev) => [...prev, newProduction]);
-        savedProduction = newProduction;
+        localProductions.add(productionWithId);
+        setProductions((prev) => [...prev, productionWithId]);
+        savedProduction = productionWithId;
       }
 
       // Genera automaticamente le attività del protocollo per ogni formaggio
-      const protocolActivities: Activity[] = [];
+      const protocolActivities: Omit<Activity, "id" | "createdAt">[] = [];
       
       for (const productionCheese of production.cheeses) {
         const cheeseType = cheeseTypes.find(ct => ct.id === productionCheese.cheeseTypeId);
@@ -521,21 +546,19 @@ export function useData() {
 
         // Crea un'attività per ogni step del protocollo
         for (const protocolStep of cheeseType.protocol) {
-          // Calcola la data dell'attività: data produzione + giorni del protocollo
           const productionDate = new Date(production.date);
-          // Normalizza la data della produzione a mezzanotte
           productionDate.setHours(0, 0, 0, 0);
           
           const activityDate = addDays(productionDate, protocolStep.day);
-          
-          // Normalizza la data dell'attività a mezzanotte per il confronto corretto
           activityDate.setHours(0, 0, 0, 0);
           
           const activityTitle = protocolStep.activity;
           const activityDescription = `Lotto: ${production.productionNumber} | ${productionCheese.liters}L`;
 
-          const protocolActivity: Activity = {
-            id: generateUUID(), // Usa UUID valido per il database
+          // ✅ NON includere id e createdAt - saveActivity li gestirà
+          const protocolActivity: Omit<Activity, "id" | "createdAt"> = {
+            // ❌ RIMOSSO: id: generateUUID(),
+            // ❌ RIMOSSO: createdAt: new Date(),
             title: activityTitle,
             description: activityDescription,
             date: activityDate,
@@ -543,7 +566,6 @@ export function useData() {
             productionId: savedProduction.id,
             cheeseTypeId: cheeseType.id,
             completed: false,
-            createdAt: new Date(),
           };
 
           protocolActivities.push(protocolActivity);
@@ -555,27 +577,34 @@ export function useData() {
         try {
           if (useSupabase) {
             const savedActivity = await saveActivity(protocolActivity);
-            setActivities((prev) => {
-              // Evita duplicati
-              const exists = prev.some(a => a.id === savedActivity.id);
-              if (exists) return prev;
-              return [...prev, savedActivity];
-            });
+            console.log('[addProduction] ✅ Protocol activity created:', savedActivity.title, 'on', format(savedActivity.date, 'yyyy-MM-dd'));
+            
+            // ❌ RIMOSSO: setActivities - la subscription lo fa automaticamente
+            // setActivities((prev) => {
+            //   const exists = prev.some(a => a.id === savedActivity.id);
+            //   if (exists) return prev;
+            //   return [...prev, savedActivity];
+            // });
           } else {
-            localActivities.add(protocolActivity);
+            // Solo localStorage - qui genera l'ID
+            const activityWithId = {
+              ...protocolActivity,
+              id: generateUUID(),
+              createdAt: new Date(),
+            } as Activity;
+            localActivities.add(activityWithId);
             setActivities((prev) => {
-              // Evita duplicati
-              const exists = prev.some(a => a.id === protocolActivity.id);
+              const exists = prev.some(a => a.id === activityWithId.id);
               if (exists) return prev;
-              return [...prev, protocolActivity];
+              return [...prev, activityWithId];
             });
+            console.log('[addProduction] ✅ Protocol activity created:', activityWithId.title, 'on', format(activityWithId.date, 'yyyy-MM-dd'));
           }
-          console.log('[addProduction] ✅ Protocol activity created:', protocolActivity.title, 'on', format(protocolActivity.date, 'yyyy-MM-dd'));
         } catch (error: any) {
           console.error('[addProduction] ❌ Error creating protocol activity:', error, protocolActivity);
           if (isProduction) {
             toast.error(`Errore nel salvataggio dell'attività del protocollo: ${protocolActivity.title}`);
-            throw error; // In produzione, non continuare se c'è un errore
+            throw error;
           }
           // In sviluppo, continua anche se c'è un errore
         }
@@ -592,10 +621,14 @@ export function useData() {
         throw error; // Rilancia l'errore per impedire il salvataggio
       } else {
         // Solo in sviluppo, fallback a localStorage
+        const productionWithId = {
+          ...newProduction,
+          id: generateUUID(),
+        } as Production;
         toast.error('Errore nel salvataggio della produzione. Salvato in locale come fallback.');
-        localProductions.add(newProduction);
-        setProductions((prev) => [...prev, newProduction]);
-        return newProduction;
+        localProductions.add(productionWithId);
+        setProductions((prev) => [...prev, productionWithId]);
+        return productionWithId;
       }
     }
   }, [useSupabase, cheeseTypes]);
