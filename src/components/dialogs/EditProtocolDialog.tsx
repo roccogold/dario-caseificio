@@ -98,7 +98,7 @@ export function EditProtocolDialog({
                 variant="ghost"
                 size="sm"
                 onClick={addProtocolStep}
-                className="h-8 gap-1 text-sm"
+                className="h-10 gap-1.5 text-sm"
               >
                 <Plus className="h-3 w-3" />
                 Aggiungi Fase

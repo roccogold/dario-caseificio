@@ -95,6 +95,7 @@ export default function Formaggi() {
           onOpenChange={setIsAddDialogOpen}
           onAdd={addCheeseType}
           existingNames={cheeseTypes.map((c) => c.name.toLowerCase())}
+          existingColors={cheeseTypes.map((c) => c.color)}
         />
 
         {/* Edit Cheese Dialog */}
@@ -107,6 +108,7 @@ export default function Formaggi() {
             setIsEditDialogOpen(false);
           }}
           existingNames={cheeseTypes.map((c) => c.name.toLowerCase())}
+          existingColors={cheeseTypes.map((c) => c.color)}
         />
 
         {/* Edit Protocol Dialog */}
@@ -173,7 +175,7 @@ export default function Formaggi() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 opacity-0 group-hover:opacity-100"
+                            className="h-10 w-10 opacity-0 group-hover:opacity-100"
                           >
                             <MoreVertical className="h-4 w-4" />
                           </Button>

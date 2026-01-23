@@ -27,8 +27,8 @@ interface EditCheeseDialogProps {
   onUpdate: (id: string, updates: {
     name: string;
     color: string;
-    yieldPercentage: number;
-    prices: {
+    yieldPercentage?: number;
+    prices?: {
       price1: number;
       price2: number;
       price3: number;
@@ -41,6 +41,7 @@ interface EditCheeseDialogProps {
     protocol: ProtocolStep[];
   }) => void;
   existingNames?: string[];
+  existingColors?: string[];
 }
 
 export function EditCheeseDialog({
@@ -49,16 +50,17 @@ export function EditCheeseDialog({
   cheese,
   onUpdate,
   existingNames = [],
+  existingColors = [],
 }: EditCheeseDialogProps) {
   const [name, setName] = useState("");
   const [color, setColor] = useState(CHEESE_COLORS[0].value);
   const [yieldPercentage, setYieldPercentage] = useState("");
   const [price1, setPrice1] = useState("");
-  const [price2, setPrice2] = useState("0");
-  const [price3, setPrice3] = useState("0");
-  const [salesPercentage1, setSalesPercentage1] = useState("100");
-  const [salesPercentage2, setSalesPercentage2] = useState("0");
-  const [salesPercentage3, setSalesPercentage3] = useState("0");
+  const [price2, setPrice2] = useState("");
+  const [price3, setPrice3] = useState("");
+  const [salesPercentage1, setSalesPercentage1] = useState("");
+  const [salesPercentage2, setSalesPercentage2] = useState("");
+  const [salesPercentage3, setSalesPercentage3] = useState("");
   const [temperaturaCoagulazione, setTemperaturaCoagulazione] = useState("");
   const [nomeFermento, setNomeFermento] = useState("");
   const [quantitaFermento, setQuantitaFermento] = useState("");
@@ -68,7 +70,7 @@ export function EditCheeseDialog({
   const [quantitaCaglio, setQuantitaCaglio] = useState("");
   const [customFields, setCustomFields] = useState<CustomField[]>([]);
   const [protocol, setProtocol] = useState<ProtocolStep[]>([
-    { day: 1, activity: "Salatura" },
+    { day: 0, activity: "" },
   ]);
 
   useEffect(() => {
@@ -86,26 +88,26 @@ export function EditCheeseDialog({
       }
       // Support legacy pricePerKg or new prices
       if (cheese.prices) {
-        setPrice1(cheese.prices.price1.toString());
-        setPrice2(cheese.prices.price2.toString());
-        setPrice3(cheese.prices.price3.toString());
-        setSalesPercentage1(cheese.prices.salesPercentage1.toString());
-        setSalesPercentage2(cheese.prices.salesPercentage2.toString());
-        setSalesPercentage3(cheese.prices.salesPercentage3.toString());
+        setPrice1(cheese.prices.price1 > 0 ? cheese.prices.price1.toString() : "");
+        setPrice2(cheese.prices.price2 > 0 ? cheese.prices.price2.toString() : "");
+        setPrice3(cheese.prices.price3 > 0 ? cheese.prices.price3.toString() : "");
+        setSalesPercentage1(cheese.prices.salesPercentage1 > 0 ? cheese.prices.salesPercentage1.toString() : "");
+        setSalesPercentage2(cheese.prices.salesPercentage2 > 0 ? cheese.prices.salesPercentage2.toString() : "");
+        setSalesPercentage3(cheese.prices.salesPercentage3 > 0 ? cheese.prices.salesPercentage3.toString() : "");
       } else if (cheese.pricePerKg !== undefined) {
         setPrice1(cheese.pricePerKg.toString());
-        setPrice2("0");
-        setPrice3("0");
-        setSalesPercentage1("100");
-        setSalesPercentage2("0");
-        setSalesPercentage3("0");
+        setPrice2("");
+        setPrice3("");
+        setSalesPercentage1("");
+        setSalesPercentage2("");
+        setSalesPercentage3("");
       } else {
         setPrice1("");
-        setPrice2("0");
-        setPrice3("0");
-        setSalesPercentage1("100");
-        setSalesPercentage2("0");
-        setSalesPercentage3("0");
+        setPrice2("");
+        setPrice3("");
+        setSalesPercentage1("");
+        setSalesPercentage2("");
+        setSalesPercentage3("");
       }
       setTemperaturaCoagulazione(cheese.defaultFields?.temperaturaCoagulazione || "");
       setNomeFermento(cheese.defaultFields?.nomeFermento || "");
@@ -115,7 +117,7 @@ export function EditCheeseDialog({
       setCaglio(cheese.defaultFields?.caglio || "");
       setQuantitaCaglio(cheese.defaultFields?.quantitaCaglio || "");
       setCustomFields(cheese.customFields || []);
-      setProtocol(cheese.protocol.length > 0 ? cheese.protocol : [{ day: 1, activity: "Salatura" }]);
+      setProtocol(cheese.protocol.length > 0 ? cheese.protocol : [{ day: 0, activity: "" }]);
     }
   }, [cheese, open]);
 
@@ -136,34 +138,49 @@ export function EditCheeseDialog({
       return;
     }
 
-    const yieldValue = parseFloat(yieldPercentage);
-    const price1Value = parseFloat(price1);
-    const price2Value = parseFloat(price2);
-    const price3Value = parseFloat(price3);
-    const salesPct1 = parseFloat(salesPercentage1);
-    const salesPct2 = parseFloat(salesPercentage2);
-    const salesPct3 = parseFloat(salesPercentage3);
-
-    if (isNaN(yieldValue) || yieldValue <= 0 || yieldValue > 100) {
-      toast.error("Inserisci una resa valida (0-100%)");
+    const otherColors = existingColors.filter(c => c !== cheese.color);
+    if (otherColors.includes(color)) {
+      toast.error("Esiste già un formaggio con questo colore");
       return;
     }
 
-    if (isNaN(price1Value) || price1Value <= 0) {
-      toast.error("Inserisci un prezzo 1 valido");
-      return;
+    // Resa is optional - validate only if provided
+    const yieldValue = yieldPercentage ? parseFloat(yieldPercentage) : undefined;
+    if (yieldValue !== undefined) {
+      if (isNaN(yieldValue) || yieldValue <= 0 || yieldValue > 100) {
+        toast.error("Inserisci una resa valida (0-100%)");
+        return;
+      }
     }
 
-    // Validate sales percentages sum to 100
-    const totalSalesPct = salesPct1 + salesPct2 + salesPct3;
-    if (Math.abs(totalSalesPct - 100) > 0.01) {
-      toast.error(`La somma delle percentuali di vendita deve essere 100% (attuale: ${totalSalesPct.toFixed(1)}%)`);
-      return;
-    }
+    // Prices are optional - validate only if at least one price is provided
+    const price1Value = price1 ? parseFloat(price1) : 0;
+    const price2Value = price2 ? parseFloat(price2) : 0;
+    const price3Value = price3 ? parseFloat(price3) : 0;
+    const salesPct1 = salesPercentage1 ? parseFloat(salesPercentage1) : 0;
+    const salesPct2 = salesPercentage2 ? parseFloat(salesPercentage2) : 0;
+    const salesPct3 = salesPercentage3 ? parseFloat(salesPercentage3) : 0;
 
-    if (salesPct1 < 0 || salesPct2 < 0 || salesPct3 < 0 || salesPct1 > 100 || salesPct2 > 100 || salesPct3 > 100) {
-      toast.error("Le percentuali di vendita devono essere tra 0% e 100%");
-      return;
+    const hasAnyPrice = price1Value > 0 || price2Value > 0 || price3Value > 0;
+    
+    if (hasAnyPrice) {
+      // If any price is provided, validate sales percentages sum to 100
+      const totalSalesPct = salesPct1 + salesPct2 + salesPct3;
+      if (Math.abs(totalSalesPct - 100) > 0.01) {
+        toast.error(`La somma delle percentuali di vendita deve essere 100% (attuale: ${totalSalesPct.toFixed(1)}%)`);
+        return;
+      }
+
+      if (salesPct1 < 0 || salesPct2 < 0 || salesPct3 < 0 || salesPct1 > 100 || salesPct2 > 100 || salesPct3 > 100) {
+        toast.error("Le percentuali di vendita devono essere tra 0% e 100%");
+        return;
+      }
+
+      // At least one price must be valid
+      if (price1Value <= 0 && price2Value <= 0 && price3Value <= 0) {
+        toast.error("Inserisci almeno un prezzo valido");
+        return;
+      }
     }
 
     // Ordina il protocollo per giorno prima di salvare
@@ -173,15 +190,17 @@ export function EditCheeseDialog({
     onUpdate(cheese.id, {
       name: name.trim(),
       color,
-      yieldPercentage: yieldValue,
-      prices: {
-        price1: price1Value,
-        price2: price2Value || 0,
-        price3: price3Value || 0,
-        salesPercentage1: salesPct1,
-        salesPercentage2: salesPct2 || 0,
-        salesPercentage3: salesPct3 || 0,
-      },
+      ...(yieldValue !== undefined && { yieldPercentage: yieldValue }),
+      ...(hasAnyPrice && {
+        prices: {
+          price1: price1Value || 0,
+          price2: price2Value || 0,
+          price3: price3Value || 0,
+          salesPercentage1: salesPct1 || 0,
+          salesPercentage2: salesPct2 || 0,
+          salesPercentage3: salesPct3 || 0,
+        },
+      }),
       defaultFields: {
         temperaturaCoagulazione: temperaturaCoagulazione.trim() || undefined,
         nomeFermento: nomeFermento.trim() || undefined,
@@ -245,7 +264,7 @@ export function EditCheeseDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form key={open ? "form-open" : "form-closed"} onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
           {/* Nome */}
           <div className="space-y-2">
             <Label htmlFor="name">Nome Formaggio</Label>
@@ -266,7 +285,7 @@ export function EditCheeseDialog({
                   key={c.value}
                   type="button"
                   onClick={() => setColor(c.value)}
-                  className={`h-8 w-8 rounded-full border-2 transition-all ${
+                  className={`h-10 w-10 rounded-full border-2 transition-all ${
                     color === c.value
                       ? "border-primary scale-110"
                       : "border-transparent hover:scale-105"
@@ -282,13 +301,19 @@ export function EditCheeseDialog({
           <div className="space-y-2">
             <Label htmlFor="yield">Resa (%)</Label>
             <Input
+              key={`yield-${open}`}
               id="yield"
-              type="number"
-              step="0.1"
-              min="0"
-              max="100"
+              type="text"
+              inputMode="decimal"
+              pattern="[0-9]*\.?[0-9]*"
+              autoComplete="off"
               value={yieldPercentage}
-              onChange={(e) => setYieldPercentage(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === "" || /^\d*\.?\d*$/.test(val)) {
+                  setYieldPercentage(val);
+                }
+              }}
               placeholder="es. 20 (20kg da 100L)"
             />
             <p className="text-xs text-muted-foreground">
@@ -308,29 +333,40 @@ export function EditCheeseDialog({
                 <div className="space-y-2">
                   <Label htmlFor="price1" className="text-xs">Prezzo Franco Caseificio (€/kg)</Label>
                   <Input
+                    key={`price1-${open}`}
                     id="price1"
-                    type="number"
-                    step="0.50"
-                    min="0"
+                    type="text"
+                    inputMode="decimal"
+                    pattern="[0-9]*\.?[0-9]*"
+                    autoComplete="off"
                     value={price1}
-                    onChange={(e) => setPrice1(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "" || /^\d*\.?\d*$/.test(val)) {
+                        setPrice1(val);
+                      }
+                    }}
                     placeholder="es. 12"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="salesPct1" className="text-xs">% di vendita</Label>
                   <Input
+                    key={`salesPct1-${open}`}
                     id="salesPct1"
-                    type="number"
-                    step="1"
-                    min="0"
-                    max="100"
+                    type="text"
+                    inputMode="decimal"
+                    pattern="[0-9]*\.?[0-9]*"
+                    autoComplete="off"
                     value={salesPercentage1}
                     onChange={(e) => {
-                      const val = parseFloat(e.target.value) || 0;
-                      const remaining = 100 - val - (parseFloat(salesPercentage2) || 0) - (parseFloat(salesPercentage3) || 0);
-                      if (remaining >= 0) {
-                        setSalesPercentage1(e.target.value);
+                      const val = e.target.value;
+                      if (val === "" || /^\d*\.?\d*$/.test(val)) {
+                        const numVal = parseFloat(val) || 0;
+                        const remaining = 100 - numVal - (parseFloat(salesPercentage2) || 0) - (parseFloat(salesPercentage3) || 0);
+                        if (remaining >= 0 || val === "") {
+                          setSalesPercentage1(val);
+                        }
                       }
                     }}
                     placeholder="es. 25%"
@@ -342,29 +378,40 @@ export function EditCheeseDialog({
                 <div className="space-y-2">
                   <Label htmlFor="price2" className="text-xs">Prezzo Franco Cliente (€/kg)</Label>
                   <Input
+                    key={`price2-${open}`}
                     id="price2"
-                    type="number"
-                    step="0.50"
-                    min="0"
+                    type="text"
+                    inputMode="decimal"
+                    pattern="[0-9]*\.?[0-9]*"
+                    autoComplete="off"
                     value={price2}
-                    onChange={(e) => setPrice2(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "" || /^\d*\.?\d*$/.test(val)) {
+                        setPrice2(val);
+                      }
+                    }}
                     placeholder="es. 12"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="salesPct2" className="text-xs">% di vendita</Label>
                   <Input
+                    key={`salesPct2-${open}`}
                     id="salesPct2"
-                    type="number"
-                    step="1"
-                    min="0"
-                    max="100"
+                    type="text"
+                    inputMode="decimal"
+                    pattern="[0-9]*\.?[0-9]*"
+                    autoComplete="off"
                     value={salesPercentage2}
                     onChange={(e) => {
-                      const val = parseFloat(e.target.value) || 0;
-                      const remaining = 100 - val - (parseFloat(salesPercentage1) || 0) - (parseFloat(salesPercentage3) || 0);
-                      if (remaining >= 0) {
-                        setSalesPercentage2(e.target.value);
+                      const val = e.target.value;
+                      if (val === "" || /^\d*\.?\d*$/.test(val)) {
+                        const numVal = parseFloat(val) || 0;
+                        const remaining = 100 - numVal - (parseFloat(salesPercentage1) || 0) - (parseFloat(salesPercentage3) || 0);
+                        if (remaining >= 0 || val === "") {
+                          setSalesPercentage2(val);
+                        }
                       }
                     }}
                     placeholder="es. 25%"
@@ -376,29 +423,40 @@ export function EditCheeseDialog({
                 <div className="space-y-2">
                   <Label htmlFor="price3" className="text-xs">Prezzo Vendita Diretta (€/kg)</Label>
                   <Input
+                    key={`price3-${open}`}
                     id="price3"
-                    type="number"
-                    step="0.50"
-                    min="0"
+                    type="text"
+                    inputMode="decimal"
+                    pattern="[0-9]*\.?[0-9]*"
+                    autoComplete="off"
                     value={price3}
-                    onChange={(e) => setPrice3(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "" || /^\d*\.?\d*$/.test(val)) {
+                        setPrice3(val);
+                      }
+                    }}
                     placeholder="es. 12"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="salesPct3" className="text-xs">% di vendita</Label>
                   <Input
+                    key={`salesPct3-${open}`}
                     id="salesPct3"
-                    type="number"
-                    step="1"
-                    min="0"
-                    max="100"
+                    type="text"
+                    inputMode="decimal"
+                    pattern="[0-9]*\.?[0-9]*"
+                    autoComplete="off"
                     value={salesPercentage3}
                     onChange={(e) => {
-                      const val = parseFloat(e.target.value) || 0;
-                      const remaining = 100 - val - (parseFloat(salesPercentage1) || 0) - (parseFloat(salesPercentage2) || 0);
-                      if (remaining >= 0) {
-                        setSalesPercentage3(e.target.value);
+                      const val = e.target.value;
+                      if (val === "" || /^\d*\.?\d*$/.test(val)) {
+                        const numVal = parseFloat(val) || 0;
+                        const remaining = 100 - numVal - (parseFloat(salesPercentage1) || 0) - (parseFloat(salesPercentage2) || 0);
+                        if (remaining >= 0 || val === "") {
+                          setSalesPercentage3(val);
+                        }
                       }
                     }}
                     placeholder="es. 25%"
@@ -509,7 +567,7 @@ export function EditCheeseDialog({
                 variant="ghost"
                 size="sm"
                 onClick={addCustomField}
-                className="h-8 gap-1 text-sm"
+                    className="h-10 gap-1.5 text-sm"
               >
                 <Plus className="h-3 w-3" />
                 Aggiungi Campo
@@ -563,7 +621,7 @@ export function EditCheeseDialog({
                 variant="ghost"
                 size="sm"
                 onClick={addProtocolStep}
-                className="h-8 gap-1 text-sm"
+                    className="h-10 gap-1.5 text-sm"
               >
                 <Plus className="h-3 w-3" />
                 Aggiungi Fase
@@ -578,20 +636,27 @@ export function EditCheeseDialog({
                   <div className="flex flex-col gap-1.5 w-12 flex-shrink-0">
                     <Label className="text-xs font-medium text-foreground">Giorno</Label>
                     <Input
-                      type="number"
-                      min="0"
-                      className="w-12 h-10 text-sm font-medium text-center bg-background border-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      value={step.day}
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      autoComplete="off"
+                      className="w-12 h-10 text-sm font-medium text-center bg-background border-border"
+                      value={step.day === 0 ? "" : step.day}
                       onChange={(e) => {
-                        const newDay = parseInt(e.target.value) || 0;
-                        updateProtocolStep(originalIndex, "day", newDay);
+                        const val = e.target.value;
+                        if (val === "" || /^\d+$/.test(val)) {
+                          const newDay = val === "" ? 0 : parseInt(val) || 0;
+                          updateProtocolStep(originalIndex, "day", newDay);
+                        }
                       }}
+                      placeholder="0"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5 flex-1 min-w-0">
                     <Label className="text-xs font-medium text-foreground">Attività</Label>
                     <Input
                       className="h-10 bg-background border-border text-sm"
+                      autoComplete="off"
                       placeholder="Descrivi l'attività..."
                       value={step.activity}
                       onChange={(e) => {

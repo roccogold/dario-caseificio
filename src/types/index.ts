@@ -17,8 +17,8 @@ export interface CheeseType {
   id: string;
   name: string;
   color: string;
-  yieldPercentage: number; // % resa (es. 20% = 20kg da 100L)
-  prices: {
+  yieldPercentage?: number; // % resa (es. 20% = 20kg da 100L) - optional
+  prices?: {
     price1: number; // €/kg
     price2: number; // €/kg
     price3: number; // €/kg

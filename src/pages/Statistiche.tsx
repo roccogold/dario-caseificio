@@ -276,7 +276,7 @@ export default function Statistiche() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8"
+                className="h-10 w-10"
                 onClick={() => setSelectedYear((y) => y - 1)}
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -287,7 +287,7 @@ export default function Statistiche() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8"
+                className="h-10 w-10"
                 onClick={() => setSelectedYear((y) => y + 1)}
                 disabled={selectedYear >= new Date().getFullYear()}
               >

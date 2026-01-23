@@ -181,7 +181,7 @@ export function EditProductionDialog({
                 variant="ghost"
                 size="sm"
                 onClick={addCheeseEntry}
-                className="h-8 gap-1 text-xs"
+                className="h-10 gap-1.5 text-sm"
               >
                 <Plus className="h-3 w-3" />
                 Aggiungi
@@ -229,7 +229,7 @@ export function EditProductionDialog({
                       variant="ghost"
                       size="icon"
                       onClick={() => removeCheeseEntry(index)}
-                      className="h-8 w-8 text-destructive"
+                      className="h-10 w-10 text-destructive"
                       disabled={cheeses.length === 1}
                     >
                       <Trash2 className="h-4 w-4" />

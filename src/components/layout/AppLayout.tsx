@@ -59,7 +59,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className="min-h-screen bg-background">
       {/* Desktop Sidebar */}
-      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r border-border bg-sidebar lg:block">
+      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r border-border bg-sidebar md:block">
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-32 items-start border-b border-sidebar-border px-6 pt-8">
@@ -132,7 +132,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       </aside>
 
       {/* Mobile Header */}
-      <header className="fixed left-0 right-0 top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:hidden">
+      <header className="fixed left-0 right-0 top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 md:hidden">
         <div className="flex h-16 items-center justify-between px-4">
           <Link to="/calendario" className="flex items-center gap-2">
             <img 
@@ -174,7 +174,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm md:hidden"
               onClick={() => setMobileMenuOpen(false)}
             />
             <motion.nav
@@ -182,7 +182,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="fixed right-0 top-16 z-50 h-[calc(100vh-4rem)] w-64 border-l border-border bg-background p-4 lg:hidden"
+              className="fixed right-0 top-16 z-50 h-[calc(100vh-4rem)] w-64 border-l border-border bg-background p-4 md:hidden"
             >
               <div className="flex flex-col h-full">
                 <div className="flex-1 space-y-1">
@@ -227,8 +227,8 @@ export function AppLayout({ children }: AppLayoutProps) {
       </AnimatePresence>
 
       {/* Main Content */}
-      <main className="min-h-screen pt-16 lg:ml-64 lg:pt-0">
-        <div className="p-4 lg:p-8">{children}</div>
+      <main className="min-h-screen pt-16 md:ml-64 md:pt-0">
+        <div className="p-4 md:p-8">{children}</div>
       </main>
     </div>
   );
