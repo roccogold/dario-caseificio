@@ -34,8 +34,20 @@ export function AppLayout({ children }: AppLayoutProps) {
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-24 items-center border-b border-sidebar-border px-6">
-            <Link to="/calendario" className="w-full">
-              {/* Branding area - ready for new design */}
+            <Link to="/calendario" className="flex items-center gap-3 w-full">
+              <img 
+                src="/frog-logo.svg" 
+                alt="Dario Frog" 
+                className="h-12 w-12 flex-shrink-0"
+              />
+              <div className="flex flex-col">
+                <span className="font-serif text-xl font-semibold tracking-widest text-primary uppercase">
+                  DARIO
+                </span>
+                <span className="text-[10px] text-muted-foreground tracking-wide">
+                  Corzano e Paterno
+                </span>
+              </div>
             </Link>
           </div>
 
@@ -71,8 +83,15 @@ export function AppLayout({ children }: AppLayoutProps) {
       {/* Mobile Header */}
       <header className="fixed left-0 right-0 top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:hidden">
         <div className="flex h-16 items-center justify-between px-4">
-          <Link to="/calendario" className="flex items-center">
-            {/* Branding area - ready for new design */}
+          <Link to="/calendario" className="flex items-center gap-2">
+            <img 
+              src="/frog-logo.svg" 
+              alt="Dario Frog" 
+              className="h-8 w-8"
+            />
+            <span className="font-serif text-lg font-semibold tracking-widest text-primary uppercase">
+              DARIO
+            </span>
           </Link>
 
           <button

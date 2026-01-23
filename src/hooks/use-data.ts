@@ -211,7 +211,7 @@ export function useData() {
   const deleteCheeseType = useCallback(async (id: string) => {
     try {
       if (useSupabase) {
-        await deleteCheese(id);
+        await deleteCheeseFromSupabase(id);
         setCheeseTypes((prev) => prev.filter((c) => c.id !== id));
       } else {
         localCheeses.delete(id);
@@ -461,7 +461,9 @@ export function useData() {
       try {
         if (useSupabase) {
           // Per Supabase, aggiorna l'attività con completedDates
-          const updated = await updateActivity(id, { completedDates: newCompletedDates });
+          const current = activities.find(a => a.id === id);
+          if (!current) return;
+          const updated = await saveActivity({ ...current, completedDates: newCompletedDates, id });
           setActivities((prev) =>
             prev.map((a) => (a.id === id ? updated : a))
           );
