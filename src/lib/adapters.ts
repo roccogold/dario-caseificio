@@ -32,7 +32,7 @@ interface DbActivity {
   title: string;
   description: string | null;
   type: 'protocol' | 'recurring' | 'one-time' | null;
-  recurrence: 'daily' | 'weekly' | 'monthly' | null;
+  recurrence: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'semiannual' | 'annual' | 'none' | null;
   production_id: string | null;
   cheese_type_id: string | null;
   is_completed: boolean;
