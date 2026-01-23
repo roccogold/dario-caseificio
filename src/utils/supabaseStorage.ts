@@ -563,6 +563,34 @@ export async function saveActivity(
       // Update attività esistente
       console.log('[saveActivity] Updating activity:', activity.id);
       
+      // Verifica autenticazione
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        console.error('[saveActivity] ❌ Authentication error during update:', authError);
+        throw new Error(`User not authenticated. RLS policies require auth.uid() IS NOT NULL. Error: ${authError?.message || 'No user found'}`);
+      }
+      console.log('[saveActivity] ✅ User authenticated for update:', user.id);
+      
+      // Prima verifica che la riga esista e sia visibile
+      const { data: existingData, error: checkError } = await supabase
+        .from('attività')
+        .select('id, title')
+        .eq('id', activity.id)
+        .maybeSingle();
+      
+      if (checkError) {
+        console.error('[saveActivity] ❌ Error checking if activity exists:', checkError);
+        throw new Error(`Failed to check if activity exists: ${checkError.message}`);
+      }
+      
+      if (!existingData) {
+        console.error('[saveActivity] ❌ Activity not found or not visible (RLS issue):', activity.id);
+        throw new Error(`Activity with id ${activity.id} not found or not visible. This might be an RLS policy issue - check that SELECT policy allows reading this activity.`);
+      }
+      
+      console.log('[saveActivity] Activity exists and is visible, proceeding with update');
+      
+      // Ora fai l'update
       const { data, error } = await supabase
         .from('attività')
         .update(dbData)
@@ -570,12 +598,33 @@ export async function saveActivity(
         .select()
 
       if (error) {
-        console.error('[saveActivity] Update error:', error);
+        console.error('[saveActivity] ❌ Update error:', error);
+        console.error('[saveActivity] Update error details:', {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint,
+          activityId: activity.id,
+          userId: user.id
+        });
+        
+        // Gestisci errori specifici
+        if (error.code === 'PGRST116') {
+          throw new Error(`PostgREST error: Update returned 0 rows. The activity exists but UPDATE policy might be blocking it. Check RLS UPDATE policy for attività table. Activity ID: ${activity.id}`);
+        }
+        if (error.code === '23505') {
+          throw new Error(`Unique constraint violation: ${error.details || error.message}`);
+        }
+        if (error.code === '23503') {
+          throw new Error(`Foreign key constraint violation: ${error.details || error.message}`);
+        }
+        
         throw error;
       }
 
       if (!data || data.length === 0) {
-        throw new Error(`Activity with id ${activity.id} not found for update`);
+        console.error('[saveActivity] ❌ Update succeeded but no data returned - RLS UPDATE policy issue');
+        throw new Error(`Update completed but no data returned. This is likely an RLS policy issue - the UPDATE policy WITH CHECK clause might be blocking the return. Activity ID: ${activity.id}`);
       }
 
       // Prendi il primo risultato
