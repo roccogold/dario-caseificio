@@ -708,7 +708,18 @@ export function useData() {
         const saved = await saveActivity(activity);
         
         console.log('[addActivity] ✅ Successfully saved to Supabase:', saved.id);
-        setActivities((prev) => [...prev, saved]);
+        
+        // ❌ BUG FIX: NON aggiungere manualmente l'attività allo stato
+        // La real-time subscription la aggiungerà automaticamente quando riceve l'evento INSERT
+        // Se aggiungiamo manualmente, l'attività viene aggiunta due volte:
+        // 1. Manualmente qui
+        // 2. Dalla real-time subscription
+        // setActivities((prev) => [...prev, saved]); // ❌ RIMOSSO
+        
+        // La subscription gestirà l'aggiornamento dello stato
+        // Aspetta un momento per permettere alla subscription di processare l'evento
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         return saved;
       } else {
         // Solo in sviluppo locale - qui possiamo generare l'ID
