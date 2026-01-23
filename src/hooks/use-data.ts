@@ -38,7 +38,26 @@ import { toast } from "sonner";
 
 // Determina se usare Supabase o localStorage
 const isProduction = import.meta.env.PROD;
-const useSupabase = isProduction && !!import.meta.env.VITE_SUPABASE_URL && !!supabase;
+
+// In produzione, Supabase è OBBLIGATORIO - nessun fallback a localStorage
+if (isProduction) {
+  if (!import.meta.env.VITE_SUPABASE_URL || !supabase) {
+    console.error('[useData] ❌ PRODUCTION ERROR: Supabase non configurato!');
+    console.error('[useData] VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL ? '✅' : '❌ Missing');
+    console.error('[useData] supabase client:', supabase ? '✅' : '❌ Not initialized');
+    throw new Error('Supabase deve essere configurato in produzione. Configura VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY in Vercel.');
+  }
+}
+
+const useSupabase = isProduction ? true : (!!import.meta.env.VITE_SUPABASE_URL && !!supabase);
+
+// Log per debugging
+if (isProduction) {
+  console.log('[useData] ✅ Production mode: Supabase OBBLIGATORIO');
+  console.log('[useData] VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL ? '✅ Configured' : '❌ Missing');
+  console.log('[useData] supabase client:', supabase ? '✅ Initialized' : '❌ Not initialized');
+  console.log('[useData] Using Supabase:', useSupabase ? '✅ Yes' : '❌ No');
+}
 
 export function useData() {
   const [cheeseTypes, setCheeseTypes] = useState<CheeseType[]>([]);
@@ -74,12 +93,18 @@ export function useData() {
           setActivities(localActivitiesData);
         }
       } catch (error) {
-        console.error('Error loading data:', error);
-        // Fallback a localStorage
-        toast.error('Errore nel caricamento dati. Usando localStorage come fallback.');
-        setCheeseTypes(localCheeses.load());
-        setProductions(localProductions.load());
-        setActivities(localActivities.load());
+        console.error('[useData] Error loading data:', error);
+        if (isProduction) {
+          // In produzione, NON fare fallback - mostra errore fatale
+          toast.error('Errore critico: impossibile caricare i dati dal database. Controlla la console per dettagli.');
+          console.error('[useData] FATAL: Cannot load from database in production');
+        } else {
+          // Solo in sviluppo, fallback a localStorage
+          toast.error('Errore nel caricamento dati. Usando localStorage come fallback.');
+          setCheeseTypes(localCheeses.load());
+          setProductions(localProductions.load());
+          setActivities(localActivities.load());
+        }
       } finally {
         setIsLoading(false);
       }
@@ -164,21 +189,39 @@ export function useData() {
 
     try {
       if (useSupabase) {
+        console.log('[addCheeseType] Attempting to save to Supabase:', { name: newCheese.name, hasYield: !!newCheese.yieldPercentage, hasPrices: !!newCheese.prices });
         const saved = await saveCheese(newCheese);
+        console.log('[addCheeseType] ✅ Successfully saved to Supabase:', saved.id);
         setCheeseTypes((prev) => [...prev, saved]);
         return saved;
       } else {
+        // Solo in sviluppo locale
+        console.log('[addCheeseType] Using localStorage (development mode)');
         localCheeses.add(newCheese);
         setCheeseTypes((prev) => [...prev, newCheese]);
         return newCheese;
       }
-    } catch (error) {
-      console.error('Error adding cheese:', error);
-      toast.error('Errore nel salvataggio del formaggio');
-      // Fallback a localStorage
-      localCheeses.add(newCheese);
-      setCheeseTypes((prev) => [...prev, newCheese]);
-      return newCheese;
+    } catch (error: any) {
+      console.error('[addCheeseType] ❌ Error saving cheese:', error);
+      const errorMessage = error?.message || 'Errore sconosciuto';
+      console.error('[addCheeseType] Error details:', { 
+        message: errorMessage, 
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint
+      });
+      
+      if (isProduction) {
+        // In produzione, NON fare fallback - mostra errore e NON salvare
+        toast.error(`Errore critico nel salvataggio: ${errorMessage}. Il formaggio NON è stato salvato.`);
+        throw error; // Rilancia l'errore per impedire il salvataggio
+      } else {
+        // Solo in sviluppo, fallback a localStorage
+        toast.error(`Errore nel salvataggio su database: ${errorMessage}. Salvato in locale come fallback.`);
+        localCheeses.add(newCheese);
+        setCheeseTypes((prev) => [...prev, newCheese]);
+        return newCheese;
+      }
     }
   }, [useSupabase]);
 
@@ -327,21 +370,28 @@ export function useData() {
         }
         setActivities((prev) => prev.filter((a) => a.cheeseTypeId !== id));
       }
-    } catch (error) {
-      console.error('Error deleting cheese:', error);
-      toast.error('Errore nell\'eliminazione del formaggio');
-      // Fallback
-      localCheeses.delete(id);
-      setCheeseTypes((prev) => prev.filter((c) => c.id !== id));
+    } catch (error: any) {
+      console.error('[deleteCheeseType] ❌ Error deleting cheese:', error);
+      const errorMessage = error?.message || 'Errore sconosciuto';
       
-      // Elimina anche le attività associate in caso di errore
-      const relatedActivities = activities.filter(
-        a => a.cheeseTypeId === id
-      );
-      for (const activity of relatedActivities) {
-        localActivities.delete(activity.id);
+      if (isProduction) {
+        toast.error(`Errore critico nell'eliminazione: ${errorMessage}. Il formaggio NON è stato eliminato.`);
+        throw error; // Rilancia l'errore
+      } else {
+        // Solo in sviluppo, fallback
+        toast.error('Errore nell\'eliminazione del formaggio. Eliminato in locale come fallback.');
+        localCheeses.delete(id);
+        setCheeseTypes((prev) => prev.filter((c) => c.id !== id));
+        
+        // Elimina anche le attività associate in caso di errore
+        const relatedActivities = activities.filter(
+          a => a.cheeseTypeId === id
+        );
+        for (const activity of relatedActivities) {
+          localActivities.delete(activity.id);
+        }
+        setActivities((prev) => prev.filter((a) => a.cheeseTypeId !== id));
       }
-      setActivities((prev) => prev.filter((a) => a.cheeseTypeId !== id));
     }
   }, [useSupabase, activities]);
 
@@ -360,9 +410,13 @@ export function useData() {
     try {
       let savedProduction: Production;
       if (useSupabase) {
+        console.log('[addProduction] Attempting to save to Supabase:', { productionNumber: newProduction.productionNumber, totalLiters: newProduction.totalLiters });
         savedProduction = await saveProduction(newProduction);
+        console.log('[addProduction] ✅ Successfully saved to Supabase:', savedProduction.id);
         setProductions((prev) => [...prev, savedProduction]);
       } else {
+        // Solo in sviluppo locale
+        console.log('[addProduction] Using localStorage (development mode)');
         localProductions.add(newProduction);
         setProductions((prev) => [...prev, newProduction]);
         savedProduction = newProduction;
@@ -428,20 +482,33 @@ export function useData() {
               return [...prev, protocolActivity];
             });
           }
-          console.log('✅ Protocol activity created:', protocolActivity.title, 'on', format(protocolActivity.date, 'yyyy-MM-dd'));
-        } catch (error) {
-          console.error('❌ Error creating protocol activity:', error, protocolActivity);
-          // Continua anche se c'è un errore nella creazione dell'attività
+          console.log('[addProduction] ✅ Protocol activity created:', protocolActivity.title, 'on', format(protocolActivity.date, 'yyyy-MM-dd'));
+        } catch (error: any) {
+          console.error('[addProduction] ❌ Error creating protocol activity:', error, protocolActivity);
+          if (isProduction) {
+            toast.error(`Errore nel salvataggio dell'attività del protocollo: ${protocolActivity.title}`);
+            throw error; // In produzione, non continuare se c'è un errore
+          }
+          // In sviluppo, continua anche se c'è un errore
         }
       }
 
       return savedProduction;
-    } catch (error) {
-      console.error('Error adding production:', error);
-      toast.error('Errore nel salvataggio della produzione');
-      localProductions.add(newProduction);
-      setProductions((prev) => [...prev, newProduction]);
-      return newProduction;
+    } catch (error: any) {
+      console.error('[addProduction] ❌ Error adding production:', error);
+      const errorMessage = error?.message || 'Errore sconosciuto';
+      
+      if (isProduction) {
+        // In produzione, NON fare fallback - mostra errore e NON salvare
+        toast.error(`Errore critico nel salvataggio della produzione: ${errorMessage}. La produzione NON è stata salvata.`);
+        throw error; // Rilancia l'errore per impedire il salvataggio
+      } else {
+        // Solo in sviluppo, fallback a localStorage
+        toast.error('Errore nel salvataggio della produzione. Salvato in locale come fallback.');
+        localProductions.add(newProduction);
+        setProductions((prev) => [...prev, newProduction]);
+        return newProduction;
+      }
     }
   }, [useSupabase, cheeseTypes]);
 
@@ -552,20 +619,33 @@ export function useData() {
 
     try {
       if (useSupabase) {
+        console.log('[addActivity] Attempting to save to Supabase:', { title: newActivity.title, type: newActivity.type });
         const saved = await saveActivity(newActivity);
+        console.log('[addActivity] ✅ Successfully saved to Supabase:', saved.id);
         setActivities((prev) => [...prev, saved]);
         return saved;
       } else {
+        // Solo in sviluppo locale
+        console.log('[addActivity] Using localStorage (development mode)');
         localActivities.add(newActivity);
         setActivities((prev) => [...prev, newActivity]);
         return newActivity;
       }
-    } catch (error) {
-      console.error('Error adding activity:', error);
-      toast.error('Errore nel salvataggio dell\'attività');
-      localActivities.add(newActivity);
-      setActivities((prev) => [...prev, newActivity]);
-      return newActivity;
+    } catch (error: any) {
+      console.error('[addActivity] ❌ Error adding activity:', error);
+      const errorMessage = error?.message || 'Errore sconosciuto';
+      
+      if (isProduction) {
+        // In produzione, NON fare fallback - mostra errore e NON salvare
+        toast.error(`Errore critico nel salvataggio dell'attività: ${errorMessage}. L'attività NON è stata salvata.`);
+        throw error; // Rilancia l'errore per impedire il salvataggio
+      } else {
+        // Solo in sviluppo, fallback a localStorage
+        toast.error('Errore nel salvataggio dell\'attività. Salvato in locale come fallback.');
+        localActivities.add(newActivity);
+        setActivities((prev) => [...prev, newActivity]);
+        return newActivity;
+      }
     }
   }, [useSupabase]);
 
@@ -667,11 +747,19 @@ export function useData() {
         localActivities.delete(id);
         setActivities((prev) => prev.filter((a) => a.id !== id));
       }
-    } catch (error) {
-      console.error('Error deleting activity:', error);
-      toast.error('Errore nell\'eliminazione dell\'attività');
-      localActivities.delete(id);
-      setActivities((prev) => prev.filter((a) => a.id !== id));
+    } catch (error: any) {
+      console.error('[deleteActivity] ❌ Error deleting activity:', error);
+      const errorMessage = error?.message || 'Errore sconosciuto';
+      
+      if (isProduction) {
+        toast.error(`Errore critico nell'eliminazione: ${errorMessage}. L'attività NON è stata eliminata.`);
+        throw error; // Rilancia l'errore
+      } else {
+        // Solo in sviluppo, fallback
+        toast.error('Errore nell\'eliminazione dell\'attività. Eliminata in locale come fallback.');
+        localActivities.delete(id);
+        setActivities((prev) => prev.filter((a) => a.id !== id));
+      }
     }
   }, [useSupabase]);
 
