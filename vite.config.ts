@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => ({
         assetFileNames: `assets/[name]-[hash].[ext]`,
       },
     },
-    // Aumenta il limite di warning per file grandi
-    chunkSizeWarningLimit: 1000,
+    // Aumenta il limite di warning per file grandi (index.js è ~1.3MB)
+    chunkSizeWarningLimit: 1500,
   },
 }));
