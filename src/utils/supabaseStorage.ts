@@ -611,13 +611,35 @@ export async function saveActivity(
       // Update attività esistente
       console.log('[saveActivity] Updating activity:', activity.id);
       
-      // Verifica autenticazione
+      // Verifica sessione e autenticazione
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error('[saveActivity] ❌ Session error during update:', sessionError);
+        throw new Error(`Session error: ${sessionError.message}`);
+      }
+      
+      if (!session) {
+        console.error('[saveActivity] ❌ No session found during update - attempting to refresh...');
+        const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
+        
+        if (refreshError || !refreshedSession) {
+          console.error('[saveActivity] ❌ Session refresh failed during update:', refreshError);
+          throw new Error(`User not authenticated. Please log in again. Session error: ${refreshError?.message || 'No session after refresh'}`);
+        }
+        
+        console.log('[saveActivity] ✅ Session refreshed successfully for update');
+      }
+      
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       if (authError || !user) {
         console.error('[saveActivity] ❌ Authentication error during update:', authError);
+        console.error('[saveActivity] Session exists:', !!session);
         throw new Error(`User not authenticated. RLS policies require auth.uid() IS NOT NULL. Error: ${authError?.message || 'No user found'}`);
       }
+      
       console.log('[saveActivity] ✅ User authenticated for update:', user.id);
+      console.log('[saveActivity] Session valid:', !!session, 'Token expires at:', session?.expires_at);
       
       // Prima verifica che la riga esista e sia visibile
       const { data: existingData, error: checkError } = await supabase
