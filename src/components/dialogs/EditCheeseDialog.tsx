@@ -333,7 +333,7 @@ export function EditCheeseDialog({
                         setSalesPercentage1(e.target.value);
                       }
                     }}
-                    placeholder="es. 6%"
+                    placeholder="es. 25%"
                   />
                 </div>
               </div>
@@ -367,7 +367,7 @@ export function EditCheeseDialog({
                         setSalesPercentage2(e.target.value);
                       }
                     }}
-                    placeholder="es. 6%"
+                    placeholder="es. 25%"
                   />
                 </div>
               </div>
@@ -401,7 +401,7 @@ export function EditCheeseDialog({
                         setSalesPercentage3(e.target.value);
                       }
                     }}
-                    placeholder="es. 6%"
+                    placeholder="es. 25%"
                   />
                 </div>
               </div>
