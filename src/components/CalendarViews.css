@@ -1,0 +1,589 @@
+.calendar-day-view {
+  min-height: 400px;
+}
+
+.view-title {
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: #222222;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0ede8;
+  letter-spacing: 0.3px;
+}
+
+.empty-calendar-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #666;
+}
+
+.empty-icon {
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.5;
+}
+
+.empty-icon svg {
+  width: 64px;
+  height: 64px;
+}
+
+.empty-calendar-state p {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.empty-hint {
+  font-size: 0.95rem;
+  color: #999;
+  margin-top: 1rem;
+}
+
+.activities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.activity-item {
+  background: #fafafa;
+  border: 1px solid #e8e8e0;
+  border-left: 4px solid #8b7355;
+  border-radius: 8px;
+  padding: 1.25rem 1.75rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.activity-item.completed {
+  opacity: 0.6;
+  background: #f5f5f5;
+}
+
+.activity-item.completed .activity-content h4 {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.activity-item.completed .activity-content .activity-description {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.activity-checkbox-wrapper {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  align-self: center;
+}
+
+.activity-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #8b7355;
+  flex-shrink: 0;
+}
+
+.activity-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-item[style*="borderLeftColor"] {
+  border-left-width: 4px;
+  border-left-style: solid;
+}
+
+.activity-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateX(4px);
+  border-left-color: #6d5a42;
+}
+
+.activity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.activity-header h4 {
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #222222;
+  margin: 0;
+  letter-spacing: 0.2px;
+  flex: 1;
+}
+
+.activity-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Icon buttons now use shared styles from Icons.css */
+
+.production-badge {
+  background-color: #8b7355;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+}
+
+.production-badge-small {
+  background-color: #8b7355;
+  color: white;
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+}
+
+.activity-description {
+  color: #666;
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+}
+
+.activity-meta {
+  color: #999;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+/* Week View */
+.calendar-week-view {
+  min-height: 500px;
+}
+
+.week-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 1rem;
+}
+
+.week-day-header {
+  text-align: center;
+}
+
+.week-day-name {
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 0.9rem;
+  color: #666;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.week-day-number {
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: #222222;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  border-radius: 50%;
+}
+
+.week-day-number.today {
+  background-color: #8b7355;
+  color: white;
+}
+
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  min-height: 400px;
+}
+
+.week-day-cell {
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 0.5rem;
+  min-height: 150px;
+  background: #fafafa;
+}
+
+.week-activity-item {
+  background: white;
+  border-left: 3px solid #8b7355;
+  padding: 0.625rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.week-activity-item[style*="borderLeftColor"] {
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+
+.week-activity-item:hover {
+  border-left-width: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+
+.activity-title {
+  flex: 1;
+  color: #3d2817;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.week-empty {
+  color: #ccc;
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 1rem;
+}
+
+/* Month View */
+.calendar-month-view {
+  min-height: 500px;
+}
+
+.month-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+.month-week-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #f0ede8;
+}
+
+.month-day-name {
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  text-align: center;
+  font-weight: 500;
+  color: #666;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.month-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.75rem;
+}
+
+.month-day-cell {
+  min-height: 100px;
+  border: 1px solid #e8e8e0;
+  border-radius: 8px;
+  padding: 0.5rem;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  aspect-ratio: 1;
+}
+
+.month-day-cell:hover {
+  background-color: #faf9f6;
+  border-color: #d4c5b0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
+}
+
+.month-day-cell.other-month {
+  background-color: #fafafa;
+  opacity: 0.5;
+}
+
+.month-day-cell.other-month .month-day-number {
+  color: #999;
+}
+
+.month-day-cell.today:not(.selected) {
+  border: 2px solid #8b7355;
+  background-color: #f5f3ef;
+  box-shadow: 0 0 0 2px rgba(139, 115, 85, 0.1);
+}
+
+.month-day-cell.today .month-day-number {
+  color: #8b7355;
+  font-weight: 600;
+}
+
+.month-day-cell.selected {
+  background-color: #8b7355;
+  color: white;
+  border: 2px solid #8b7355;
+  box-shadow: 0 2px 8px rgba(139, 115, 85, 0.2);
+}
+
+.month-day-cell.selected .month-day-number {
+  color: white;
+  font-weight: 600;
+}
+
+.month-day-cell.selected .month-no-activities {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.month-day-cell.selected .month-day-number {
+  color: #8b7355;
+  font-weight: 600;
+}
+
+
+.month-day-number {
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-weight: 500;
+  color: #222222;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  line-height: 1.2;
+}
+
+.month-day-activities {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+  overflow: hidden;
+  justify-content: flex-end;
+  align-items: center;
+  padding-bottom: 0.25rem;
+  min-height: 20px;
+}
+
+.month-no-activities {
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 0.75rem;
+  color: #999;
+  font-style: italic;
+  text-align: center;
+  padding: 0.25rem 0;
+  opacity: 0.6;
+}
+
+.month-activity-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  justify-content: center;
+  align-items: center;
+  margin-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.month-activity-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+/* Mobile optimizations (max-width: 767px) */
+@media (max-width: 767px) {
+  .view-title {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .empty-calendar-state {
+    padding: 2rem 1rem;
+  }
+
+  .empty-icon svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .empty-calendar-state p {
+    font-size: 0.95rem;
+  }
+
+  .empty-hint {
+    font-size: 0.85rem;
+  }
+
+  .activities-list {
+    gap: 0.75rem;
+  }
+
+  .activity-item {
+    padding: 1rem 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    min-height: auto;
+    touch-action: manipulation;
+  }
+
+  .activity-checkbox-wrapper {
+    align-self: flex-start;
+  }
+
+  .activity-checkbox {
+    width: 22px;
+    height: 22px;
+  }
+
+  .activity-content {
+    width: 100%;
+  }
+
+  .activity-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .activity-header h4 {
+    font-size: 1rem;
+  }
+
+  .activity-header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .activity-description {
+    font-size: 0.85rem;
+  }
+
+  .activity-meta {
+    font-size: 0.8rem;
+  }
+
+  .week-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .week-day-header {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .week-day-cell {
+    min-height: 120px;
+    padding: 0.5rem;
+  }
+
+  .week-activity-item {
+    padding: 0.625rem;
+    min-height: 44px;
+    font-size: 0.85rem;
+    touch-action: manipulation;
+  }
+
+  .production-badge-small {
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+  }
+
+  .month-grid {
+    gap: 0.25rem;
+  }
+
+  .month-day-cell {
+    min-height: 100px;
+    padding: 0.5rem 0.25rem;
+    touch-action: manipulation;
+  }
+
+  .month-day-number {
+    font-size: 0.85rem;
+  }
+
+  .month-activity-item {
+    padding: 0.375rem 0.5rem;
+    min-height: 36px;
+    font-size: 0.75rem;
+    touch-action: manipulation;
+  }
+
+  .month-activity-text {
+    font-size: 0.7rem;
+  }
+
+  .month-activity-more {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+/* Tablet optimizations (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .activity-item {
+    padding: 1.5rem 2rem;
+    min-height: 60px;
+    touch-action: manipulation;
+  }
+
+  .activity-checkbox {
+    width: 24px;
+    height: 24px;
+  }
+
+  .week-day-cell {
+    min-height: 180px;
+    padding: 0.75rem;
+  }
+
+  .week-activity-item {
+    padding: 0.75rem;
+    min-height: 44px;
+    font-size: 0.95rem;
+    touch-action: manipulation;
+  }
+
+  .month-day-cell {
+    min-height: 140px;
+    padding: 1rem;
+    touch-action: manipulation;
+  }
+
+  .month-activity-item {
+    padding: 0.5rem 0.75rem;
+    min-height: 40px;
+    touch-action: manipulation;
+  }
+
+  .month-activity-text {
+    font-size: 0.85rem;
+  }
+}

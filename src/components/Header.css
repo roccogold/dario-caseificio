@@ -1,0 +1,273 @@
+.header {
+  padding: 1.5rem 1rem 0 1rem;
+  background: #ffffff;
+  margin-bottom: 0;
+}
+
+.header-top {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  width: 100%;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 2rem;
+  gap: 2rem;
+  position: relative;
+}
+
+.header-left-section {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-shrink: 0;
+}
+
+.header-center-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  box-sizing: border-box;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  max-width: 600px;
+  pointer-events: none;
+}
+
+.header-dario-brand {
+  pointer-events: auto;
+}
+
+.header-right-section {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  z-index: 20;
+  min-width: 200px;
+  position: relative;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.header-logo-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.header-user-menu {
+  display: flex !important;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative;
+  z-index: 20;
+}
+
+.user-name {
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 0.95rem;
+  color: #666;
+  font-style: italic;
+}
+
+.logout-button {
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+  color: #8b7355;
+  border: 1px solid #8b7355;
+  border-radius: 4px;
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #8b7355;
+  color: white;
+}
+
+.header-logo {
+  max-width: 200px;
+  height: auto;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.header-subtitle-section {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0.5rem auto 0;
+  padding: 0 2rem;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.header-dario-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  margin: 0 auto;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  max-width: 100%;
+}
+
+.header-dario-logo {
+  font-family: 'Playfair Display', 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #8C7B68;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1;
+  -webkit-text-fill-color: #8C7B68;
+  font-feature-settings: "liga" 1, "kern" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.header-dario-tagline {
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 0.75rem;
+  color: #999;
+  font-style: italic;
+  letter-spacing: 0.3px;
+}
+
+.header-title {
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: #222222;
+  margin: 0;
+  letter-spacing: 0.5px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.header-subtitle {
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 0.95rem;
+  color: #555;
+  font-weight: 400;
+  font-style: italic;
+  margin: 0;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* Mobile optimizations (max-width: 767px) */
+@media (max-width: 767px) {
+  .header {
+    padding: 1rem 0.75rem 0 0.75rem;
+  }
+
+  .header-top {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+
+  .header-left-section {
+    justify-content: center;
+  }
+
+  .header-center-section {
+    order: -1;
+    position: static;
+    transform: none;
+    width: 100%;
+  }
+
+  .header-right-section {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .header-subtitle-section {
+    padding: 0 1rem;
+    margin-top: 0.75rem;
+  }
+
+  .header-logo {
+    max-width: 120px;
+  }
+
+  .header-dario-logo {
+    font-size: 1.5rem;
+  }
+
+  .header-dario-tagline {
+    font-size: 0.65rem;
+  }
+
+  .header-title {
+    font-size: 1.25rem;
+  }
+
+  .header-subtitle {
+    font-size: 0.8rem;
+  }
+
+  .header-user-menu {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .user-name {
+    font-size: 0.85rem;
+  }
+
+  .logout-button {
+    padding: 0.5rem 0.875rem;
+    min-height: 44px;
+    font-size: 0.85rem;
+    touch-action: manipulation;
+  }
+}
+
+/* Tablet optimizations (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .header {
+    padding: 1.25rem 1rem 0 1rem;
+  }
+
+  .header-top {
+    padding: 0 1.5rem;
+    gap: 1.5rem;
+  }
+
+  .header-logo {
+    max-width: 180px;
+  }
+
+  .logout-button {
+    padding: 0.625rem 1.25rem;
+    min-height: 44px;
+    font-size: 0.95rem;
+    touch-action: manipulation;
+  }
+
+  .header-title {
+    font-size: 1.6rem;
+  }
+
+  .header-subtitle {
+    font-size: 0.9rem;
+  }
+}

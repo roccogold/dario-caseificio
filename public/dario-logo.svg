@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <defs>
+    <style>
+      .dario-text {
+        font-family: 'Laurentian Semi Bold', 'Garamond Premier Semibold', 'Versina Bold', 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+        font-size: 40px;
+        font-weight: 600;
+        font-style: normal;
+        fill: #8B7355;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+    </style>
+  </defs>
+  <text x="0" y="40" class="dario-text">DARIO</text>
+</svg>

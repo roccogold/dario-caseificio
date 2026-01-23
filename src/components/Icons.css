@@ -1,0 +1,121 @@
+/* Base icon styles - consistent across all icons */
+.icon-edit,
+.icon-delete,
+.icon-note,
+.icon-calendar,
+.icon-cheese {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* Edit icon color - inherits from button */
+.icon-edit {
+  color: currentColor;
+}
+
+/* Delete icon color - inherits from button */
+.icon-delete {
+  color: currentColor;
+}
+
+/* Button styles for edit/delete buttons - consistent everywhere */
+.icon-button {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  background: transparent;
+  width: 36px;
+  height: 36px;
+  line-height: 1;
+  flex-shrink: 0;
+  /* Touch-friendly: minimum 44x44px for tablets */
+  min-width: 44px;
+  min-height: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(139, 115, 85, 0.2);
+}
+
+.icon-button:hover {
+  transform: scale(1.05);
+}
+
+/* Edit button styles */
+.icon-button.edit {
+  color: #8b7355;
+}
+
+.icon-button.edit:hover {
+  background-color: #f5f3ef;
+  color: #6d5a42;
+}
+
+/* Delete button styles */
+.icon-button.delete {
+  color: #c97a6a;
+}
+
+.icon-button.delete:hover {
+  background-color: #fee;
+  color: #b86555;
+}
+
+/* Note icon color */
+.icon-note {
+  color: currentColor;
+}
+
+/* Note button styles */
+.icon-button.note {
+  color: #8b7355;
+}
+
+.icon-button.note:hover {
+  background-color: #f5f3ef;
+  color: #6d5a42;
+}
+
+/* Mobile optimizations (max-width: 767px) */
+@media (max-width: 767px) {
+  .icon-button {
+    width: 40px;
+    height: 40px;
+    padding: 0.5rem;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(139, 115, 85, 0.1);
+  }
+
+  .icon-edit,
+  .icon-delete,
+  .icon-note,
+  .icon-calendar,
+  .icon-cheese {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Tablet optimizations (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .icon-button {
+    width: 44px;
+    height: 44px;
+    padding: 0.625rem;
+  }
+
+  .icon-edit,
+  .icon-delete,
+  .icon-note,
+  .icon-calendar,
+  .icon-cheese {
+    width: 20px;
+    height: 20px;
+  }
+}

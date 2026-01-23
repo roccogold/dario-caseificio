@@ -1,0 +1,151 @@
+.sidebar {
+  width: 240px;
+  background-color: #f5f3ef;
+  border-right: 1px solid #e8e8e0;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  overflow-y: auto;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e8e8e0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sidebar-logo {
+  flex-shrink: 0;
+}
+
+.sidebar-logo-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #8b7355;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.sidebar-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.sidebar-brand-name {
+  font-family: 'Playfair Display', 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #8C7B68;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  -webkit-text-fill-color: #8C7B68;
+  font-feature-settings: "liga" 1, "kern" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.sidebar-brand-subtitle {
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 0.75rem;
+  color: #666;
+  line-height: 1.2;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 0.95rem;
+  color: #666;
+  text-align: left;
+  width: 100%;
+  position: relative;
+}
+
+.sidebar-item:hover {
+  background-color: #ede8e0;
+  color: #8b7355;
+}
+
+.sidebar-item.active {
+  background-color: #e8e0d0;
+  color: #8b7355;
+  font-weight: 500;
+}
+
+.sidebar-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background-color: #8b7355;
+}
+
+.sidebar-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+
+.sidebar-divider {
+  height: 1px;
+  background-color: #e8e8e0;
+  margin: 0.5rem 1.5rem;
+}
+
+/* Mobile optimizations */
+@media (max-width: 767px) {
+  .sidebar {
+    width: 200px;
+    padding-top: 70px;
+  }
+
+  .sidebar-item {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+  }
+
+  .sidebar-icon {
+    font-size: 1rem;
+    width: 18px;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .sidebar {
+    width: 220px;
+  }
+}

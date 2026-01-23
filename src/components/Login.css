@@ -1,0 +1,293 @@
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f5f3ef 0%, #ffffff 100%);
+  padding: 2rem;
+}
+
+.login-box {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  padding: 3rem;
+  width: 100%;
+  max-width: 450px;
+  border: 1px solid #e8e8e0;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.login-logo {
+  max-width: 220px;
+  height: auto;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.dario-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.dario-logo {
+  font-family: 'Playfair Display', 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #8C7B68;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1;
+  -webkit-text-fill-color: #8C7B68;
+  font-feature-settings: "liga" 1, "kern" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.dario-tagline {
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 0.9rem;
+  color: #999;
+  font-style: italic;
+  letter-spacing: 0.5px;
+}
+
+.login-welcome {
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #222222;
+  margin: 0;
+  letter-spacing: 0.3px;
+  line-height: 1.6;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.login-welcome strong {
+  font-weight: 600;
+  color: #8b7355;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.login-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.login-form label {
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #222222;
+}
+
+.login-form input {
+  padding: 0.875rem;
+  border: 1px solid #d4c5b0;
+  border-radius: 6px;
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 1rem;
+  color: #222222;
+  transition: all 0.3s ease;
+}
+
+.login-form input:focus {
+  outline: none;
+  border-color: #8b7355;
+  box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
+}
+
+.login-button {
+  padding: 0.875rem 1.5rem;
+  background-color: #8b7355;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(139, 115, 85, 0.2);
+  letter-spacing: 0.3px;
+}
+
+.login-button:hover:not(:disabled) {
+  background-color: #6d5a42;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(139, 115, 85, 0.3);
+}
+
+.login-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.forgot-password-link,
+.back-link {
+  background: none;
+  border: none;
+  color: #8b7355;
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0.5rem 0;
+  transition: color 0.2s ease;
+}
+
+.forgot-password-link:hover,
+.back-link:hover {
+  color: #6d5a42;
+}
+
+.error-message {
+  background-color: #fee;
+  border: 1px solid #fcc;
+  color: #c33;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.success-message {
+  background-color: #efe;
+  border: 1px solid #cfc;
+  color: #3c3;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.forgot-password-info {
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 0.9rem;
+  color: #666;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.login-form h3 {
+  font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #222222;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* Mobile optimizations (max-width: 767px) */
+@media (max-width: 767px) {
+  .login-container {
+    padding: 1rem 0.75rem;
+    min-height: 100vh;
+    align-items: flex-start;
+    padding-top: 2rem;
+  }
+
+  .login-box {
+    padding: 1.5rem 1.25rem;
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    border-radius: 8px;
+  }
+
+  .login-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .login-logo {
+    max-width: 120px;
+    margin-bottom: 1rem;
+  }
+
+  .dario-logo {
+    font-size: 1.75rem;
+  }
+
+  .dario-tagline {
+    font-size: 0.7rem;
+  }
+
+  .login-welcome {
+    font-size: 0.9rem;
+  }
+
+  .login-form {
+    gap: 1rem;
+  }
+
+  .login-form input {
+    padding: 0.875rem;
+    min-height: 44px;
+    font-size: 0.95rem;
+    touch-action: manipulation;
+  }
+
+  .login-button {
+    width: 100%;
+    padding: 0.875rem 1.5rem;
+    min-height: 44px;
+    font-size: 0.95rem;
+    touch-action: manipulation;
+  }
+
+  .forgot-password-link,
+  .back-link {
+    padding: 0.75rem 0;
+    min-height: 44px;
+    font-size: 0.85rem;
+    touch-action: manipulation;
+  }
+}
+
+/* Tablet optimizations (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .login-container {
+    padding: 1.5rem;
+  }
+
+  .login-box {
+    padding: 2.5rem;
+    max-width: 500px;
+  }
+
+  .login-form input {
+    padding: 1rem;
+    min-height: 48px;
+    font-size: 1.05rem;
+    touch-action: manipulation;
+  }
+
+  .login-button {
+    padding: 1rem 2rem;
+    min-height: 48px;
+    font-size: 1.05rem;
+    touch-action: manipulation;
+  }
+
+  .forgot-password-link,
+  .back-link {
+    padding: 0.75rem 0;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+}
