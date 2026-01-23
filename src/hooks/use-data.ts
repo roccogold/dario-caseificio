@@ -704,10 +704,8 @@ export function useData() {
         });
         
         // Passa l'attività SENZA ID - saveActivity genererà l'UUID
-        const saved = await saveActivity({
-          ...activity,
-          createdAt: new Date(),
-        });
+        // createdAt viene gestito da saveActivity
+        const saved = await saveActivity(activity);
         
         console.log('[addActivity] ✅ Successfully saved to Supabase:', saved.id);
         setActivities((prev) => [...prev, saved]);
