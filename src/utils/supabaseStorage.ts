@@ -8,6 +8,7 @@ import {
   typeProductionToDb,
   typeActivityToDb,
 } from "@/lib/adapters"
+import { generateUUID } from "@/lib/utils"
 
 /**
  * Ottiene l'IP dell'utente (semplificato - in produzione usa un servizio esterno)
@@ -148,7 +149,7 @@ export async function saveCheese(cheese: Omit<CheeseType, "id" | "createdAt"> & 
       // Strategia: Usa sempre UUID generato
       const generatedId = cheese.id && !cheese.id.startsWith('temp-') 
         ? cheese.id 
-        : crypto.randomUUID();
+        : generateUUID();
       
       console.log('[saveCheese] Using UUID for insert:', generatedId);
       
@@ -317,7 +318,7 @@ export async function saveProduction(
       
       const generatedId = production.id && !production.id.startsWith('temp-') 
         ? production.id 
-        : crypto.randomUUID();
+        : generateUUID();
       
       console.log('[saveProduction] 🔵 Starting insert with UUID:', { 
         productionNumber: production.productionNumber,
@@ -521,7 +522,7 @@ export async function saveActivity(
       // Strategia: Usa sempre UUID generato
       const generatedId = activity.id && !activity.id.startsWith('temp-') 
         ? activity.id 
-        : crypto.randomUUID();
+        : generateUUID();
       
       console.log('[saveActivity] Using UUID for insert:', generatedId);
       
