@@ -38,18 +38,39 @@ import { toast } from "sonner";
 
 // Determina se usare Supabase o localStorage
 const isProduction = import.meta.env.PROD;
+const hasSupabaseUrl = !!import.meta.env.VITE_SUPABASE_URL;
+const hasSupabaseKey = !!import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseInitialized = !!supabase;
 
 // In produzione, Supabase è OBBLIGATORIO - nessun fallback a localStorage
 if (isProduction) {
-  if (!import.meta.env.VITE_SUPABASE_URL || !supabase) {
-    console.error('[useData] ❌ PRODUCTION ERROR: Supabase non configurato!');
-    console.error('[useData] VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL ? '✅' : '❌ Missing');
-    console.error('[useData] supabase client:', supabase ? '✅' : '❌ Not initialized');
-    throw new Error('Supabase deve essere configurato in produzione. Configura VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY in Vercel.');
+  console.log('[useData] 🔍 Production mode check:');
+  console.log('[useData]   - VITE_SUPABASE_URL:', hasSupabaseUrl ? '✅ Present' : '❌ MISSING');
+  console.log('[useData]   - VITE_SUPABASE_ANON_KEY:', hasSupabaseKey ? '✅ Present' : '❌ MISSING');
+  console.log('[useData]   - supabase client:', supabaseInitialized ? '✅ Initialized' : '❌ NOT INITIALIZED');
+  
+  if (!hasSupabaseUrl || !hasSupabaseKey || !supabaseInitialized) {
+    const errorMsg = `❌ FATAL: Supabase non configurato in produzione!
+    VITE_SUPABASE_URL: ${hasSupabaseUrl ? 'OK' : 'MISSING'}
+    VITE_SUPABASE_ANON_KEY: ${hasSupabaseKey ? 'OK' : 'MISSING'}
+    supabase client: ${supabaseInitialized ? 'OK' : 'NOT INITIALIZED'}
+    
+    Configura le variabili d'ambiente in Vercel:
+    1. Vai su Vercel Dashboard → Project Settings → Environment Variables
+    2. Aggiungi VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY
+    3. Redeploy l'applicazione`;
+    
+    console.error('[useData]', errorMsg);
+    alert(errorMsg); // Mostra alert anche all'utente
+    throw new Error('Supabase deve essere configurato in produzione');
   }
+  
+  console.log('[useData] ✅ Production mode: Supabase configurato correttamente');
 }
 
-const useSupabase = isProduction ? true : (!!import.meta.env.VITE_SUPABASE_URL && !!supabase);
+const useSupabase = isProduction ? true : (hasSupabaseUrl && hasSupabaseKey && supabaseInitialized);
+
+console.log('[useData] Final decision - useSupabase:', useSupabase, '(isProduction:', isProduction, ')');
 
 // Log per debugging
 if (isProduction) {
@@ -71,19 +92,42 @@ export function useData() {
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
+      
+      // In produzione, FORZA il caricamento da Supabase
+      if (isProduction && !useSupabase) {
+        const errorMsg = '❌ ERRORE CRITICO: Supabase non configurato in produzione! Impossibile caricare i dati.';
+        console.error('[useData]', errorMsg);
+        toast.error(errorMsg);
+        setIsLoading(false);
+        return;
+      }
+      
       try {
         if (useSupabase) {
+          console.log('[useData] 🔵 Loading data from Supabase...');
+          if (!supabase) {
+            throw new Error('Supabase client non inizializzato');
+          }
+          
           // Carica da Supabase
           const [cheeses, prods, acts] = await Promise.all([
             loadCheeses(),
             loadProductions(),
             loadActivities(),
           ]);
+          
+          console.log('[useData] ✅ Loaded from Supabase:', {
+            cheeses: cheeses.length,
+            productions: prods.length,
+            activities: acts.length
+          });
+          
           setCheeseTypes(cheeses);
           setProductions(prods);
           setActivities(acts);
         } else {
-          // Carica da localStorage
+          // Solo in sviluppo locale
+          console.log('[useData] Loading data from localStorage (development mode)');
           const localCheesesData = localCheeses.load();
           const localProductionsData = localProductions.load();
           const localActivitiesData = localActivities.load();
@@ -92,12 +136,21 @@ export function useData() {
           setProductions(localProductionsData);
           setActivities(localActivitiesData);
         }
-      } catch (error) {
-        console.error('[useData] Error loading data:', error);
+      } catch (error: any) {
+        console.error('[useData] ❌ Error loading data:', error);
+        console.error('[useData] Error details:', {
+          message: error?.message,
+          code: error?.code,
+          details: error?.details,
+          hint: error?.hint
+        });
+        
         if (isProduction) {
           // In produzione, NON fare fallback - mostra errore fatale
-          toast.error('Errore critico: impossibile caricare i dati dal database. Controlla la console per dettagli.');
+          const errorMsg = `❌ ERRORE CRITICO: Impossibile caricare i dati dal database: ${error?.message || 'Errore sconosciuto'}`;
+          toast.error(errorMsg);
           console.error('[useData] FATAL: Cannot load from database in production');
+          // Non impostare i dati - lascia gli array vuoti
         } else {
           // Solo in sviluppo, fallback a localStorage
           toast.error('Errore nel caricamento dati. Usando localStorage come fallback.');
@@ -187,11 +240,38 @@ export function useData() {
       createdAt: new Date(),
     };
 
+    // In produzione, FORZA l'uso di Supabase
+    if (isProduction && !useSupabase) {
+      const errorMsg = '❌ ERRORE CRITICO: Supabase non configurato in produzione! Il formaggio NON può essere salvato.';
+      console.error('[addCheeseType]', errorMsg);
+      toast.error(errorMsg);
+      throw new Error('Supabase non configurato in produzione');
+    }
+
     try {
       if (useSupabase) {
-        console.log('[addCheeseType] Attempting to save to Supabase:', { name: newCheese.name, hasYield: !!newCheese.yieldPercentage, hasPrices: !!newCheese.prices });
+        console.log('[addCheeseType] 🔵 Attempting to save to Supabase:', { 
+          name: newCheese.name, 
+          hasYield: !!newCheese.yieldPercentage, 
+          hasPrices: !!newCheese.prices,
+          supabaseConfigured: !!supabase
+        });
+        
+        if (!supabase) {
+          throw new Error('Supabase client non inizializzato');
+        }
+        
         const saved = await saveCheese(newCheese);
         console.log('[addCheeseType] ✅ Successfully saved to Supabase:', saved.id);
+        
+        // Verifica che il formaggio sia stato effettivamente salvato
+        const verify = await loadCheeses();
+        const found = verify.find(c => c.id === saved.id);
+        if (!found) {
+          console.error('[addCheeseType] ❌ WARNING: Formaggio salvato ma non trovato nel DB!');
+          toast.error('⚠️ Formaggio salvato ma verifica fallita. Ricarica la pagina.');
+        }
+        
         setCheeseTypes((prev) => [...prev, saved]);
         return saved;
       } else {
@@ -208,12 +288,13 @@ export function useData() {
         message: errorMessage, 
         code: error?.code,
         details: error?.details,
-        hint: error?.hint
+        hint: error?.hint,
+        stack: error?.stack
       });
       
       if (isProduction) {
         // In produzione, NON fare fallback - mostra errore e NON salvare
-        toast.error(`Errore critico nel salvataggio: ${errorMessage}. Il formaggio NON è stato salvato.`);
+        toast.error(`❌ ERRORE CRITICO: ${errorMessage}. Il formaggio NON è stato salvato nel database.`);
         throw error; // Rilancia l'errore per impedire il salvataggio
       } else {
         // Solo in sviluppo, fallback a localStorage
