@@ -88,13 +88,37 @@ export async function saveCheese(cheese: Omit<CheeseType, "id" | "createdAt"> & 
     throw new Error('Supabase non configurato')
   }
   try {
-    // Verifica autenticazione prima di procedere
+    // Verifica sessione e autenticazione prima di procedere
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError) {
+      console.error('[saveCheese] ❌ Session error:', sessionError);
+      throw new Error(`Session error: ${sessionError.message}`);
+    }
+    
+    if (!session) {
+      console.error('[saveCheese] ❌ No session found - attempting to refresh...');
+      // Prova a refreshare la sessione
+      const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
+      
+      if (refreshError || !refreshedSession) {
+        console.error('[saveCheese] ❌ Session refresh failed:', refreshError);
+        throw new Error(`User not authenticated. Please log in again. Session error: ${refreshError?.message || 'No session after refresh'}`);
+      }
+      
+      console.log('[saveCheese] ✅ Session refreshed successfully');
+    }
+    
+    // Verifica che l'utente esista
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       console.error('[saveCheese] ❌ Authentication error:', authError);
+      console.error('[saveCheese] Session exists:', !!session);
       throw new Error(`User not authenticated. RLS policies require auth.uid() IS NOT NULL. Error: ${authError?.message || 'No user found'}`);
     }
+    
     console.log('[saveCheese] ✅ User authenticated:', user.id);
+    console.log('[saveCheese] Session valid:', !!session, 'Token expires at:', session?.expires_at);
     
     // Valida campi obbligatori
     if (!cheese.name || cheese.name.trim() === '') {
@@ -431,13 +455,37 @@ export async function saveActivity(
     throw new Error('Supabase non configurato')
   }
   try {
-    // Verifica autenticazione prima di procedere
+    // Verifica sessione e autenticazione prima di procedere
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError) {
+      console.error('[saveActivity] ❌ Session error:', sessionError);
+      throw new Error(`Session error: ${sessionError.message}`);
+    }
+    
+    if (!session) {
+      console.error('[saveActivity] ❌ No session found - attempting to refresh...');
+      // Prova a refreshare la sessione
+      const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
+      
+      if (refreshError || !refreshedSession) {
+        console.error('[saveActivity] ❌ Session refresh failed:', refreshError);
+        throw new Error(`User not authenticated. Please log in again. Session error: ${refreshError?.message || 'No session after refresh'}`);
+      }
+      
+      console.log('[saveActivity] ✅ Session refreshed successfully');
+    }
+    
+    // Verifica che l'utente esista
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       console.error('[saveActivity] ❌ Authentication error:', authError);
+      console.error('[saveActivity] Session exists:', !!session);
       throw new Error(`User not authenticated. RLS policies require auth.uid() IS NOT NULL. Error: ${authError?.message || 'No user found'}`);
     }
+    
     console.log('[saveActivity] ✅ User authenticated:', user.id);
+    console.log('[saveActivity] Session valid:', !!session, 'Token expires at:', session?.expires_at);
     
     // Valida campi obbligatori
     if (!activity.title || activity.title.trim() === '') {
