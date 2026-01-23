@@ -6,12 +6,24 @@
    Design System: Warm, earthy, elegant Italian craftsmanship aesthetic
 */
 
-/* Logo DARIO Fonts - Priority order: Laurentian Semi Bold > Garamond Premier Semibold > Versina Bold > Cormorant Garamond (fallback) */
+/* Logo DARIO Fonts - Priority order: TC Galliard Bold > Garamond Premier Semibold Caption > Garamond Premier Semibold > Laurentian Semi Bold (fallback) */
 @font-face {
-  font-family: 'Laurentian Semi Bold';
-  src: url('/fonts/LaurentianPro-SemiBold.woff2') format('woff2'),
-       url('/fonts/LaurentianPro-SemiBold.woff') format('woff'),
-       url('/fonts/LaurentianPro-SemiBold.ttf') format('truetype');
+  font-family: 'TC Galliard Bold';
+  src: url('/fonts/TCGalliard-Bold.woff2') format('woff2'),
+       url('/fonts/TCGalliard-Bold.woff') format('woff'),
+       url('/fonts/TCGalliard-Bold.otf') format('opentype'),
+       url('/fonts/TCGalliard-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Garamond Premier Semibold Caption';
+  src: url('/fonts/GaramondPremierPro-SemiboldCaption.woff2') format('woff2'),
+       url('/fonts/GaramondPremierPro-SemiboldCaption.woff') format('woff'),
+       url('/fonts/GaramondPremierPro-SemiboldCaption.otf') format('opentype'),
+       url('/fonts/GaramondPremierPro-SemiboldCaption.ttf') format('truetype');
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -23,6 +35,16 @@
        url('/fonts/GaramondPremierPro-Semibold.woff') format('woff'),
        url('/fonts/GaramondPremierPro-Semibold.otf') format('opentype'),
        url('/fonts/GaramondPremierPro-Semibold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Laurentian Semi Bold';
+  src: url('/fonts/LaurentianPro-SemiBold.woff2') format('woff2'),
+       url('/fonts/LaurentianPro-SemiBold.woff') format('woff'),
+       url('/fonts/LaurentianPro-SemiBold.ttf') format('truetype');
   font-weight: 600;
   font-style: normal;
   font-display: swap;

@@ -1,12 +1,14 @@
 import { motion } from "framer-motion";
-import { Check, Clock, Repeat, CalendarDays, CircleDot, Edit, Trash2 } from "lucide-react";
+import { Check, Repeat, CalendarDays, ClipboardList, Edit, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Activity } from "@/types";
 import { format } from "date-fns";
+import { CheeseBadge } from "@/components/ui/cheese-badge";
 
 interface ActivityCardProps {
   activity: Activity;
   cheeseColor?: string;
+  cheeseTypeName?: string;
   onToggle: () => void;
   currentDate?: Date;
   onEdit?: () => void;
@@ -16,13 +18,14 @@ interface ActivityCardProps {
 export function ActivityCard({
   activity,
   cheeseColor,
+  cheeseTypeName,
   onToggle,
   currentDate = new Date(),
   onEdit,
   onDelete,
 }: ActivityCardProps) {
   const typeIcons = {
-    protocol: CircleDot,
+    protocol: ClipboardList,
     recurring: Repeat,
     "one-time": CalendarDays,
   };
@@ -64,6 +67,13 @@ export function ActivityCard({
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
+            {activity.type === "protocol" && cheeseTypeName && cheeseColor && (
+              <CheeseBadge
+                name={cheeseTypeName}
+                color={cheeseColor}
+                size="sm"
+              />
+            )}
             <p
               className={cn(
                 "font-medium text-card-foreground",
@@ -72,7 +82,7 @@ export function ActivityCard({
             >
               {activity.title}
             </p>
-            {cheeseColor && (
+            {activity.type !== "protocol" && cheeseColor && (
               <span
                 className="h-3 w-3 rounded-full"
                 style={{ backgroundColor: cheeseColor }}
@@ -125,14 +135,8 @@ export function ActivityCard({
               activity.recurrence === "semiannual" ? "Semestrale" :
               activity.recurrence === "annual" ? "Annuale" : ""
             )}
-            {activity.type === "one-time" && "Una tantum"}
+            {activity.type === "one-time" && "Nessuna ricorrenza"}
           </span>
-          {!isCompleted && (
-            <span className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Clock className="h-3 w-3" />
-              In sospeso
-            </span>
-          )}
         </div>
       </div>
     </motion.div>

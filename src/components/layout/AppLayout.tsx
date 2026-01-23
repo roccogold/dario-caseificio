@@ -1,5 +1,5 @@
 import { ReactNode, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar,
@@ -9,8 +9,11 @@ import {
   Menu,
   X,
   Milk,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { signOut } from "@/utils/supabaseAuth";
+import { clearSession } from "@/utils/auth";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -25,7 +28,33 @@ const navigation = [
 
 export function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      // Determina se usare autenticazione locale o Supabase
+      const isDevelopment = import.meta.env.DEV || import.meta.env.MODE === 'development';
+      
+      if (isDevelopment) {
+        // Logout locale
+        clearSession();
+      } else {
+        // Logout Supabase
+        await signOut();
+      }
+      
+      // Reindirizza al login e ricarica la pagina
+      navigate('/', { replace: true });
+      window.location.reload();
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Fallback: pulisci la sessione locale e ricarica
+      clearSession();
+      navigate('/', { replace: true });
+      window.location.reload();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -33,18 +62,29 @@ export function AppLayout({ children }: AppLayoutProps) {
       <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r border-border bg-sidebar lg:block">
         <div className="flex h-full flex-col">
           {/* Logo */}
-          <div className="flex h-24 items-center border-b border-sidebar-border px-6">
-            <Link to="/calendario" className="flex items-center gap-3 w-full">
+          <div className="flex h-32 items-start border-b border-sidebar-border px-6 pt-8">
+            <Link to="/calendario" className="flex items-center gap-4 w-full">
               <img 
                 src="/frog-logo.svg" 
                 alt="Dario Frog" 
-                className="h-12 w-12 flex-shrink-0"
+                className="h-16 w-16 flex-shrink-0"
               />
               <div className="flex flex-col">
-                <span className="font-serif text-xl font-semibold tracking-widest text-primary uppercase">
+                <span 
+                  className="text-2xl tracking-widest uppercase"
+                  style={{ 
+                    color: '#8B7355',
+                    fontFamily: "'TC Galliard Bold', 'Garamond Premier Semibold Caption', 'Garamond Premier Semibold', 'Laurentian Semi Bold', 'EB Garamond', Georgia, serif",
+                    fontWeight: 700,
+                    letterSpacing: '0.1em'
+                  }}
+                >
                   DARIO
                 </span>
-                <span className="text-[10px] text-muted-foreground tracking-wide">
+                <span 
+                  className="text-xs tracking-wide font-serif"
+                  style={{ color: '#A68B6F' }}
+                >
                   Corzano e Paterno
                 </span>
               </div>
@@ -77,6 +117,17 @@ export function AppLayout({ children }: AppLayoutProps) {
               );
             })}
           </nav>
+
+          {/* Logout Button */}
+          <div className="border-t border-sidebar-border p-4">
+            <button
+              onClick={handleLogout}
+              className="group flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-sidebar-foreground transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-destructive"
+            >
+              <LogOut className="h-5 w-5 text-muted-foreground transition-colors group-hover:text-destructive" />
+              Esci
+            </button>
+          </div>
         </div>
       </aside>
 
@@ -89,7 +140,15 @@ export function AppLayout({ children }: AppLayoutProps) {
               alt="Dario Frog" 
               className="h-8 w-8"
             />
-            <span className="font-serif text-lg font-semibold tracking-widest text-primary uppercase">
+            <span 
+              className="text-lg tracking-widest uppercase"
+              style={{ 
+                color: '#8B7355',
+                fontFamily: "'TC Galliard Bold', 'Garamond Premier Semibold Caption', 'Garamond Premier Semibold', 'Laurentian Semi Bold', 'EB Garamond', Georgia, serif",
+                fontWeight: 700,
+                letterSpacing: '0.1em'
+              }}
+            >
               DARIO
             </span>
           </Link>
@@ -125,26 +184,42 @@ export function AppLayout({ children }: AppLayoutProps) {
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className="fixed right-0 top-16 z-50 h-[calc(100vh-4rem)] w-64 border-l border-border bg-background p-4 lg:hidden"
             >
-              <div className="space-y-1">
-                {navigation.map((item) => {
-                  const isActive = location.pathname === item.href;
-                  return (
-                    <Link
-                      key={item.name}
-                      to={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={cn(
-                        "flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all",
-                        isActive
-                          ? "bg-muted text-foreground"
-                          : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                      )}
-                    >
-                      <item.icon className="h-5 w-5" />
-                      {item.name}
-                    </Link>
-                  );
-                })}
+              <div className="flex flex-col h-full">
+                <div className="flex-1 space-y-1">
+                  {navigation.map((item) => {
+                    const isActive = location.pathname === item.href;
+                    return (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={cn(
+                          "flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all",
+                          isActive
+                            ? "bg-muted text-foreground"
+                            : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                        )}
+                      >
+                        <item.icon className="h-5 w-5" />
+                        {item.name}
+                      </Link>
+                    );
+                  })}
+                </div>
+                
+                {/* Logout Button */}
+                <div className="border-t border-border pt-4 mt-auto">
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground transition-all hover:bg-muted/50 hover:text-destructive"
+                  >
+                    <LogOut className="h-5 w-5" />
+                    Esci
+                  </button>
+                </div>
               </div>
             </motion.nav>
           </>

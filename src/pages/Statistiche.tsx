@@ -9,10 +9,24 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
+  Milk,
+  Filter,
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   BarChart,
   Bar,
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -25,6 +39,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { StatCard } from "@/components/ui/stat-card";
 import { Button } from "@/components/ui/button";
 import { CheeseBadge } from "@/components/ui/cheese-badge";
+import { cn } from "@/lib/utils";
 
 const MONTHS_IT = [
   "Gen",
@@ -41,22 +56,166 @@ const MONTHS_IT = [
   "Dic",
 ];
 
+// Custom Tooltip Component for Bar Chart
+const CustomTooltip = ({ active, payload, cheeseTypes }: any) => {
+  if (!active || !payload || !payload.length) return null;
+
+  // Filtra solo i valori > 0
+  const validPayload = payload.filter((entry: any) => entry.value > 0);
+  if (validPayload.length === 0) return null;
+
+  return (
+    <div
+      style={{
+        backgroundColor: "hsl(var(--card))",
+        border: "1px solid hsl(var(--border))",
+        borderRadius: "8px",
+        padding: "8px 12px",
+        fontSize: "12px",
+      }}
+    >
+      {validPayload.map((entry: any, index: number) => {
+        const cheese = cheeseTypes.find((c: any) => c.name === entry.dataKey);
+        if (!cheese || entry.value === 0) return null;
+        
+        return (
+          <div key={index} style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: index < validPayload.length - 1 ? "4px" : "0" }}>
+            <CheeseBadge
+              name={cheese.name}
+              color={cheese.color}
+              size="sm"
+              className="text-xs"
+            />
+            <span style={{ fontSize: "12px", color: "hsl(var(--muted-foreground))" }}>
+              {entry.value} L
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+// Custom Tooltip Component for Area Chart (Annual View)
+const CustomAreaTooltip = ({ active, payload, label, cheeseTypes }: any) => {
+  if (!active || !payload || !payload.length) return null;
+
+  // Filtra solo i valori > 0 (escludi "total" se è 0)
+  const validPayload = payload.filter((entry: any) => {
+    if (entry.dataKey === "total") {
+      return entry.value > 0;
+    }
+    return entry.value > 0;
+  });
+  
+  if (validPayload.length === 0) return null;
+
+  return (
+    <div
+      style={{
+        backgroundColor: "hsl(var(--card))",
+        border: "1px solid hsl(var(--border))",
+        borderRadius: "8px",
+        padding: "8px 12px",
+        fontSize: "12px",
+      }}
+    >
+      {label && (
+        <div style={{ fontWeight: 500, marginBottom: "6px", color: "hsl(var(--foreground))" }}>
+          {label}
+        </div>
+      )}
+      {validPayload.map((entry: any, index: number) => {
+        if (entry.dataKey === "total") {
+          return (
+            <div key={`total-${index}`} style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: index < validPayload.length - 1 ? "4px" : "0" }}>
+              <span
+                style={{
+                  height: "10px",
+                  width: "10px",
+                  borderRadius: "50%",
+                  backgroundColor: "#F5E6D3",
+                  display: "inline-block",
+                }}
+              />
+              <span style={{ fontSize: "12px", color: "hsl(var(--muted-foreground))" }}>
+                Totale: <span style={{ color: "hsl(var(--foreground))", fontWeight: 500 }}>{entry.value} L</span>
+              </span>
+            </div>
+          );
+        }
+        
+        const cheese = cheeseTypes.find((c: any) => c.name === entry.dataKey);
+        if (!cheese || entry.value === 0) return null;
+        
+        return (
+          <div key={index} style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: index < validPayload.length - 1 ? "4px" : "0" }}>
+            <CheeseBadge
+              name={cheese.name}
+              color={cheese.color}
+              size="sm"
+              className="text-xs"
+            />
+            <span style={{ fontSize: "12px", color: "hsl(var(--muted-foreground))" }}>
+              {entry.value} L
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 export default function Statistiche() {
   const { productions, cheeseTypes, getMonthlyStats } = useData();
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedCheeseId, setSelectedCheeseId] = useState<string | null>(null);
+  const [viewType, setViewType] = useState<"annual" | "monthly">("annual");
 
-  const monthlyStats = useMemo(
-    () => getMonthlyStats(selectedYear),
-    [selectedYear, productions]
-  );
+  const monthlyStats = useMemo(() => {
+    const stats = getMonthlyStats(selectedYear);
+    
+    // Filtra per formaggio se selezionato
+    if (selectedCheeseId) {
+      return stats.map(stat => ({
+        ...stat,
+        cheeseBreakdown: stat.cheeseBreakdown.filter(
+          c => c.cheeseTypeId === selectedCheeseId
+        ),
+        totalLiters: stat.cheeseBreakdown
+          .filter(c => c.cheeseTypeId === selectedCheeseId)
+          .reduce((sum, c) => sum + c.liters, 0),
+      }));
+    }
+    
+    return stats;
+  }, [selectedYear, productions, selectedCheeseId, getMonthlyStats]);
 
-  // Calculate yearly totals
+  // Calculate yearly totals - filtered by cheese if selected
   const yearlyTotals = useMemo(() => {
     const totalLiters = monthlyStats.reduce((sum, m) => sum + m.totalLiters, 0);
-    const totalProductions = monthlyStats.reduce(
-      (sum, m) => sum + m.productions,
-      0
-    );
+    
+    // Count productions - if filtering by cheese, count only productions that include that cheese
+    let totalProductions = 0;
+    if (selectedCheeseId) {
+      // Count unique productions that contain the selected cheese in the selected year
+      const productionIds = new Set<string>();
+      productions.forEach(p => {
+        const prodDate = new Date(p.date);
+        if (prodDate.getFullYear() === selectedYear &&
+            p.cheeses.some(c => c.cheeseTypeId === selectedCheeseId)) {
+          productionIds.add(p.id);
+        }
+      });
+      totalProductions = productionIds.size;
+    } else {
+      // Count all productions for the year
+      totalProductions = monthlyStats.reduce(
+        (sum, m) => sum + m.productions,
+        0
+      );
+    }
+    
     const avgPerMonth = totalLiters / 12;
     const bestMonth = monthlyStats.reduce(
       (best, m) => (m.totalLiters > best.totalLiters ? m : best),
@@ -64,15 +223,24 @@ export default function Statistiche() {
     );
 
     return { totalLiters, totalProductions, avgPerMonth, bestMonth };
-  }, [monthlyStats]);
+  }, [monthlyStats, selectedCheeseId, productions, selectedYear]);
 
-  // Prepare chart data
+  // Prepare chart data - filtered by cheese if selected
   const chartData = useMemo(() => {
+    const cheesesToShow = selectedCheeseId 
+      ? cheeseTypes.filter(c => c.id === selectedCheeseId)
+      : cheeseTypes;
+    
     return monthlyStats.map((stat) => {
       const data: Record<string, number | string> = {
         month: MONTHS_IT[stat.month],
       };
-      cheeseTypes.forEach((cheese) => {
+      
+      // Add total liters for the month
+      data.total = stat.totalLiters;
+      
+      // Add individual cheese data
+      cheesesToShow.forEach((cheese) => {
         const cheeseData = stat.cheeseBreakdown.find(
           (c) => c.cheeseTypeId === cheese.id
         );
@@ -80,23 +248,8 @@ export default function Statistiche() {
       });
       return data;
     });
-  }, [monthlyStats, cheeseTypes]);
+  }, [monthlyStats, cheeseTypes, selectedCheeseId]);
 
-  // Cheese ranking for the year
-  const cheeseRanking = useMemo(() => {
-    return cheeseTypes
-      .map((cheese) => {
-        const totalLiters = monthlyStats.reduce((sum, month) => {
-          const cheeseData = month.cheeseBreakdown.find(
-            (c) => c.cheeseTypeId === cheese.id
-          );
-          return sum + (cheeseData?.liters || 0);
-        }, 0);
-        return { cheese, totalLiters };
-      })
-      .filter((c) => c.totalLiters > 0)
-      .sort((a, b) => b.totalLiters - a.totalLiters);
-  }, [monthlyStats, cheeseTypes]);
 
   return (
     <AppLayout>
@@ -116,33 +269,94 @@ export default function Statistiche() {
             </p>
           </div>
 
-          {/* Year Selector */}
-          <div className="flex items-center gap-2 rounded-lg border border-border bg-card p-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setSelectedYear((y) => y - 1)}
+          {/* Filters */}
+          <div className="flex items-center gap-3">
+            {/* Year Selector */}
+            <div className="flex items-center gap-2 rounded-lg border border-border bg-card p-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setSelectedYear((y) => y - 1)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="min-w-[4rem] text-center font-serif font-semibold">
+                {selectedYear}
+              </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setSelectedYear((y) => y + 1)}
+                disabled={selectedYear >= new Date().getFullYear()}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Cheese Filter */}
+            <Select
+              value={selectedCheeseId || "all"}
+              onValueChange={(value) =>
+                setSelectedCheeseId(value === "all" ? null : value)
+              }
             >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="min-w-[4rem] text-center font-serif font-semibold">
-              {selectedYear}
-            </span>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setSelectedYear((y) => y + 1)}
-              disabled={selectedYear >= new Date().getFullYear()}
+              <SelectTrigger className="w-[180px]">
+                <div className="flex items-center gap-2">
+                  <Milk className="h-4 w-4 text-muted-foreground" />
+                  <SelectValue placeholder="Tutti i formaggi" />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tutti i formaggi</SelectItem>
+                {cheeseTypes.map((cheese) => (
+                  <SelectItem key={cheese.id} value={cheese.id}>
+                    {cheese.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Monthly/Annual Toggle */}
+            <ToggleGroup
+              type="single"
+              value={viewType}
+              onValueChange={(value) => {
+                if (value) setViewType(value as "annual" | "monthly");
+              }}
+              className="border border-border rounded-lg bg-muted/30 p-1 gap-0"
             >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+              <ToggleGroupItem
+                value="annual"
+                aria-label="Annual view"
+                className={cn(
+                  "px-4 py-2 font-serif rounded-md transition-all",
+                  viewType === "annual"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "bg-transparent text-muted-foreground hover:text-foreground"
+                )}
+              >
+                Annuale
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="monthly"
+                aria-label="Monthly view"
+                className={cn(
+                  "px-4 py-2 font-serif rounded-md transition-all",
+                  viewType === "monthly"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "bg-transparent text-muted-foreground hover:text-foreground"
+                )}
+              >
+                Mensile
+              </ToggleGroupItem>
+            </ToggleGroup>
           </div>
         </motion.div>
 
         {/* Stats Cards */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2">
           <StatCard
             title="Litri Totali"
             value={yearlyTotals.totalLiters}
@@ -156,117 +370,137 @@ export default function Statistiche() {
             icon={<Factory className="h-6 w-6" />}
             delay={100}
           />
-          <StatCard
-            title="Media Mensile"
-            value={Math.round(yearlyTotals.avgPerMonth)}
-            suffix=" L"
-            icon={<TrendingUp className="h-6 w-6" />}
-            delay={200}
-          />
-          <StatCard
-            title="Mese Migliore"
-            value={yearlyTotals.bestMonth?.totalLiters || 0}
-            suffix=" L"
-            icon={<Calendar className="h-6 w-6" />}
-            delay={300}
-          />
         </div>
 
-        {/* Chart and Ranking */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Chart */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="lg:col-span-2 rounded-xl border border-border bg-card p-6 shadow-card"
-          >
+        {/* Chart */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="rounded-xl border border-border bg-card p-6 shadow-card"
+        >
             <h2 className="mb-6 font-serif text-xl font-semibold text-card-foreground">
-              Produzione Mensile
+              {viewType === "annual" ? "Andamento Produzione" : `Produzione Mensile (${selectedYear})`}
             </h2>
             <div className="h-[350px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData}>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="hsl(var(--border))"
-                  />
-                  <XAxis
-                    dataKey="month"
-                    tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
-                    axisLine={{ stroke: "hsl(var(--border))" }}
-                  />
-                  <YAxis
-                    tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
-                    axisLine={{ stroke: "hsl(var(--border))" }}
-                    tickFormatter={(value) => `${value}L`}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "8px",
-                    }}
-                  />
-                  <Legend />
-                  {cheeseTypes.slice(0, 5).map((cheese) => (
-                    <Bar
-                      key={cheese.id}
-                      dataKey={cheese.name}
-                      stackId="a"
-                      fill={cheese.color}
+                {viewType === "annual" ? (
+                  <AreaChart data={chartData}>
+                    <defs>
+                      <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#F5E6D3" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#F5E6D3" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="hsl(var(--border))"
                     />
-                  ))}
-                </BarChart>
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                      axisLine={{ stroke: "hsl(var(--border))" }}
+                    />
+                    <YAxis
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                      axisLine={{ stroke: "hsl(var(--border))" }}
+                      tickFormatter={(value) => `${value}L`}
+                    />
+                    <Tooltip
+                      content={<CustomAreaTooltip cheeseTypes={cheeseTypes} />}
+                    />
+                    {selectedCheeseId ? (
+                      <>
+                        <Area
+                          type="monotone"
+                          dataKey="total"
+                          stroke="#F5E6D3"
+                          fillOpacity={1}
+                          fill="url(#colorTotal)"
+                        />
+                        {cheeseTypes
+                          .filter(c => c.id === selectedCheeseId)
+                          .map((cheese) => (
+                            <Line
+                              key={cheese.id}
+                              type="monotone"
+                              dataKey={cheese.name}
+                              stroke={cheese.color}
+                              strokeWidth={2}
+                              dot={{ fill: cheese.color, r: 4 }}
+                              activeDot={{ r: 6 }}
+                            />
+                          ))}
+                      </>
+                    ) : (
+                      <>
+                        <Area
+                          type="monotone"
+                          dataKey="total"
+                          stroke="#F5E6D3"
+                          fillOpacity={1}
+                          fill="url(#colorTotal)"
+                        />
+                        {cheeseTypes.slice(0, 3).map((cheese) => (
+                          <Line
+                            key={cheese.id}
+                            type="monotone"
+                            dataKey={cheese.name}
+                            stroke={cheese.color}
+                            strokeWidth={2}
+                            dot={{ fill: cheese.color, r: 4 }}
+                            activeDot={{ r: 6 }}
+                          />
+                        ))}
+                      </>
+                    )}
+                  </AreaChart>
+                ) : (
+                  <BarChart data={chartData}>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="hsl(var(--border))"
+                    />
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                      axisLine={{ stroke: "hsl(var(--border))" }}
+                    />
+                    <YAxis
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                      axisLine={{ stroke: "hsl(var(--border))" }}
+                      tickFormatter={(value) => `${value}L`}
+                    />
+                    <Tooltip
+                      content={<CustomTooltip cheeseTypes={cheeseTypes} />}
+                    />
+                    {selectedCheeseId ? (
+                      cheeseTypes
+                        .filter(c => c.id === selectedCheeseId)
+                        .map((cheese) => (
+                          <Bar
+                            key={cheese.id}
+                            dataKey={cheese.name}
+                            fill={cheese.color}
+                            radius={[8, 8, 0, 0]}
+                          />
+                        ))
+                    ) : (
+                      cheeseTypes.slice(0, 5).map((cheese, index, array) => (
+                        <Bar
+                          key={cheese.id}
+                          dataKey={cheese.name}
+                          stackId="a"
+                          fill={cheese.color}
+                          radius={index === array.length - 1 ? [8, 8, 0, 0] : [0, 0, 0, 0]}
+                        />
+                      ))
+                    )}
+                  </BarChart>
+                )}
               </ResponsiveContainer>
             </div>
           </motion.div>
-
-          {/* Cheese Ranking */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="rounded-xl border border-border bg-card p-6 shadow-card"
-          >
-            <h2 className="mb-6 font-serif text-xl font-semibold text-card-foreground">
-              Classifica Formaggi
-            </h2>
-            <div className="space-y-4">
-              {cheeseRanking.map((item, index) => (
-                <div
-                  key={item.cheese.id}
-                  className="flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold ${
-                        index === 0
-                          ? "bg-warning/20 text-warning"
-                          : "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {index + 1}
-                    </span>
-                    <CheeseBadge
-                      name={item.cheese.name}
-                      color={item.cheese.color}
-                      size="sm"
-                    />
-                  </div>
-                  <span className="font-medium text-foreground">
-                    {item.totalLiters.toLocaleString("it-IT")} L
-                  </span>
-                </div>
-              ))}
-              {cheeseRanking.length === 0 && (
-                <p className="text-sm italic text-muted-foreground">
-                  Nessun dato disponibile per quest'anno
-                </p>
-              )}
-            </div>
-          </motion.div>
-        </div>
       </div>
     </AppLayout>
   );

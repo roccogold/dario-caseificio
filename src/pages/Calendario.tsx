@@ -182,6 +182,16 @@ export default function Calendario() {
                       ) : null;
                     })}
                   </div>
+                  {prod.notes && (
+                    <div className="mt-3 pt-3 border-t border-border">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">
+                        Note
+                      </p>
+                      <p className="text-sm text-foreground whitespace-pre-wrap">
+                        {prod.notes}
+                      </p>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -203,20 +213,24 @@ export default function Calendario() {
           ) : (
             <div className="space-y-2">
                     <AnimatePresence mode="popLayout">
-                      {dayActivities.map((activity) => (
-                        <ActivityCard
-                          key={activity.id}
-                          activity={activity}
-                          cheeseColor={getCheeseType(activity.cheeseTypeId)?.color}
-                          onToggle={() => toggleActivity(activity.id, selectedDate)}
-                          currentDate={selectedDate}
-                          onEdit={() => {
-                            setSelectedActivity(activity);
-                            setIsEditActivityDialogOpen(true);
-                          }}
-                          onDelete={() => deleteActivity(activity.id)}
-                        />
-                      ))}
+                      {dayActivities.map((activity) => {
+                        const cheeseType = getCheeseType(activity.cheeseTypeId);
+                        return (
+                          <ActivityCard
+                            key={activity.id}
+                            activity={activity}
+                            cheeseColor={cheeseType?.color}
+                            cheeseTypeName={cheeseType?.name}
+                            onToggle={() => toggleActivity(activity.id, selectedDate)}
+                            currentDate={selectedDate}
+                            onEdit={() => {
+                              setSelectedActivity(activity);
+                              setIsEditActivityDialogOpen(true);
+                            }}
+                            onDelete={() => deleteActivity(activity.id)}
+                          />
+                        );
+                      })}
                     </AnimatePresence>
             </div>
           )}
@@ -275,6 +289,11 @@ export default function Calendario() {
                           <div className="text-muted-foreground">
                             {prod.totalLiters}L
                           </div>
+                          {prod.notes && (
+                            <div className="mt-1 text-[10px] text-muted-foreground line-clamp-2">
+                              {prod.notes}
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -285,6 +304,12 @@ export default function Calendario() {
                     const isCompletedForDate = activity.recurrence && activity.recurrence !== 'none' && activity.type === 'recurring'
                       ? (activity.completedDates || []).includes(format(day, 'yyyy-MM-dd'))
                       : activity.completed;
+                    
+                    // Trova la produzione associata per le attività di protocollo
+                    const associatedProduction = activity.type === "protocol" && activity.productionId
+                      ? productions.find(p => p.id === activity.productionId)
+                      : null;
+                    
                     return (
                       <div
                         key={activity.id}
@@ -299,18 +324,25 @@ export default function Calendario() {
                           borderLeftColor: cheeseType?.color || undefined,
                         }}
                       >
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 flex-wrap">
                           {isCompletedForDate ? (
                             <CheckCircle2 className="h-3 w-3 text-success" />
                           ) : (
                             <Circle className="h-3 w-3 text-muted-foreground" />
                           )}
-                          <span className="font-medium">{activity.title}</span>
-                          {activity.type === "protocol" && (
-                            <span className="ml-1 rounded-full bg-primary/10 px-1 text-[10px]">
-                              P
+                          {activity.type === "protocol" && associatedProduction && (
+                            <span className="rounded-full bg-primary/10 px-1.5 text-[10px] font-medium">
+                              #{associatedProduction.productionNumber}
                             </span>
                           )}
+                          {activity.type === "protocol" && cheeseType && (
+                            <CheeseBadge
+                              name={cheeseType.name}
+                              color={cheeseType.color}
+                              size="sm"
+                            />
+                          )}
+                          <span className="font-medium">{activity.title}</span>
                         </div>
                       </div>
                     );
@@ -392,25 +424,56 @@ export default function Calendario() {
                     const isCompletedForDate = activity.recurrence && activity.recurrence !== 'none' && activity.type === 'recurring'
                       ? (activity.completedDates || []).includes(format(day, 'yyyy-MM-dd'))
                       : activity.completed;
+                    
+                    // Trova la produzione associata per le attività di protocollo
+                    const associatedProduction = activity.type === "protocol" && activity.productionId
+                      ? productions.find(p => p.id === activity.productionId)
+                      : null;
+                    
                     return (
                       <div
                         key={activity.id}
                         className={cn(
-                          "text-[10px] truncate flex items-center gap-1",
-                          isCompletedForDate && "opacity-60 line-through",
+                          "text-[10px] flex items-center gap-1 flex-wrap",
+                          isCompletedForDate && "opacity-60",
                           !isCurrentMonth && "text-muted-foreground/50"
                         )}
                       >
-                        <span
-                          className={cn(
-                            "h-1.5 w-1.5 rounded-full flex-shrink-0",
-                            isCompletedForDate ? "bg-success" : cheeseType ? "" : "bg-muted-foreground"
-                          )}
-                          style={{
-                            backgroundColor: !isCompletedForDate && cheeseType ? cheeseType.color : undefined,
-                          }}
-                        />
-                        <span className="truncate">{activity.title}</span>
+                        {activity.type === "protocol" && cheeseType ? (
+                          <>
+                            {associatedProduction && (
+                              <span className="rounded-full bg-primary/10 px-1 text-[8px] font-medium flex-shrink-0">
+                                #{associatedProduction.productionNumber}
+                              </span>
+                            )}
+                            <CheeseBadge
+                              name={cheeseType.name}
+                              color={cheeseType.color}
+                              size="sm"
+                              className="text-[9px] px-1.5 py-0"
+                            />
+                            <span className={cn(
+                              "truncate",
+                              isCompletedForDate && "line-through"
+                            )}>{activity.title}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span
+                              className={cn(
+                                "h-1.5 w-1.5 rounded-full flex-shrink-0",
+                                isCompletedForDate ? "bg-success" : cheeseType ? "" : "bg-muted-foreground"
+                              )}
+                              style={{
+                                backgroundColor: !isCompletedForDate && cheeseType ? cheeseType.color : undefined,
+                              }}
+                            />
+                            <span className={cn(
+                              "truncate",
+                              isCompletedForDate && "line-through"
+                            )}>{activity.title}</span>
+                          </>
+                        )}
                       </div>
                     );
                   })}

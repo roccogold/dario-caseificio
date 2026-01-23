@@ -120,11 +120,12 @@ export const findUserByUsername = (username) => {
 }
 
 /**
- * Find user by email
+ * Find user by email (case-insensitive)
  */
 export const findUserByEmail = (email) => {
   const users = getUsers()
-  return users.find(u => u.email === email)
+  const normalizedEmail = email?.toLowerCase().trim()
+  return users.find(u => u.email?.toLowerCase().trim() === normalizedEmail)
 }
 
 /**

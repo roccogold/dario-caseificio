@@ -184,9 +184,97 @@ export function useData() {
 
   const updateCheeseType = useCallback(async (id: string, updates: Partial<CheeseType>) => {
     try {
+      const current = cheeseTypes.find(c => c.id === id);
+      if (!current) return;
+
+      // Se il protocollo viene modificato, aggiorna le attività di protocollo esistenti
+      if (updates.protocol !== undefined) {
+        // Trova tutte le produzioni che contengono questo formaggio
+        const relatedProductions = productions.filter(p =>
+          p.cheeses.some(c => c.cheeseTypeId === id)
+        );
+
+        // Per ogni produzione, elimina le vecchie attività di protocollo per questo formaggio
+        for (const production of relatedProductions) {
+          const oldProtocolActivities = activities.filter(
+            a => a.type === 'protocol' &&
+                 a.productionId === production.id &&
+                 a.cheeseTypeId === id
+          );
+
+          // Elimina le vecchie attività
+          for (const activity of oldProtocolActivities) {
+            if (useSupabase) {
+              try {
+                await deleteActivityFromSupabase(activity.id);
+              } catch (err) {
+                console.error('Error deleting old protocol activity:', err);
+              }
+            } else {
+              localActivities.delete(activity.id);
+            }
+          }
+          setActivities((prev) =>
+            prev.filter(a => !(a.type === 'protocol' && a.productionId === production.id && a.cheeseTypeId === id))
+          );
+
+          // Ricrea le attività di protocollo con il nuovo protocollo
+          const productionCheese = production.cheeses.find(c => c.cheeseTypeId === id);
+          if (productionCheese && updates.protocol && updates.protocol.length > 0) {
+            const newProtocolActivities: Activity[] = [];
+            const productionDate = new Date(production.date);
+            productionDate.setHours(0, 0, 0, 0);
+
+            for (const protocolStep of updates.protocol) {
+              const activityDate = addDays(productionDate, protocolStep.day);
+              activityDate.setHours(0, 0, 0, 0);
+
+              const activityTitle = protocolStep.activity;
+              const activityDescription = `Lotto: ${production.productionNumber} | ${productionCheese.liters}L`;
+
+              const protocolActivity: Activity = {
+                id: `act-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                title: activityTitle,
+                description: activityDescription,
+                date: activityDate,
+                type: 'protocol',
+                productionId: production.id,
+                cheeseTypeId: id,
+                completed: false,
+                createdAt: new Date(),
+              };
+
+              newProtocolActivities.push(protocolActivity);
+            }
+
+            // Salva le nuove attività
+            for (const protocolActivity of newProtocolActivities) {
+              try {
+                if (useSupabase) {
+                  const savedActivity = await saveActivity(protocolActivity);
+                  setActivities((prev) => {
+                    const exists = prev.some(a => a.id === savedActivity.id);
+                    if (exists) return prev;
+                    return [...prev, savedActivity];
+                  });
+                } else {
+                  localActivities.add(protocolActivity);
+                  setActivities((prev) => {
+                    const exists = prev.some(a => a.id === protocolActivity.id);
+                    if (exists) return prev;
+                    return [...prev, protocolActivity];
+                  });
+                }
+              } catch (error) {
+                console.error('Error creating new protocol activity:', error);
+              }
+            }
+          }
+        }
+      }
+
+      // Aggiorna il formaggio
       if (useSupabase) {
-        const current = cheeseTypes.find(c => c.id === id);
-        if (!current) return;
         const updated = await saveCheese({ ...current, ...updates, id });
         setCheeseTypes((prev) =>
           prev.map((c) => (c.id === id ? updated : c))
@@ -206,16 +294,38 @@ export function useData() {
         prev.map((c) => (c.id === id ? { ...c, ...updates } : c))
       );
     }
-  }, [useSupabase, cheeseTypes]);
+  }, [useSupabase, cheeseTypes, productions, activities]);
 
   const deleteCheeseType = useCallback(async (id: string) => {
     try {
+      // Trova tutte le attività associate a questo formaggio
+      const relatedActivities = activities.filter(
+        a => a.cheeseTypeId === id
+      );
+
+      // Elimina il formaggio
       if (useSupabase) {
         await deleteCheeseFromSupabase(id);
         setCheeseTypes((prev) => prev.filter((c) => c.id !== id));
+        
+        // Elimina anche le attività associate
+        for (const activity of relatedActivities) {
+          try {
+            await deleteActivityFromSupabase(activity.id);
+          } catch (err) {
+            console.error('Error deleting related activity:', err);
+          }
+        }
+        setActivities((prev) => prev.filter((a) => a.cheeseTypeId !== id));
       } else {
         localCheeses.delete(id);
         setCheeseTypes((prev) => prev.filter((c) => c.id !== id));
+        
+        // Elimina anche le attività associate
+        for (const activity of relatedActivities) {
+          localActivities.delete(activity.id);
+        }
+        setActivities((prev) => prev.filter((a) => a.cheeseTypeId !== id));
       }
     } catch (error) {
       console.error('Error deleting cheese:', error);
@@ -223,8 +333,17 @@ export function useData() {
       // Fallback
       localCheeses.delete(id);
       setCheeseTypes((prev) => prev.filter((c) => c.id !== id));
+      
+      // Elimina anche le attività associate in caso di errore
+      const relatedActivities = activities.filter(
+        a => a.cheeseTypeId === id
+      );
+      for (const activity of relatedActivities) {
+        localActivities.delete(activity.id);
+      }
+      setActivities((prev) => prev.filter((a) => a.cheeseTypeId !== id));
     }
-  }, [useSupabase]);
+  }, [useSupabase, activities]);
 
   // ============================================
   // PRODUCTION OPERATIONS
@@ -270,7 +389,7 @@ export function useData() {
           // Normalizza la data dell'attività a mezzanotte per il confronto corretto
           activityDate.setHours(0, 0, 0, 0);
           
-          const activityTitle = `${cheeseType.name} - ${protocolStep.activity}`;
+          const activityTitle = protocolStep.activity;
           const activityDescription = `Lotto: ${production.productionNumber} | ${productionCheese.liters}L`;
 
           const protocolActivity: Activity = {
@@ -375,20 +494,51 @@ export function useData() {
 
   const deleteProduction = useCallback(async (id: string) => {
     try {
+      // Trova tutte le attività associate a questa produzione (non solo quelle di protocollo)
+      const relatedActivities = activities.filter(
+        a => a.productionId === id
+      );
+
+      // Elimina la produzione
       if (useSupabase) {
         await deleteProductionFromSupabase(id);
         setProductions((prev) => prev.filter((p) => p.id !== id));
+        
+        // Elimina anche tutte le attività associate
+        for (const activity of relatedActivities) {
+          try {
+            await deleteActivityFromSupabase(activity.id);
+          } catch (err) {
+            console.error('Error deleting related activity:', err);
+          }
+        }
+        setActivities((prev) => prev.filter((a) => a.productionId !== id));
       } else {
         localProductions.delete(id);
         setProductions((prev) => prev.filter((p) => p.id !== id));
+        
+        // Elimina anche tutte le attività associate
+        for (const activity of relatedActivities) {
+          localActivities.delete(activity.id);
+        }
+        setActivities((prev) => prev.filter((a) => a.productionId !== id));
       }
     } catch (error) {
       console.error('Error deleting production:', error);
       toast.error('Errore nell\'eliminazione della produzione');
       localProductions.delete(id);
       setProductions((prev) => prev.filter((p) => p.id !== id));
+      
+      // Elimina anche tutte le attività associate in caso di errore
+      const relatedActivities = activities.filter(
+        a => a.productionId === id
+      );
+      for (const activity of relatedActivities) {
+        localActivities.delete(activity.id);
+      }
+      setActivities((prev) => prev.filter((a) => a.productionId !== id));
     }
-  }, [useSupabase]);
+  }, [useSupabase, activities]);
 
   // ============================================
   // ACTIVITY OPERATIONS

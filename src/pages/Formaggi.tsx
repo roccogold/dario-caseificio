@@ -2,13 +2,14 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus,
-  CircleDot,
+  Milk,
   Euro,
   Droplets,
   MoreVertical,
   Edit,
   Trash2,
   Search,
+  FileText,
 } from "lucide-react";
 import { useData } from "@/hooks/use-data";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -27,6 +28,8 @@ import { AddCheeseDialog } from "@/components/dialogs/AddCheeseDialog";
 import { EditCheeseDialog } from "@/components/dialogs/EditCheeseDialog";
 import { EditProtocolDialog } from "@/components/dialogs/EditProtocolDialog";
 import { CheeseType } from "@/types";
+import { generateCheesePDF } from "@/utils/generatePDF";
+import { toast } from "sonner";
 
 export default function Formaggi() {
   const { cheeseTypes, addCheeseType, updateCheeseType, deleteCheeseType } = useData();
@@ -123,7 +126,7 @@ export default function Formaggi() {
         {/* Cheese Grid */}
         {filteredCheeseTypes.length === 0 ? (
           <EmptyState
-            icon={<CircleDot className="h-8 w-8" />}
+            icon={<Milk className="h-8 w-8" />}
             title={searchQuery ? "Nessun risultato" : "Nessun formaggio"}
             description={
               searchQuery
@@ -185,6 +188,21 @@ export default function Formaggi() {
                             <Edit className="mr-2 h-4 w-4" />
                             Modifica
                           </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={async () => {
+                              try {
+                                await generateCheesePDF(cheese);
+                                toast.success('PDF generato con successo!');
+                              } catch (error: any) {
+                                console.error('Error generating PDF:', error);
+                                const errorMessage = error?.message || 'Errore nella generazione del PDF';
+                                toast.error(errorMessage);
+                              }
+                            }}
+                          >
+                            <FileText className="mr-2 h-4 w-4" />
+                            Genera Scheda PDF
+                          </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             className="text-destructive"
@@ -198,7 +216,7 @@ export default function Formaggi() {
                     </div>
 
                     {/* Stats */}
-                    <div className="mt-4 grid grid-cols-2 gap-4">
+                    <div className="mt-4 space-y-3">
                       <div className="flex items-center gap-2">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
                           <Droplets className="h-4 w-4 text-muted-foreground" />
@@ -206,26 +224,138 @@ export default function Formaggi() {
                         <div>
                           <p className="text-xs text-muted-foreground">Resa</p>
                           <p className="text-sm font-medium">
-                            {cheese.yieldPerLiter} kg/L
+                            {cheese.yieldPercentage !== undefined 
+                              ? `${cheese.yieldPercentage}%` 
+                              : cheese.yieldPerLiter 
+                                ? `${(cheese.yieldPerLiter * 100).toFixed(1)}%` 
+                                : 'N/A'}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
-                          <Euro className="h-4 w-4 text-muted-foreground" />
-                        </div>
-                        <div>
-                          <p className="text-xs text-muted-foreground">Prezzo</p>
-                          <p className="text-sm font-medium">
-                            €{cheese.pricePerKg.toFixed(2)}/kg
-                          </p>
-                        </div>
+                      
+                      {/* Prezzi */}
+                      <div className="space-y-2">
+                        {cheese.prices ? (
+                          <>
+                            {cheese.prices.price1 > 0 && (
+                              <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">Franco Caseificio:</span>
+                                <span className="font-medium">€{cheese.prices.price1.toFixed(2)}/kg</span>
+                                {cheese.prices.salesPercentage1 > 0 && (
+                                  <span className="text-xs text-muted-foreground">({cheese.prices.salesPercentage1}%)</span>
+                                )}
+                              </div>
+                            )}
+                            {cheese.prices.price2 > 0 && (
+                              <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">Franco Cliente:</span>
+                                <span className="font-medium">€{cheese.prices.price2.toFixed(2)}/kg</span>
+                                {cheese.prices.salesPercentage2 > 0 && (
+                                  <span className="text-xs text-muted-foreground">({cheese.prices.salesPercentage2}%)</span>
+                                )}
+                              </div>
+                            )}
+                            {cheese.prices.price3 > 0 && (
+                              <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">Vendita Diretta:</span>
+                                <span className="font-medium">€{cheese.prices.price3.toFixed(2)}/kg</span>
+                                {cheese.prices.salesPercentage3 > 0 && (
+                                  <span className="text-xs text-muted-foreground">({cheese.prices.salesPercentage3}%)</span>
+                                )}
+                              </div>
+                            )}
+                          </>
+                        ) : cheese.pricePerKg ? (
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Prezzo:</span>
+                            <span className="font-medium">€{cheese.pricePerKg.toFixed(2)}/kg</span>
+                          </div>
+                        ) : null}
                       </div>
                     </div>
 
+                    {/* Default Fields */}
+                    {cheese.defaultFields && (
+                      <div className="mt-4 border-t border-border pt-4">
+                        <div className="space-y-2">
+                          {cheese.defaultFields.temperaturaCoagulazione && (
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-medium text-muted-foreground">
+                                  Temperatura Coagulazione
+                                </p>
+                                <p className="text-sm text-foreground mt-0.5">
+                                  {cheese.defaultFields.temperaturaCoagulazione}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                          {cheese.defaultFields.nomeFermento && (
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-medium text-muted-foreground">
+                                  Nome Fermento
+                                </p>
+                                <p className="text-sm text-foreground mt-0.5">
+                                  {cheese.defaultFields.nomeFermento}
+                                  {cheese.defaultFields.quantitaFermento && ` (${cheese.defaultFields.quantitaFermento} unità)`}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                          {cheese.defaultFields.muffe && (
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-medium text-muted-foreground">
+                                  Muffe
+                                </p>
+                                <p className="text-sm text-foreground mt-0.5">
+                                  {cheese.defaultFields.muffe}
+                                  {cheese.defaultFields.quantitaMuffe && ` (${cheese.defaultFields.quantitaMuffe} unità)`}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                          {cheese.defaultFields.caglio && (
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-medium text-muted-foreground">
+                                  Caglio
+                                </p>
+                                <p className="text-sm text-foreground mt-0.5">
+                                  {cheese.defaultFields.caglio}
+                                  {cheese.defaultFields.quantitaCaglio && ` (${cheese.defaultFields.quantitaCaglio} cc)`}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Custom Fields */}
+                    {cheese.customFields && cheese.customFields.length > 0 && (
+                      <div className={`mt-4 border-t border-border pt-4 ${cheese.defaultFields ? '' : ''}`}>
+                        <div className="space-y-2">
+                          {cheese.customFields.map((field, index) => (
+                            <div key={index} className="flex items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-medium text-muted-foreground">
+                                  {field.key || "Campo"}
+                                </p>
+                                <p className="text-sm text-foreground mt-0.5">
+                                  {field.value || "-"}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Protocol Preview */}
                     {cheese.protocol.length > 0 && (
-                      <div className="mt-4 border-t border-border pt-4">
+                      <div className={`mt-4 border-t border-border pt-4 ${cheese.customFields && cheese.customFields.length > 0 ? '' : ''}`}>
                         <p className="mb-2 text-xs font-medium uppercase text-muted-foreground">
                           Protocollo ({cheese.protocol.length} fasi)
                         </p>

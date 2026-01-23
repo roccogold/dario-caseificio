@@ -9,8 +9,27 @@ interface DbCheese {
   name: string;
   color: string;
   protocol: ProtocolStep[];
-  yield_liters_per_kg: number | null; // ATTENZIONE: nome confuso, ma è kg per liter
-  price_per_kg: number | null;
+  yield_liters_per_kg: number | null; // Legacy: kg per liter (resa)
+  yield_percentage: number | null; // Nuovo: % resa (es. 20 = 20kg da 100L)
+  price_per_kg: number | null; // Legacy: prezzo singolo
+  prices: {
+    price1: number;
+    price2: number;
+    price3: number;
+    salesPercentage1: number;
+    salesPercentage2: number;
+    salesPercentage3: number;
+  } | null; // Nuovo: 3 prezzi con % vendita
+  default_fields: {
+    temperaturaCoagulazione?: string;
+    nomeFermento?: string;
+    quantitaFermento?: string;
+    muffe?: string;
+    quantitaMuffe?: string;
+    caglio?: string;
+    quantitaCaglio?: string;
+  } | null; // Nuovo: parametri predefiniti
+  custom_fields: Array<{ key: string; value: string }> | null; // Nuovo: campi personalizzati
   created_at: string;
   updated_at?: string;
 }
@@ -36,6 +55,7 @@ interface DbActivity {
   production_id: string | null;
   cheese_type_id: string | null;
   is_completed: boolean;
+  completed_dates: string[] | null; // Nuovo: array di date per attività ricorrenti
   created_at: string;
   updated_at?: string;
 }
@@ -45,14 +65,61 @@ interface DbActivity {
 // ============================================
 
 export function dbCheeseToType(dbCheese: DbCheese): CheeseType {
+  // Calcola yieldPercentage: se presente nel DB usa quello, altrimenti converte da yield_liters_per_kg
+  let yieldPercentage: number;
+  if (dbCheese.yield_percentage !== null && dbCheese.yield_percentage !== undefined) {
+    yieldPercentage = Number(dbCheese.yield_percentage);
+  } else if (dbCheese.yield_liters_per_kg !== null && dbCheese.yield_liters_per_kg !== undefined) {
+    // Conversione: yield_liters_per_kg (kg/L) → yield_percentage (%)
+    yieldPercentage = Number(dbCheese.yield_liters_per_kg) * 100;
+  } else {
+    yieldPercentage = 20; // Default
+  }
+
+  // Gestisci prices: se presente nel DB usa quello, altrimenti usa price_per_kg legacy
+  let prices: CheeseType['prices'];
+  if (dbCheese.prices && typeof dbCheese.prices === 'object') {
+    prices = {
+      price1: Number(dbCheese.prices.price1) || 0,
+      price2: Number(dbCheese.prices.price2) || 0,
+      price3: Number(dbCheese.prices.price3) || 0,
+      salesPercentage1: Number(dbCheese.prices.salesPercentage1) || 100,
+      salesPercentage2: Number(dbCheese.prices.salesPercentage2) || 0,
+      salesPercentage3: Number(dbCheese.prices.salesPercentage3) || 0,
+    };
+  } else if (dbCheese.price_per_kg !== null && dbCheese.price_per_kg !== undefined) {
+    // Fallback a price_per_kg legacy
+    prices = {
+      price1: Number(dbCheese.price_per_kg),
+      price2: 0,
+      price3: 0,
+      salesPercentage1: 100,
+      salesPercentage2: 0,
+      salesPercentage3: 0,
+    };
+  } else {
+    prices = {
+      price1: 0,
+      price2: 0,
+      price3: 0,
+      salesPercentage1: 100,
+      salesPercentage2: 0,
+      salesPercentage3: 0,
+    };
+  }
+
   return {
     id: dbCheese.id,
     name: dbCheese.name,
     color: dbCheese.color,
     protocol: dbCheese.protocol || [],
-    // ATTENZIONE: yield_liters_per_kg nel DB è in realtà kg per liter (resa)
-    yieldPerLiter: dbCheese.yield_liters_per_kg ?? 0,
-    pricePerKg: dbCheese.price_per_kg ?? 0,
+    yieldPercentage,
+    prices,
+    defaultFields: dbCheese.default_fields || undefined,
+    customFields: dbCheese.custom_fields || undefined,
+    // Legacy fields per backward compatibility
+    yieldPerLiter: dbCheese.yield_liters_per_kg ?? (yieldPercentage / 100),
+    pricePerKg: dbCheese.price_per_kg ?? prices.price1,
     createdAt: new Date(dbCheese.created_at),
   };
 }
@@ -80,6 +147,7 @@ export function dbActivityToType(dbActivity: DbActivity): Activity {
     productionId: dbActivity.production_id || undefined,
     cheeseTypeId: dbActivity.cheese_type_id || undefined,
     completed: dbActivity.is_completed,
+    completedDates: dbActivity.completed_dates || undefined,
     createdAt: new Date(dbActivity.created_at),
   };
 }
@@ -89,13 +157,32 @@ export function dbActivityToType(dbActivity: DbActivity): Activity {
 // ============================================
 
 export function typeCheeseToDb(cheese: Omit<CheeseType, "id" | "createdAt"> & { id?: string }): Partial<DbCheese> {
+  // Calcola yield_percentage: se presente usa quello, altrimenti converte da yieldPerLiter
+  const yieldPercentage = cheese.yieldPercentage !== undefined 
+    ? cheese.yieldPercentage 
+    : (cheese.yieldPerLiter ? cheese.yieldPerLiter * 100 : 20);
+
+  // Usa prices se presente, altrimenti usa pricePerKg legacy
+  const prices = cheese.prices || {
+    price1: cheese.pricePerKg || 0,
+    price2: 0,
+    price3: 0,
+    salesPercentage1: cheese.pricePerKg ? 100 : 0,
+    salesPercentage2: 0,
+    salesPercentage3: 0,
+  };
+
   return {
     name: cheese.name,
     color: cheese.color,
     protocol: cheese.protocol || [],
-    // ATTENZIONE: yield_liters_per_kg nel DB è in realtà kg per liter (resa)
-    yield_liters_per_kg: cheese.yieldPerLiter,
-    price_per_kg: cheese.pricePerKg,
+    yield_percentage: yieldPercentage,
+    prices: prices,
+    default_fields: cheese.defaultFields || null,
+    custom_fields: cheese.customFields || null,
+    // Mantieni anche legacy fields per backward compatibility
+    yield_liters_per_kg: cheese.yieldPerLiter ?? (yieldPercentage / 100),
+    price_per_kg: cheese.pricePerKg ?? prices.price1,
   };
 }
 
@@ -121,5 +208,6 @@ export function typeActivityToDb(activity: Omit<Activity, "id" | "createdAt"> & 
     production_id: activity.productionId || null,
     cheese_type_id: activity.cheeseTypeId || null,
     is_completed: activity.completed,
+    completed_dates: activity.completedDates || null,
   };
 }

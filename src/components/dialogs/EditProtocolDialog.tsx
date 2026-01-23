@@ -98,7 +98,7 @@ export function EditProtocolDialog({
                 variant="ghost"
                 size="sm"
                 onClick={addProtocolStep}
-                className="h-8 gap-1 text-xs"
+                className="h-8 gap-1 text-sm"
               >
                 <Plus className="h-3 w-3" />
                 Aggiungi Fase
@@ -109,13 +109,13 @@ export function EditProtocolDialog({
                 // Trova l'indice originale nel protocollo non ordinato
                 const originalIndex = protocol.findIndex(p => p === step);
                 return (
-                <div key={originalIndex} className="flex gap-3 items-start">
-                  <div className="flex flex-col gap-1.5 w-14 flex-shrink-0">
+                <div key={originalIndex} className="flex gap-3 items-end">
+                  <div className="flex flex-col gap-1.5 w-12 flex-shrink-0">
                     <Label className="text-xs font-medium text-foreground">Giorno</Label>
                     <Input
                       type="number"
                       min="0"
-                      className="w-14 h-10 text-sm font-medium text-center bg-background border-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      className="w-12 h-10 text-sm font-medium text-center bg-background border-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       value={step.day}
                       onChange={(e) => {
                         const newDay = parseInt(e.target.value) || 0;
@@ -139,7 +139,7 @@ export function EditProtocolDialog({
                     variant="ghost"
                     size="icon"
                     onClick={() => removeProtocolStep(originalIndex)}
-                    className="h-10 w-10 text-muted-foreground hover:text-destructive hover:bg-destructive/10 mt-6 flex-shrink-0 transition-colors"
+                    className="h-10 w-10 text-muted-foreground hover:text-destructive hover:bg-destructive/10 mb-0 flex-shrink-0 transition-colors"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

@@ -1,10 +1,12 @@
-import { useState } from 'react'
-import { signIn, resetPassword } from '../utils/supabaseAuth'
-import { findUserByEmail, initializeUsers } from '../utils/userStorage'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { signIn, resetPassword, isAuthenticated } from '../utils/supabaseAuth'
+import { findUserByEmail, findUserByUsername, initializeUsers } from '../utils/userStorage'
 import { createSession, hashPassword } from '../utils/auth'
 import './Login.css'
 
-function Login({ onLogin }) {
+function Login() {
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -25,8 +27,13 @@ function Login({ onLogin }) {
       if (isDevelopment) {
         // Autenticazione locale in sviluppo
         initializeUsers() // Assicura che l'utente di default esista
-        const user = findUserByEmail(email) || findUserByEmail(email.toLowerCase())
+        
+        // Cerca l'utente per email (case-insensitive)
+        const normalizedEmail = email.trim().toLowerCase()
+        const user = findUserByEmail(normalizedEmail) || findUserByUsername(normalizedEmail)
+        
         if (!user) {
+          console.error('User not found:', normalizedEmail)
           setError('Credenziali non valide')
           setLoading(false)
           return
@@ -37,8 +44,12 @@ function Login({ onLogin }) {
         if (user.passwordHash === passwordHash) {
           // Crea sessione locale
           createSession(user)
-          onLogin()
+          // Reindirizza alla pagina principale
+          navigate('/calendario', { replace: true })
+          // Ricarica la pagina per aggiornare lo stato di autenticazione
+          window.location.reload()
         } else {
+          console.error('Password mismatch for user:', normalizedEmail)
           setError('Credenziali non valide')
         }
       } else {
@@ -46,7 +57,10 @@ function Login({ onLogin }) {
         const result = await signIn(email, password)
         
         if (result.success) {
-          onLogin()
+          // Reindirizza alla pagina principale
+          navigate('/calendario', { replace: true })
+          // Ricarica la pagina per aggiornare lo stato di autenticazione
+          window.location.reload()
         } else {
           setError(result.error || 'Credenziali non valide')
         }
@@ -73,8 +87,9 @@ function Login({ onLogin }) {
           setLoading(false)
           return
         }
-        // In sviluppo, mostra un messaggio che il reset password non è disponibile
-        setError('In modalità sviluppo, il reset password non è disponibile. Usa le credenziali di default.')
+        // In sviluppo, mostra le credenziali di default
+        setResetSent(true)
+        setError('')
         setLoading(false)
         return
       } else {
@@ -95,29 +110,54 @@ function Login({ onLogin }) {
   }
 
   return (
-    <div className="login-container">
-      <div className="login-box">
-        <div className="login-header">
-          <img 
-            src="https://www.corzanoepaterno.com/organic-farm/wp-content/uploads/2020/02/corzanopaternologo.svg" 
-            alt="Corzano e Paterno Logo" 
-            className="login-logo"
-          />
-          <div className="dario-brand">
-            <span className="dario-logo">DARIO</span>
-            <span className="dario-tagline">Il Tuo Diario di Produzione</span>
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-card border border-border rounded-xl shadow-card p-8">
+        <div className="flex flex-col items-center text-center mb-8">
+          {/* Logo e Branding */}
+          <div className="flex items-center gap-4 mb-6">
+            <img 
+              src="/frog-logo.svg" 
+              alt="Dario Frog" 
+              className="h-16 w-16 flex-shrink-0"
+            />
+            <div className="flex flex-col items-start">
+              <span 
+                className="text-2xl tracking-widest uppercase"
+                style={{ 
+                  color: '#8B7355',
+                  fontFamily: "'TC Galliard Bold', 'Garamond Premier Semibold Caption', 'Garamond Premier Semibold', 'Laurentian Semi Bold', 'EB Garamond', Georgia, serif",
+                  fontWeight: 700,
+                  letterSpacing: '0.1em'
+                }}
+              >
+                DARIO
+              </span>
+              <span 
+                className="text-xs tracking-wide font-serif"
+                style={{ color: '#A68B6F' }}
+              >
+                Corzano e Paterno
+              </span>
+            </div>
           </div>
-          <p className="login-welcome">
+          
+          <p className="text-sm text-muted-foreground font-serif max-w-md">
             Il tuo assistente digitale per gestire la produzione artigianale di formaggi con precisione e cura
           </p>
         </div>
 
         {!showForgotPassword ? (
-          <form onSubmit={handleSubmit} className="login-form">
-            {error && <div className="error-message">{error}</div>}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg p-3 text-center">
+                {error}
+              </div>
+            )}
             
-            <div className="form-group">
-              <label htmlFor="email">Email</label>
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-sm font-medium text-foreground font-serif">
+                Email
+              </label>
               <input
                 id="email"
                 type="email"
@@ -126,11 +166,14 @@ function Login({ onLogin }) {
                 required
                 autoFocus
                 placeholder="Inserisci la tua email"
+                className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm font-serif focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-sm font-medium text-foreground font-serif">
+                Password
+              </label>
               <input
                 id="password"
                 type="password"
@@ -138,37 +181,56 @@ function Login({ onLogin }) {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="Inserisci la tua password"
+                className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm font-serif focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
               />
             </div>
 
-            <button type="submit" className="login-button" disabled={loading}>
+            <button 
+              type="submit" 
+              disabled={loading}
+              className="w-full py-2.5 px-4 bg-primary text-primary-foreground rounded-lg font-serif text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+            >
               {loading ? 'Accesso in corso...' : 'Accedi'}
             </button>
 
             <button
               type="button"
-              className="forgot-password-link"
               onClick={() => setShowForgotPassword(true)}
+              className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors font-serif underline"
             >
               Password dimenticata?
             </button>
           </form>
         ) : (
-          <form onSubmit={handleForgotPassword} className="login-form">
-            <h3>Recupera Password</h3>
-            <p className="forgot-password-info">
+          <form onSubmit={handleForgotPassword} className="space-y-4">
+            <h3 className="text-xl font-semibold text-foreground text-center mb-2 font-serif">
+              Recupera Password
+            </h3>
+            <p className="text-sm text-muted-foreground text-center mb-4 font-serif">
               Inserisci la tua email e ti invieremo le istruzioni per reimpostare la password.
             </p>
 
-            {error && <div className="error-message">{error}</div>}
+            {error && (
+              <div className="bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg p-3 text-center">
+                {error}
+              </div>
+            )}
             {resetSent && (
-              <div className="success-message">
-                Email inviata! Controlla la tua casella di posta per le istruzioni.
+              <div className="bg-muted border border-border text-foreground text-sm rounded-lg p-4 text-center">
+                {isDevelopment ? (
+                  <p className="text-muted-foreground">
+                    Il reset password non è disponibile in modalità sviluppo.
+                  </p>
+                ) : (
+                  <p>Email inviata! Controlla la tua casella di posta per le istruzioni.</p>
+                )}
               </div>
             )}
 
-            <div className="form-group">
-              <label htmlFor="reset-email">Email</label>
+            <div className="space-y-2">
+              <label htmlFor="reset-email" className="text-sm font-medium text-foreground font-serif">
+                Email
+              </label>
               <input
                 id="reset-email"
                 type="email"
@@ -176,22 +238,27 @@ function Login({ onLogin }) {
                 onChange={(e) => setResetEmail(e.target.value)}
                 required
                 placeholder="Inserisci la tua email"
+                className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm font-serif focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
               />
             </div>
 
-            <button type="submit" className="login-button" disabled={loading || resetSent}>
+            <button 
+              type="submit" 
+              disabled={loading || resetSent}
+              className="w-full py-2.5 px-4 bg-primary text-primary-foreground rounded-lg font-serif text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+            >
               {loading ? 'Invio in corso...' : resetSent ? 'Email Inviata' : 'Invia Istruzioni'}
             </button>
 
             <button
               type="button"
-              className="back-link"
               onClick={() => {
                 setShowForgotPassword(false)
                 setResetEmail('')
                 setResetSent(false)
                 setError('')
               }}
+              className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors font-serif underline"
             >
               ← Torna al login
             </button>

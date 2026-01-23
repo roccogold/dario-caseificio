@@ -1,11 +1,38 @@
+export interface CustomField {
+  key: string; // Nome del campo (es. "Fermenti")
+  value: string; // Valore del campo (testo libero)
+}
+
+export interface DefaultFields {
+  temperaturaCoagulazione?: string; // Temperatura Coagulazione
+  nomeFermento?: string; // Nome Fermento
+  quantitaFermento?: string; // Quantità Fermento (unità)
+  muffe?: string; // Muffe
+  quantitaMuffe?: string; // Quantità Muffe (unità)
+  caglio?: string; // Caglio
+  quantitaCaglio?: string; // Quantità Caglio (cc)
+}
+
 export interface CheeseType {
   id: string;
   name: string;
   color: string;
-  yieldPerLiter: number; // kg per liter
-  pricePerKg: number;
+  yieldPercentage: number; // % resa (es. 20% = 20kg da 100L)
+  prices: {
+    price1: number; // €/kg
+    price2: number; // €/kg
+    price3: number; // €/kg
+    salesPercentage1: number; // % di vendita per prezzo 1
+    salesPercentage2: number; // % di vendita per prezzo 2
+    salesPercentage3: number; // % di vendita per prezzo 3
+  };
+  defaultFields?: DefaultFields; // Campi predefiniti
+  customFields?: CustomField[]; // Campi personalizzati dinamici
   protocol: ProtocolStep[];
   createdAt: Date;
+  // Legacy fields for backward compatibility
+  yieldPerLiter?: number; // deprecated - use yieldPercentage
+  pricePerKg?: number; // deprecated - use prices.price1
 }
 
 export interface ProtocolStep {
