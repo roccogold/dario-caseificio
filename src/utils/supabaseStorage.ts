@@ -245,20 +245,23 @@ export async function saveProduction(
     const dbData = typeProductionToDb(production)
     
     if (!production.id || production.id.startsWith('temp-')) {
-      // Nuova produzione - NON includere l'ID, lascia che il database lo generi
-      // Questo evita problemi con "Cannot coerce" quando si include l'ID manualmente
+      // Nuova produzione - Usa sempre UUID generato
       const { id: _, ...dbDataWithoutId } = dbData;
       
-      console.log('[saveProduction] 🔵 Starting insert (DB will generate ID):', { 
+      const generatedId = production.id && !production.id.startsWith('temp-') 
+        ? production.id 
+        : crypto.randomUUID();
+      
+      console.log('[saveProduction] 🔵 Starting insert with UUID:', { 
         productionNumber: production.productionNumber,
+        id: generatedId,
         insertDataKeys: Object.keys(dbDataWithoutId)
       });
       
-      // Insert con select - il database genererà l'ID automaticamente
-      const { data: insertedData, error: insertError } = await supabase
+      // Insert con UUID esplicito, poi fetch separato per evitare problemi RLS
+      const { error: insertError } = await supabase
         .from('produzioni')
-        .insert(dbDataWithoutId)
-        .select();
+        .insert({ ...dbDataWithoutId, id: generatedId });
 
       if (insertError) {
         console.error('[saveProduction] ❌ Insert error:', insertError);
@@ -271,14 +274,27 @@ export async function saveProduction(
         throw insertError;
       }
 
-      if (!insertedData || insertedData.length === 0) {
-        console.error('[saveProduction] ❌ Insert succeeded but no data returned');
-        throw new Error('Insert completed but no data returned from database');
+      console.log('[saveProduction] Insert successful, fetching record with ID:', generatedId);
+      
+      // Fetch separato per evitare problemi RLS con SELECT dopo INSERT
+      const { data: fetchedData, error: fetchError } = await supabase
+        .from('produzioni')
+        .select('*')
+        .eq('id', generatedId)
+        .maybeSingle();
+
+      if (fetchError) {
+        console.error('[saveProduction] ❌ Fetch error after insert:', fetchError);
+        throw new Error(`Insert succeeded but failed to fetch record: ${fetchError.message}`);
       }
 
-      // Prendi il primo risultato (dovrebbe essere l'unico)
-      const inserted = insertedData[0];
-      console.log('[saveProduction] ✅ Production inserted successfully with DB-generated ID:', inserted.id);
+      if (!fetchedData) {
+        console.error('[saveProduction] ❌ Record not found after insert - possible RLS issue');
+        throw new Error(`Insert succeeded but record with ID ${generatedId} not found. Check RLS policies.`);
+      }
+
+      const inserted = fetchedData;
+      console.log('[saveProduction] ✅ Production inserted and fetched successfully with ID:', inserted.id);
 
       await logAction('create', 'produzione', inserted.id, { 
         production_number: production.productionNumber 
