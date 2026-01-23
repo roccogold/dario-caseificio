@@ -230,37 +230,58 @@ export async function saveProduction(
     const dbData = typeProductionToDb(production)
     
     if (!production.id || production.id.startsWith('temp-')) {
-      // Nuova produzione - assicurati che l'ID sia incluso se fornito
+      // Nuova produzione - includi l'ID se fornito (UUID pre-generato)
       const insertData = production.id ? { ...dbData, id: production.id } : dbData;
       
-      console.log('[saveProduction] Inserting new production:', { 
+      console.log('[saveProduction] 🔵 Starting insert:', { 
         hasId: !!production.id, 
         id: production.id,
-        productionNumber: production.productionNumber
+        productionNumber: production.productionNumber,
+        insertDataKeys: Object.keys(insertData)
       });
       
-      const { data, error } = await supabase
+      // Prova prima senza select, poi recupera il record
+      const { data: insertResult, error: insertError } = await supabase
         .from('produzioni')
-        .insert(insertData)
-        .select()
+        .insert(insertData);
 
-      if (error) {
-        console.error('[saveProduction] Insert error:', error);
-        throw error;
+      if (insertError) {
+        console.error('[saveProduction] ❌ Insert error:', insertError);
+        console.error('[saveProduction] Error details:', {
+          message: insertError.message,
+          code: insertError.code,
+          details: insertError.details,
+          hint: insertError.hint
+        });
+        throw insertError;
       }
 
-      if (!data || data.length === 0) {
-        throw new Error('Insert completed but no data returned');
+      console.log('[saveProduction] Insert completed, now fetching record...');
+      
+      // Recupera il record appena inserito usando l'ID
+      const recordId = production.id;
+      const { data: fetchedData, error: fetchError } = await supabase
+        .from('produzioni')
+        .select('*')
+        .eq('id', recordId)
+        .maybeSingle();
+
+      if (fetchError) {
+        console.error('[saveProduction] ❌ Fetch error after insert:', fetchError);
+        throw new Error(`Insert succeeded but failed to fetch record: ${fetchError.message}`);
       }
 
-      // Prendi il primo risultato (dovrebbe essere l'unico)
-      const inserted = data[0];
-      console.log('[saveProduction] ✅ Production inserted successfully:', inserted.id);
+      if (!fetchedData) {
+        console.error('[saveProduction] ❌ No data returned after insert and fetch');
+        throw new Error('Insert completed but record not found');
+      }
 
-      await logAction('create', 'produzione', inserted.id, { 
+      console.log('[saveProduction] ✅ Production inserted and fetched successfully:', fetchedData.id);
+
+      await logAction('create', 'produzione', fetchedData.id, { 
         production_number: production.productionNumber 
       })
-      return dbProductionToType(inserted as any)
+      return dbProductionToType(fetchedData as any)
     } else {
       // Update produzione esistente
       console.log('[saveProduction] Updating production:', production.id);
