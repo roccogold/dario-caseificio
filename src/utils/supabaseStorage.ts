@@ -101,58 +101,75 @@ export async function saveCheese(cheese: Omit<CheeseType, "id" | "createdAt"> & 
         insertDataKeys: Object.keys(dbDataWithoutId)
       });
       
-      // Prova prima senza ID (se il DB ha default UUID)
-      let insertedData: any[] | null = null;
-      let insertError: any = null;
+      // Strategia: Insert senza select, poi fetch separato per evitare problemi RLS
+      let insertedId: string | null = null;
       
-      const { data: dataWithoutId, error: errorWithoutId } = await supabase
-        .from('formaggi')
-        .insert(dbDataWithoutId)
-        .select();
-
-      if (errorWithoutId) {
-        console.log('[saveCheese] ⚠️ Insert without ID failed, trying with ID:', errorWithoutId.message);
-        insertError = errorWithoutId;
+      // Se abbiamo un ID, usalo nell'insert
+      if (cheese.id && !cheese.id.startsWith('temp-')) {
+        console.log('[saveCheese] Using provided UUID:', cheese.id);
+        const { error: insertError } = await supabase
+          .from('formaggi')
+          .insert(dbData);
         
-        // Se fallisce senza ID, prova con ID (se fornito)
-        if (cheese.id && !cheese.id.startsWith('temp-')) {
-          const { data: dataWithId, error: errorWithId } = await supabase
-            .from('formaggi')
-            .insert(dbData)
-            .select();
-          
-          if (!errorWithId && dataWithId && dataWithId.length > 0) {
-            insertedData = dataWithId;
-            insertError = null;
-            console.log('[saveCheese] ✅ Insert with ID succeeded');
-          } else {
-            insertError = errorWithId || insertError;
-          }
+        if (insertError) {
+          console.error('[saveCheese] ❌ Insert error:', insertError);
+          throw insertError;
         }
+        insertedId = cheese.id;
       } else {
-        insertedData = dataWithoutId;
+        // Prova senza ID (se DB ha default UUID)
+        console.log('[saveCheese] Attempting insert without ID (DB will generate)');
+        const { data: insertResult, error: insertError } = await supabase
+          .from('formaggi')
+          .insert(dbDataWithoutId)
+          .select('id');
+        
+        if (insertError) {
+          console.log('[saveCheese] ⚠️ Insert without ID failed, trying with generated UUID:', insertError.message);
+          // Fallback: genera UUID e riprova
+          const generatedId = cheese.id || crypto.randomUUID();
+          const { error: retryError } = await supabase
+            .from('formaggi')
+            .insert({ ...dbDataWithoutId, id: generatedId });
+          
+          if (retryError) {
+            console.error('[saveCheese] ❌ Insert with generated UUID also failed:', retryError);
+            throw retryError;
+          }
+          insertedId = generatedId;
+        } else if (insertResult && insertResult.length > 0) {
+          insertedId = insertResult[0].id;
+        } else {
+          throw new Error('Insert completed but no ID returned');
+        }
       }
 
-      if (insertError) {
-        console.error('[saveCheese] ❌ Insert error:', insertError);
-        console.error('[saveCheese] Error details:', {
-          message: insertError.message,
-          code: insertError.code,
-          details: insertError.details,
-          hint: insertError.hint
-        });
-        throw insertError;
+      if (!insertedId) {
+        throw new Error('Failed to determine inserted record ID');
       }
 
-      if (!insertedData || insertedData.length === 0) {
-        console.error('[saveCheese] ❌ Insert succeeded but no data returned');
-        console.error('[saveCheese] This might be due to RLS policies preventing SELECT after INSERT');
-        throw new Error('Insert completed but no data returned from database. Check RLS policies.');
+      console.log('[saveCheese] Insert successful, fetching record with ID:', insertedId);
+      
+      // Fetch separato per evitare problemi RLS con SELECT dopo INSERT
+      const { data: fetchedData, error: fetchError } = await supabase
+        .from('formaggi')
+        .select('*')
+        .eq('id', insertedId)
+        .maybeSingle();
+
+      if (fetchError) {
+        console.error('[saveCheese] ❌ Fetch error after insert:', fetchError);
+        throw new Error(`Insert succeeded but failed to fetch record: ${fetchError.message}`);
       }
 
-      // Prendi il primo risultato (dovrebbe essere l'unico)
-      const inserted = insertedData[0];
-      console.log('[saveCheese] ✅ Cheese inserted successfully with ID:', inserted.id);
+      if (!fetchedData) {
+        console.error('[saveCheese] ❌ Record not found after insert - possible RLS issue');
+        throw new Error(`Insert succeeded but record with ID ${insertedId} not found. Check RLS policies.`);
+      }
+
+      const inserted = fetchedData;
+
+      console.log('[saveCheese] ✅ Cheese inserted and fetched successfully with ID:', inserted.id);
 
       await logAction('create', 'formaggio', inserted.id, { name: cheese.name })
       return dbCheeseToType(inserted as any)
@@ -386,58 +403,74 @@ export async function saveActivity(
         insertDataKeys: Object.keys(dbDataWithoutId)
       });
       
-      // Prova prima senza ID (se il DB ha default UUID)
-      let insertedData: any[] | null = null;
-      let insertError: any = null;
+      // Strategia: Insert senza select, poi fetch separato per evitare problemi RLS
+      let insertedId: string | null = null;
       
-      const { data: dataWithoutId, error: errorWithoutId } = await supabase
-        .from('attività')
-        .insert(dbDataWithoutId)
-        .select();
-
-      if (errorWithoutId) {
-        console.log('[saveActivity] ⚠️ Insert without ID failed, trying with ID:', errorWithoutId.message);
-        insertError = errorWithoutId;
+      // Se abbiamo un ID, usalo nell'insert
+      if (activity.id && !activity.id.startsWith('temp-')) {
+        console.log('[saveActivity] Using provided UUID:', activity.id);
+        const { error: insertError } = await supabase
+          .from('attività')
+          .insert(dbData);
         
-        // Se fallisce senza ID, prova con ID (se fornito)
-        if (activity.id && !activity.id.startsWith('temp-')) {
-          const { data: dataWithId, error: errorWithId } = await supabase
-            .from('attività')
-            .insert(dbData)
-            .select();
-          
-          if (!errorWithId && dataWithId && dataWithId.length > 0) {
-            insertedData = dataWithId;
-            insertError = null;
-            console.log('[saveActivity] ✅ Insert with ID succeeded');
-          } else {
-            insertError = errorWithId || insertError;
-          }
+        if (insertError) {
+          console.error('[saveActivity] ❌ Insert error:', insertError);
+          throw insertError;
         }
+        insertedId = activity.id;
       } else {
-        insertedData = dataWithoutId;
+        // Prova senza ID (se DB ha default UUID)
+        console.log('[saveActivity] Attempting insert without ID (DB will generate)');
+        const { data: insertResult, error: insertError } = await supabase
+          .from('attività')
+          .insert(dbDataWithoutId)
+          .select('id');
+        
+        if (insertError) {
+          console.log('[saveActivity] ⚠️ Insert without ID failed, trying with generated UUID:', insertError.message);
+          // Fallback: genera UUID e riprova
+          const generatedId = activity.id || crypto.randomUUID();
+          const { error: retryError } = await supabase
+            .from('attività')
+            .insert({ ...dbDataWithoutId, id: generatedId });
+          
+          if (retryError) {
+            console.error('[saveActivity] ❌ Insert with generated UUID also failed:', retryError);
+            throw retryError;
+          }
+          insertedId = generatedId;
+        } else if (insertResult && insertResult.length > 0) {
+          insertedId = insertResult[0].id;
+        } else {
+          throw new Error('Insert completed but no ID returned');
+        }
       }
 
-      if (insertError) {
-        console.error('[saveActivity] ❌ Insert error:', insertError);
-        console.error('[saveActivity] Error details:', {
-          message: insertError.message,
-          code: insertError.code,
-          details: insertError.details,
-          hint: insertError.hint
-        });
-        throw insertError;
+      if (!insertedId) {
+        throw new Error('Failed to determine inserted record ID');
       }
 
-      if (!insertedData || insertedData.length === 0) {
-        console.error('[saveActivity] ❌ Insert succeeded but no data returned');
-        console.error('[saveActivity] This might be due to RLS policies preventing SELECT after INSERT');
-        throw new Error('Insert completed but no data returned from database. Check RLS policies.');
+      console.log('[saveActivity] Insert successful, fetching record with ID:', insertedId);
+      
+      // Fetch separato per evitare problemi RLS con SELECT dopo INSERT
+      const { data: fetchedData, error: fetchError } = await supabase
+        .from('attività')
+        .select('*')
+        .eq('id', insertedId)
+        .maybeSingle();
+
+      if (fetchError) {
+        console.error('[saveActivity] ❌ Fetch error after insert:', fetchError);
+        throw new Error(`Insert succeeded but failed to fetch record: ${fetchError.message}`);
       }
 
-      // Prendi il primo risultato (dovrebbe essere l'unico)
-      const inserted = insertedData[0];
-      console.log('[saveActivity] ✅ Activity inserted successfully with ID:', inserted.id);
+      if (!fetchedData) {
+        console.error('[saveActivity] ❌ Record not found after insert - possible RLS issue');
+        throw new Error(`Insert succeeded but record with ID ${insertedId} not found. Check RLS policies.`);
+      }
+
+      const inserted = fetchedData;
+      console.log('[saveActivity] ✅ Activity inserted and fetched successfully with ID:', inserted.id);
 
       await logAction('create', 'attività', inserted.id, { title: activity.title })
       return dbActivityToType(inserted as any)
