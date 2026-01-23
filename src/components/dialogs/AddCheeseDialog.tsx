@@ -281,6 +281,7 @@ export function AddCheeseDialog({
                     min="0"
                     value={price1}
                     onChange={(e) => setPrice1(e.target.value)}
+                    placeholder="es. 12"
                   />
                 </div>
                 <div className="space-y-2">
@@ -299,6 +300,7 @@ export function AddCheeseDialog({
                         setSalesPercentage1(e.target.value);
                       }
                     }}
+                    placeholder="es. 6%"
                   />
                 </div>
               </div>
@@ -313,6 +315,7 @@ export function AddCheeseDialog({
                     min="0"
                     value={price2}
                     onChange={(e) => setPrice2(e.target.value)}
+                    placeholder="es. 12"
                   />
                 </div>
                 <div className="space-y-2">
@@ -331,6 +334,7 @@ export function AddCheeseDialog({
                         setSalesPercentage2(e.target.value);
                       }
                     }}
+                    placeholder="es. 6%"
                   />
                 </div>
               </div>
@@ -345,6 +349,7 @@ export function AddCheeseDialog({
                     min="0"
                     value={price3}
                     onChange={(e) => setPrice3(e.target.value)}
+                    placeholder="es. 12"
                   />
                 </div>
                 <div className="space-y-2">
@@ -363,6 +368,7 @@ export function AddCheeseDialog({
                         setSalesPercentage3(e.target.value);
                       }
                     }}
+                    placeholder="es. 6%"
                   />
                 </div>
               </div>
