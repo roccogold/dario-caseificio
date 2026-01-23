@@ -117,24 +117,58 @@ export async function saveCheese(cheese: Omit<CheeseType, "id" | "createdAt"> & 
         throw insertError;
       }
 
-      console.log('[saveCheese] Insert completed, now fetching record...');
+      console.log('[saveCheese] Insert completed, now fetching record with ID:', cheese.id);
       
       // Recupera il record appena inserito usando l'ID
-      const recordId = cheese.id;
+      // Usa maybeSingle() per gestire il caso in cui il record non esista
       const { data: fetchedData, error: fetchError } = await supabase
         .from('formaggi')
         .select('*')
-        .eq('id', recordId)
+        .eq('id', cheese.id)
         .maybeSingle();
 
       if (fetchError) {
         console.error('[saveCheese] ❌ Fetch error after insert:', fetchError);
-        throw new Error(`Insert succeeded but failed to fetch record: ${fetchError.message}`);
+        console.error('[saveCheese] Fetch error details:', {
+          message: fetchError.message,
+          code: fetchError.code,
+          details: fetchError.details,
+          hint: fetchError.hint
+        });
+        // Prova a fare un insert con select come fallback
+        console.log('[saveCheese] Attempting fallback: insert with select...');
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from('formaggi')
+          .insert(insertData)
+          .select();
+        
+        if (fallbackError || !fallbackData || fallbackData.length === 0) {
+          throw new Error(`Insert succeeded but failed to fetch record: ${fetchError.message}. Fallback also failed.`);
+        }
+        
+        const inserted = fallbackData[0];
+        console.log('[saveCheese] ✅ Fallback succeeded:', inserted.id);
+        await logAction('create', 'formaggio', inserted.id, { name: cheese.name })
+        return dbCheeseToType(inserted as any);
       }
 
       if (!fetchedData) {
         console.error('[saveCheese] ❌ No data returned after insert and fetch');
-        throw new Error('Insert completed but record not found');
+        // Prova fallback
+        console.log('[saveCheese] Attempting fallback: insert with select...');
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from('formaggi')
+          .insert(insertData)
+          .select();
+        
+        if (fallbackError || !fallbackData || fallbackData.length === 0) {
+          throw new Error('Insert completed but record not found and fallback failed');
+        }
+        
+        const inserted = fallbackData[0];
+        console.log('[saveCheese] ✅ Fallback succeeded:', inserted.id);
+        await logAction('create', 'formaggio', inserted.id, { name: cheese.name })
+        return dbCheeseToType(inserted as any);
       }
 
       console.log('[saveCheese] ✅ Cheese inserted and fetched successfully:', fetchedData.id);
@@ -400,24 +434,57 @@ export async function saveActivity(
         throw insertError;
       }
 
-      console.log('[saveActivity] Insert completed, now fetching record...');
+      console.log('[saveActivity] Insert completed, now fetching record with ID:', activity.id);
       
       // Recupera il record appena inserito usando l'ID
-      const recordId = activity.id;
       const { data: fetchedData, error: fetchError } = await supabase
         .from('attività')
         .select('*')
-        .eq('id', recordId)
+        .eq('id', activity.id)
         .maybeSingle();
 
       if (fetchError) {
         console.error('[saveActivity] ❌ Fetch error after insert:', fetchError);
-        throw new Error(`Insert succeeded but failed to fetch record: ${fetchError.message}`);
+        console.error('[saveActivity] Fetch error details:', {
+          message: fetchError.message,
+          code: fetchError.code,
+          details: fetchError.details,
+          hint: fetchError.hint
+        });
+        // Prova a fare un insert con select come fallback
+        console.log('[saveActivity] Attempting fallback: insert with select...');
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from('attività')
+          .insert(insertData)
+          .select();
+        
+        if (fallbackError || !fallbackData || fallbackData.length === 0) {
+          throw new Error(`Insert succeeded but failed to fetch record: ${fetchError.message}. Fallback also failed.`);
+        }
+        
+        const inserted = fallbackData[0];
+        console.log('[saveActivity] ✅ Fallback succeeded:', inserted.id);
+        await logAction('create', 'attività', inserted.id, { title: activity.title })
+        return dbActivityToType(inserted as any);
       }
 
       if (!fetchedData) {
         console.error('[saveActivity] ❌ No data returned after insert and fetch');
-        throw new Error('Insert completed but record not found');
+        // Prova fallback
+        console.log('[saveActivity] Attempting fallback: insert with select...');
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from('attività')
+          .insert(insertData)
+          .select();
+        
+        if (fallbackError || !fallbackData || fallbackData.length === 0) {
+          throw new Error('Insert completed but record not found and fallback failed');
+        }
+        
+        const inserted = fallbackData[0];
+        console.log('[saveActivity] ✅ Fallback succeeded:', inserted.id);
+        await logAction('create', 'attività', inserted.id, { title: activity.title })
+        return dbActivityToType(inserted as any);
       }
 
       console.log('[saveActivity] ✅ Activity inserted and fetched successfully:', fetchedData.id);
