@@ -101,48 +101,31 @@ export async function saveCheese(cheese: Omit<CheeseType, "id" | "createdAt"> & 
         insertDataKeys: Object.keys(dbDataWithoutId)
       });
       
-      // Strategia: Insert senza select, poi fetch separato per evitare problemi RLS
-      let insertedId: string | null = null;
+      // Strategia: Usa sempre UUID generato (il DB potrebbe non avere default UUID)
+      // Questo evita problemi con database senza default UUID generator
+      const generatedId = cheese.id && !cheese.id.startsWith('temp-') 
+        ? cheese.id 
+        : crypto.randomUUID();
       
-      // Se abbiamo un ID, usalo nell'insert
-      if (cheese.id && !cheese.id.startsWith('temp-')) {
-        console.log('[saveCheese] Using provided UUID:', cheese.id);
-        const { error: insertError } = await supabase
-          .from('formaggi')
-          .insert(dbData);
-        
-        if (insertError) {
-          console.error('[saveCheese] ❌ Insert error:', insertError);
-          throw insertError;
-        }
-        insertedId = cheese.id;
-      } else {
-        // Prova senza ID (se DB ha default UUID)
-        console.log('[saveCheese] Attempting insert without ID (DB will generate)');
-        const { data: insertResult, error: insertError } = await supabase
-          .from('formaggi')
-          .insert(dbDataWithoutId)
-          .select('id');
-        
-        if (insertError) {
-          console.log('[saveCheese] ⚠️ Insert without ID failed, trying with generated UUID:', insertError.message);
-          // Fallback: genera UUID e riprova
-          const generatedId = cheese.id || crypto.randomUUID();
-          const { error: retryError } = await supabase
-            .from('formaggi')
-            .insert({ ...dbDataWithoutId, id: generatedId });
-          
-          if (retryError) {
-            console.error('[saveCheese] ❌ Insert with generated UUID also failed:', retryError);
-            throw retryError;
-          }
-          insertedId = generatedId;
-        } else if (insertResult && insertResult.length > 0) {
-          insertedId = insertResult[0].id;
-        } else {
-          throw new Error('Insert completed but no ID returned');
-        }
+      console.log('[saveCheese] Using UUID for insert:', generatedId);
+      
+      // Insert con UUID esplicito (più affidabile)
+      const { error: insertError } = await supabase
+        .from('formaggi')
+        .insert({ ...dbDataWithoutId, id: generatedId });
+      
+      if (insertError) {
+        console.error('[saveCheese] ❌ Insert error:', insertError);
+        console.error('[saveCheese] Error details:', {
+          message: insertError.message,
+          code: insertError.code,
+          details: insertError.details,
+          hint: insertError.hint
+        });
+        throw insertError;
       }
+      
+      const insertedId = generatedId;
 
       if (!insertedId) {
         throw new Error('Failed to determine inserted record ID');
@@ -403,48 +386,31 @@ export async function saveActivity(
         insertDataKeys: Object.keys(dbDataWithoutId)
       });
       
-      // Strategia: Insert senza select, poi fetch separato per evitare problemi RLS
-      let insertedId: string | null = null;
+      // Strategia: Usa sempre UUID generato (il DB potrebbe non avere default UUID)
+      // Questo evita problemi con database senza default UUID generator
+      const generatedId = activity.id && !activity.id.startsWith('temp-') 
+        ? activity.id 
+        : crypto.randomUUID();
       
-      // Se abbiamo un ID, usalo nell'insert
-      if (activity.id && !activity.id.startsWith('temp-')) {
-        console.log('[saveActivity] Using provided UUID:', activity.id);
-        const { error: insertError } = await supabase
-          .from('attività')
-          .insert(dbData);
-        
-        if (insertError) {
-          console.error('[saveActivity] ❌ Insert error:', insertError);
-          throw insertError;
-        }
-        insertedId = activity.id;
-      } else {
-        // Prova senza ID (se DB ha default UUID)
-        console.log('[saveActivity] Attempting insert without ID (DB will generate)');
-        const { data: insertResult, error: insertError } = await supabase
-          .from('attività')
-          .insert(dbDataWithoutId)
-          .select('id');
-        
-        if (insertError) {
-          console.log('[saveActivity] ⚠️ Insert without ID failed, trying with generated UUID:', insertError.message);
-          // Fallback: genera UUID e riprova
-          const generatedId = activity.id || crypto.randomUUID();
-          const { error: retryError } = await supabase
-            .from('attività')
-            .insert({ ...dbDataWithoutId, id: generatedId });
-          
-          if (retryError) {
-            console.error('[saveActivity] ❌ Insert with generated UUID also failed:', retryError);
-            throw retryError;
-          }
-          insertedId = generatedId;
-        } else if (insertResult && insertResult.length > 0) {
-          insertedId = insertResult[0].id;
-        } else {
-          throw new Error('Insert completed but no ID returned');
-        }
+      console.log('[saveActivity] Using UUID for insert:', generatedId);
+      
+      // Insert con UUID esplicito (più affidabile)
+      const { error: insertError } = await supabase
+        .from('attività')
+        .insert({ ...dbDataWithoutId, id: generatedId });
+      
+      if (insertError) {
+        console.error('[saveActivity] ❌ Insert error:', insertError);
+        console.error('[saveActivity] Error details:', {
+          message: insertError.message,
+          code: insertError.code,
+          details: insertError.details,
+          hint: insertError.hint
+        });
+        throw insertError;
       }
+      
+      const insertedId = generatedId;
 
       if (!insertedId) {
         throw new Error('Failed to determine inserted record ID');
