@@ -693,21 +693,32 @@ export function useData() {
   // ACTIVITY OPERATIONS
   // ============================================
   const addActivity = useCallback(async (activity: Omit<Activity, "id" | "createdAt">) => {
-    const newActivity: Activity = {
-      ...activity,
-      id: generateUUID(), // Usa UUID valido per il database
-      createdAt: new Date(),
-    };
-
     try {
       if (useSupabase) {
-        console.log('[addActivity] Attempting to save to Supabase:', { title: newActivity.title, type: newActivity.type });
-        const saved = await saveActivity(newActivity);
+        // ❌ BUG FIX: NON passare l'ID a saveActivity per nuove attività
+        // saveActivity controlla se activity.id esiste per decidere tra INSERT e UPDATE
+        // Se passiamo un ID, fa UPDATE invece di INSERT → errore PGRST116
+        console.log('[addActivity] Attempting to save to Supabase (new activity, no ID):', { 
+          title: activity.title, 
+          type: activity.type 
+        });
+        
+        // Passa l'attività SENZA ID - saveActivity genererà l'UUID
+        const saved = await saveActivity({
+          ...activity,
+          createdAt: new Date(),
+        });
+        
         console.log('[addActivity] ✅ Successfully saved to Supabase:', saved.id);
         setActivities((prev) => [...prev, saved]);
         return saved;
       } else {
-        // Solo in sviluppo locale
+        // Solo in sviluppo locale - qui possiamo generare l'ID
+        const newActivity: Activity = {
+          ...activity,
+          id: generateUUID(),
+          createdAt: new Date(),
+        };
         console.log('[addActivity] Using localStorage (development mode)');
         localActivities.add(newActivity);
         setActivities((prev) => [...prev, newActivity]);
@@ -723,6 +734,11 @@ export function useData() {
         throw error; // Rilancia l'errore per impedire il salvataggio
       } else {
         // Solo in sviluppo, fallback a localStorage
+        const newActivity: Activity = {
+          ...activity,
+          id: generateUUID(),
+          createdAt: new Date(),
+        };
         toast.error('Errore nel salvataggio dell\'attività. Salvato in locale come fallback.');
         localActivities.add(newActivity);
         setActivities((prev) => [...prev, newActivity]);
