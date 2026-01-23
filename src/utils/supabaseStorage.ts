@@ -91,35 +91,56 @@ export async function saveCheese(cheese: Omit<CheeseType, "id" | "createdAt"> & 
     const dbData = typeCheeseToDb(cheese)
     
     if (!cheese.id || cheese.id.startsWith('temp-')) {
-      // Nuovo formaggio - assicurati che l'ID sia incluso se fornito
+      // Nuovo formaggio - includi l'ID se fornito (UUID pre-generato)
       const insertData = cheese.id ? { ...dbData, id: cheese.id } : dbData;
       
-      console.log('[saveCheese] Inserting new cheese:', { 
+      console.log('[saveCheese] 🔵 Starting insert:', { 
         hasId: !!cheese.id, 
         id: cheese.id,
-        name: cheese.name
+        name: cheese.name,
+        insertDataKeys: Object.keys(insertData)
       });
       
-      const { data, error } = await supabase
+      // Prova prima senza select, poi recupera il record
+      const { data: insertResult, error: insertError } = await supabase
         .from('formaggi')
-        .insert(insertData)
-        .select()
+        .insert(insertData);
 
-      if (error) {
-        console.error('[saveCheese] Insert error:', error);
-        throw error;
+      if (insertError) {
+        console.error('[saveCheese] ❌ Insert error:', insertError);
+        console.error('[saveCheese] Error details:', {
+          message: insertError.message,
+          code: insertError.code,
+          details: insertError.details,
+          hint: insertError.hint
+        });
+        throw insertError;
       }
 
-      if (!data || data.length === 0) {
-        throw new Error('Insert completed but no data returned');
+      console.log('[saveCheese] Insert completed, now fetching record...');
+      
+      // Recupera il record appena inserito usando l'ID
+      const recordId = cheese.id;
+      const { data: fetchedData, error: fetchError } = await supabase
+        .from('formaggi')
+        .select('*')
+        .eq('id', recordId)
+        .maybeSingle();
+
+      if (fetchError) {
+        console.error('[saveCheese] ❌ Fetch error after insert:', fetchError);
+        throw new Error(`Insert succeeded but failed to fetch record: ${fetchError.message}`);
       }
 
-      // Prendi il primo risultato (dovrebbe essere l'unico)
-      const inserted = data[0];
-      console.log('[saveCheese] ✅ Cheese inserted successfully:', inserted.id);
+      if (!fetchedData) {
+        console.error('[saveCheese] ❌ No data returned after insert and fetch');
+        throw new Error('Insert completed but record not found');
+      }
 
-      await logAction('create', 'formaggio', inserted.id, { name: cheese.name })
-      return dbCheeseToType(inserted as any)
+      console.log('[saveCheese] ✅ Cheese inserted and fetched successfully:', fetchedData.id);
+
+      await logAction('create', 'formaggio', fetchedData.id, { name: cheese.name })
+      return dbCheeseToType(fetchedData as any)
     } else {
       // Update formaggio esistente
       console.log('[saveCheese] Updating cheese:', cheese.id);
@@ -331,36 +352,57 @@ export async function saveActivity(
     const dbData = typeActivityToDb(activity)
     
     if (!activity.id || activity.id.startsWith('temp-')) {
-      // Nuova attività - assicurati che l'ID sia incluso se fornito
+      // Nuova attività - includi l'ID se fornito (UUID pre-generato)
       const insertData = activity.id ? { ...dbData, id: activity.id } : dbData;
       
-      console.log('[saveActivity] Inserting new activity:', { 
+      console.log('[saveActivity] 🔵 Starting insert:', { 
         hasId: !!activity.id, 
         id: activity.id,
         title: activity.title,
-        type: activity.type 
+        type: activity.type,
+        insertDataKeys: Object.keys(insertData)
       });
       
-      const { data, error } = await supabase
+      // Prova prima senza select, poi recupera il record
+      const { data: insertResult, error: insertError } = await supabase
         .from('attività')
-        .insert(insertData)
-        .select()
+        .insert(insertData);
 
-      if (error) {
-        console.error('[saveActivity] Insert error:', error);
-        throw error;
+      if (insertError) {
+        console.error('[saveActivity] ❌ Insert error:', insertError);
+        console.error('[saveActivity] Error details:', {
+          message: insertError.message,
+          code: insertError.code,
+          details: insertError.details,
+          hint: insertError.hint
+        });
+        throw insertError;
       }
 
-      if (!data || data.length === 0) {
-        throw new Error('Insert completed but no data returned');
+      console.log('[saveActivity] Insert completed, now fetching record...');
+      
+      // Recupera il record appena inserito usando l'ID
+      const recordId = activity.id;
+      const { data: fetchedData, error: fetchError } = await supabase
+        .from('attività')
+        .select('*')
+        .eq('id', recordId)
+        .maybeSingle();
+
+      if (fetchError) {
+        console.error('[saveActivity] ❌ Fetch error after insert:', fetchError);
+        throw new Error(`Insert succeeded but failed to fetch record: ${fetchError.message}`);
       }
 
-      // Prendi il primo risultato (dovrebbe essere l'unico)
-      const inserted = data[0];
-      console.log('[saveActivity] ✅ Activity inserted successfully:', inserted.id);
+      if (!fetchedData) {
+        console.error('[saveActivity] ❌ No data returned after insert and fetch');
+        throw new Error('Insert completed but record not found');
+      }
 
-      await logAction('create', 'attività', inserted.id, { title: activity.title })
-      return dbActivityToType(inserted as any)
+      console.log('[saveActivity] ✅ Activity inserted and fetched successfully:', fetchedData.id);
+
+      await logAction('create', 'attività', fetchedData.id, { title: activity.title })
+      return dbActivityToType(fetchedData as any)
     } else {
       // Update attività esistente
       console.log('[saveActivity] Updating activity:', activity.id);
