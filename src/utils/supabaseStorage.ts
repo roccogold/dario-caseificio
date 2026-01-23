@@ -428,14 +428,21 @@ export async function toggleActivityCompleted(activityId: string, completed: boo
       .update({ is_completed: completed })
       .eq('id', activityId)
       .select()
-      .single()
 
-    if (error) throw error
+    if (error) {
+      console.error('[toggleActivityCompleted] Update error:', error);
+      throw error;
+    }
 
+    if (!data || data.length === 0) {
+      throw new Error(`Activity with id ${activityId} not found for update`);
+    }
+
+    const updated = data[0];
     await logAction(completed ? 'complete' : 'uncomplete', 'attività', activityId)
-    return dbActivityToType(data as any)
+    return dbActivityToType(updated as any)
   } catch (error) {
-    console.error('Error toggling activity completed:', error)
+    console.error('[toggleActivityCompleted] ❌ Error toggling activity completed:', error)
     throw error
   }
 }
