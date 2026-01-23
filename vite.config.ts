@@ -17,5 +17,20 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+    // Forza la risoluzione esplicita dei moduli
+    dedupe: ["react", "react-dom"],
+  },
+  build: {
+    // Forza un build pulito
+    rollupOptions: {
+      output: {
+        // Genera nomi file deterministici ma unici
+        entryFileNames: `assets/[name]-[hash].js`,
+        chunkFileNames: `assets/[name]-[hash].js`,
+        assetFileNames: `assets/[name]-[hash].[ext]`,
+      },
+    },
+    // Aumenta il limite di warning per file grandi
+    chunkSizeWarningLimit: 1000,
   },
 }));
