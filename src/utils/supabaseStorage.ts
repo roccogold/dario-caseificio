@@ -91,20 +91,47 @@ export async function saveCheese(cheese: Omit<CheeseType, "id" | "createdAt"> & 
     const dbData = typeCheeseToDb(cheese)
     
     if (!cheese.id || cheese.id.startsWith('temp-')) {
-      // Nuovo formaggio - NON includere l'ID, lascia che il database lo generi
-      // Questo evita problemi con "Cannot coerce" quando si include l'ID manualmente
+      // Nuovo formaggio - Prova prima senza ID, se fallisce prova con ID
       const { id: _, ...dbDataWithoutId } = dbData;
       
-      console.log('[saveCheese] 🔵 Starting insert (DB will generate ID):', { 
+      console.log('[saveCheese] 🔵 Starting insert:', { 
         name: cheese.name,
+        hasId: !!cheese.id,
+        id: cheese.id,
         insertDataKeys: Object.keys(dbDataWithoutId)
       });
       
-      // Insert con select - il database genererà l'ID automaticamente
-      const { data: insertedData, error: insertError } = await supabase
+      // Prova prima senza ID (se il DB ha default UUID)
+      let insertedData: any[] | null = null;
+      let insertError: any = null;
+      
+      const { data: dataWithoutId, error: errorWithoutId } = await supabase
         .from('formaggi')
         .insert(dbDataWithoutId)
         .select();
+
+      if (errorWithoutId) {
+        console.log('[saveCheese] ⚠️ Insert without ID failed, trying with ID:', errorWithoutId.message);
+        insertError = errorWithoutId;
+        
+        // Se fallisce senza ID, prova con ID (se fornito)
+        if (cheese.id && !cheese.id.startsWith('temp-')) {
+          const { data: dataWithId, error: errorWithId } = await supabase
+            .from('formaggi')
+            .insert(dbData)
+            .select();
+          
+          if (!errorWithId && dataWithId && dataWithId.length > 0) {
+            insertedData = dataWithId;
+            insertError = null;
+            console.log('[saveCheese] ✅ Insert with ID succeeded');
+          } else {
+            insertError = errorWithId || insertError;
+          }
+        }
+      } else {
+        insertedData = dataWithoutId;
+      }
 
       if (insertError) {
         console.error('[saveCheese] ❌ Insert error:', insertError);
@@ -119,12 +146,13 @@ export async function saveCheese(cheese: Omit<CheeseType, "id" | "createdAt"> & 
 
       if (!insertedData || insertedData.length === 0) {
         console.error('[saveCheese] ❌ Insert succeeded but no data returned');
-        throw new Error('Insert completed but no data returned from database');
+        console.error('[saveCheese] This might be due to RLS policies preventing SELECT after INSERT');
+        throw new Error('Insert completed but no data returned from database. Check RLS policies.');
       }
 
       // Prendi il primo risultato (dovrebbe essere l'unico)
       const inserted = insertedData[0];
-      console.log('[saveCheese] ✅ Cheese inserted successfully with DB-generated ID:', inserted.id);
+      console.log('[saveCheese] ✅ Cheese inserted successfully with ID:', inserted.id);
 
       await logAction('create', 'formaggio', inserted.id, { name: cheese.name })
       return dbCheeseToType(inserted as any)
@@ -347,21 +375,48 @@ export async function saveActivity(
     const dbData = typeActivityToDb(activity)
     
     if (!activity.id || activity.id.startsWith('temp-')) {
-      // Nuova attività - NON includere l'ID, lascia che il database lo generi
-      // Questo evita problemi con "Cannot coerce" quando si include l'ID manualmente
+      // Nuova attività - Prova prima senza ID, se fallisce prova con ID
       const { id: _, ...dbDataWithoutId } = dbData;
       
-      console.log('[saveActivity] 🔵 Starting insert (DB will generate ID):', { 
+      console.log('[saveActivity] 🔵 Starting insert:', { 
         title: activity.title,
         type: activity.type,
+        hasId: !!activity.id,
+        id: activity.id,
         insertDataKeys: Object.keys(dbDataWithoutId)
       });
       
-      // Insert con select - il database genererà l'ID automaticamente
-      const { data: insertedData, error: insertError } = await supabase
+      // Prova prima senza ID (se il DB ha default UUID)
+      let insertedData: any[] | null = null;
+      let insertError: any = null;
+      
+      const { data: dataWithoutId, error: errorWithoutId } = await supabase
         .from('attività')
         .insert(dbDataWithoutId)
         .select();
+
+      if (errorWithoutId) {
+        console.log('[saveActivity] ⚠️ Insert without ID failed, trying with ID:', errorWithoutId.message);
+        insertError = errorWithoutId;
+        
+        // Se fallisce senza ID, prova con ID (se fornito)
+        if (activity.id && !activity.id.startsWith('temp-')) {
+          const { data: dataWithId, error: errorWithId } = await supabase
+            .from('attività')
+            .insert(dbData)
+            .select();
+          
+          if (!errorWithId && dataWithId && dataWithId.length > 0) {
+            insertedData = dataWithId;
+            insertError = null;
+            console.log('[saveActivity] ✅ Insert with ID succeeded');
+          } else {
+            insertError = errorWithId || insertError;
+          }
+        }
+      } else {
+        insertedData = dataWithoutId;
+      }
 
       if (insertError) {
         console.error('[saveActivity] ❌ Insert error:', insertError);
@@ -376,12 +431,13 @@ export async function saveActivity(
 
       if (!insertedData || insertedData.length === 0) {
         console.error('[saveActivity] ❌ Insert succeeded but no data returned');
-        throw new Error('Insert completed but no data returned from database');
+        console.error('[saveActivity] This might be due to RLS policies preventing SELECT after INSERT');
+        throw new Error('Insert completed but no data returned from database. Check RLS policies.');
       }
 
       // Prendi il primo risultato (dovrebbe essere l'unico)
       const inserted = insertedData[0];
-      console.log('[saveActivity] ✅ Activity inserted successfully with DB-generated ID:', inserted.id);
+      console.log('[saveActivity] ✅ Activity inserted successfully with ID:', inserted.id);
 
       await logAction('create', 'attività', inserted.id, { title: activity.title })
       return dbActivityToType(inserted as any)
