@@ -16,7 +16,7 @@ async function getUserIP() {
 /**
  * Log di un'azione
  */
-async function logAction(action, entityType, entityId = null, details = {}) {
+export async function logAction(action, entityType, entityId = null, details = {}) {
   if (!supabase) {
     return // Skip logging if Supabase is not configured
   }
