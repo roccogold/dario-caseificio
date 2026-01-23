@@ -8,7 +8,6 @@ import {
   typeProductionToDb,
   typeActivityToDb,
 } from "@/lib/adapters"
-import { generateUUID } from "@/lib/utils"
 
 /**
  * Ottiene l'IP dell'utente (semplificato - in produzione usa un servizio esterno)
@@ -140,27 +139,15 @@ export async function saveCheese(cheese: Omit<CheeseType, "id" | "createdAt"> & 
       
       console.log('[saveCheese] 🔵 Starting insert:', { 
         name: cheese.name,
-        hasId: !!cheese.id,
-        id: cheese.id,
-        userId: user.id,
         insertDataKeys: Object.keys(dbDataWithoutId)
       });
       
-      // Strategia: Usa sempre UUID generato
-      const generatedId = cheese.id && !cheese.id.startsWith('temp-') 
-        ? cheese.id 
-        : generateUUID();
-      
-      console.log('[saveCheese] Using UUID for insert:', generatedId);
-      
-      const insertPayload = { ...dbDataWithoutId, id: generatedId };
-      console.log('[saveCheese] Insert payload:', JSON.stringify(insertPayload, null, 2));
-      
-      // Prova prima con select, poi fallback a fetch separato
+      // ✅ INSERT SENZA ID - Supabase lo genererà con gen_random_uuid()
       const { error: insertError, data: insertData } = await supabase
         .from('formaggi')
-        .insert(insertPayload)
-        .select();
+        .insert(dbDataWithoutId) // ✅ NO ID!
+        .select()
+        .single(); // ✅ Usa .single() invece di [0]
       
       if (insertError) {
         console.error('[saveCheese] ❌ Insert error:', insertError);
@@ -168,8 +155,7 @@ export async function saveCheese(cheese: Omit<CheeseType, "id" | "createdAt"> & 
           message: insertError.message,
           code: insertError.code,
           details: insertError.details,
-          hint: insertError.hint,
-          insertPayload: insertPayload
+          hint: insertError.hint
         });
         
         // Gestisci errori specifici
@@ -189,38 +175,9 @@ export async function saveCheese(cheese: Omit<CheeseType, "id" | "createdAt"> & 
         throw insertError;
       }
       
-      // Se insert restituisce dati, usali direttamente
-      if (insertData && insertData.length > 0) {
-        console.log('[saveCheese] ✅ Insert returned data directly:', insertData[0].id);
-        const inserted = insertData[0];
-        await logAction('create', 'formaggio', inserted.id, { name: cheese.name })
-        return dbCheeseToType(inserted as any);
-      }
-      
-      // Fallback: fetch separato
-      const insertedId = generatedId;
-      console.log('[saveCheese] Insert completed without return data, fetching record with ID:', insertedId);
-      
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      const { data: fetchedData, error: fetchError } = await supabase
-        .from('formaggi')
-        .select('*')
-        .eq('id', insertedId)
-        .maybeSingle();
-
-      if (fetchError) {
-        console.error('[saveCheese] ❌ Fetch error after insert:', fetchError);
-        throw new Error(`Insert succeeded but failed to fetch record: ${fetchError.message}. This might be an RLS policy issue.`);
-      }
-
-      if (!fetchedData) {
-        console.error('[saveCheese] ❌ Record not found after insert - possible RLS issue');
-        throw new Error(`Insert succeeded but record with ID ${insertedId} not found. This is likely an RLS policy issue.`);
-      }
-
-      const inserted = fetchedData;
-      console.log('[saveCheese] ✅ Cheese inserted and fetched successfully with ID:', inserted.id);
+      // insertData contiene già il record con l'ID generato
+      const inserted = insertData;
+      console.log('[saveCheese] ✅ Cheese inserted successfully with ID:', inserted.id);
 
       await logAction('create', 'formaggio', inserted.id, { name: cheese.name })
       return dbCheeseToType(inserted as any)
@@ -313,23 +270,20 @@ export async function saveProduction(
     const dbData = typeProductionToDb(production)
     
     if (!production.id || production.id.startsWith('temp-')) {
-      // Nuova produzione - Usa sempre UUID generato
+      // Nuova produzione
       const { id: _, ...dbDataWithoutId } = dbData;
       
-      const generatedId = production.id && !production.id.startsWith('temp-') 
-        ? production.id 
-        : generateUUID();
-      
-      console.log('[saveProduction] 🔵 Starting insert with UUID:', { 
+      console.log('[saveProduction] 🔵 Starting insert:', { 
         productionNumber: production.productionNumber,
-        id: generatedId,
         insertDataKeys: Object.keys(dbDataWithoutId)
       });
       
-      // Insert con UUID esplicito, poi fetch separato per evitare problemi RLS
-      const { error: insertError } = await supabase
+      // ✅ INSERT SENZA ID
+      const { error: insertError, data: insertData } = await supabase
         .from('produzioni')
-        .insert({ ...dbDataWithoutId, id: generatedId });
+        .insert(dbDataWithoutId) // NO ID!
+        .select()
+        .single();
 
       if (insertError) {
         console.error('[saveProduction] ❌ Insert error:', insertError);
@@ -342,27 +296,8 @@ export async function saveProduction(
         throw insertError;
       }
 
-      console.log('[saveProduction] Insert successful, fetching record with ID:', generatedId);
-      
-      // Fetch separato per evitare problemi RLS con SELECT dopo INSERT
-      const { data: fetchedData, error: fetchError } = await supabase
-        .from('produzioni')
-        .select('*')
-        .eq('id', generatedId)
-        .maybeSingle();
-
-      if (fetchError) {
-        console.error('[saveProduction] ❌ Fetch error after insert:', fetchError);
-        throw new Error(`Insert succeeded but failed to fetch record: ${fetchError.message}`);
-      }
-
-      if (!fetchedData) {
-        console.error('[saveProduction] ❌ Record not found after insert - possible RLS issue');
-        throw new Error(`Insert succeeded but record with ID ${generatedId} not found. Check RLS policies.`);
-      }
-
-      const inserted = fetchedData;
-      console.log('[saveProduction] ✅ Production inserted and fetched successfully with ID:', inserted.id);
+      const inserted = insertData;
+      console.log('[saveProduction] ✅ Production inserted with ID:', inserted.id);
 
       await logAction('create', 'produzione', inserted.id, { 
         production_number: production.productionNumber 
@@ -510,30 +445,16 @@ export async function saveActivity(
       
       console.log('[saveActivity] 🔵 Starting insert:', { 
         title: activity.title,
-        date: activity.date,
         type: activity.type,
-        hasId: !!activity.id,
-        id: activity.id,
-        userId: user.id,
-        insertDataKeys: Object.keys(dbDataWithoutId),
         insertData: dbDataWithoutId
       });
       
-      // Strategia: Usa sempre UUID generato
-      const generatedId = activity.id && !activity.id.startsWith('temp-') 
-        ? activity.id 
-        : generateUUID();
-      
-      console.log('[saveActivity] Using UUID for insert:', generatedId);
-      
-      const insertPayload = { ...dbDataWithoutId, id: generatedId };
-      console.log('[saveActivity] Insert payload:', JSON.stringify(insertPayload, null, 2));
-      
-      // Insert con UUID esplicito
+      // ✅ INSERT SENZA ID
       const { error: insertError, data: insertData } = await supabase
         .from('attività')
-        .insert(insertPayload)
-        .select();
+        .insert(dbDataWithoutId) // NO ID!
+        .select()
+        .single();
       
       if (insertError) {
         console.error('[saveActivity] ❌ Insert error:', insertError);
@@ -541,8 +462,7 @@ export async function saveActivity(
           message: insertError.message,
           code: insertError.code,
           details: insertError.details,
-          hint: insertError.hint,
-          insertPayload: insertPayload
+          hint: insertError.hint
         });
         
         // Se è un errore di constraint, fornisci più dettagli
@@ -561,50 +481,9 @@ export async function saveActivity(
         
         throw insertError;
       }
-      
-      // Se insert restituisce dati, usali direttamente
-      if (insertData && insertData.length > 0) {
-        console.log('[saveActivity] ✅ Insert returned data directly:', insertData[0].id);
-        const inserted = insertData[0];
-        await logAction('create', 'attività', inserted.id, { title: activity.title })
-        return dbActivityToType(inserted as any);
-      }
-      
-      // Se siamo qui, l'insert non ha restituito dati, proviamo fetch separato
-      const insertedId = generatedId;
-      console.log('[saveActivity] Insert completed without return data, fetching record with ID:', insertedId);
-      
-      // Aspetta un momento per assicurarsi che l'insert sia committato
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Fetch separato per evitare problemi RLS con SELECT dopo INSERT
-      const { data: fetchedData, error: fetchError } = await supabase
-        .from('attività')
-        .select('*')
-        .eq('id', insertedId)
-        .maybeSingle();
 
-      if (fetchError) {
-        console.error('[saveActivity] ❌ Fetch error after insert:', fetchError);
-        console.error('[saveActivity] Fetch error details:', {
-          message: fetchError.message,
-          code: fetchError.code,
-          details: fetchError.details,
-          hint: fetchError.hint,
-          insertedId: insertedId
-        });
-        throw new Error(`Insert succeeded but failed to fetch record: ${fetchError.message}. This might be an RLS policy issue.`);
-      }
-
-      if (!fetchedData) {
-        console.error('[saveActivity] ❌ Record not found after insert - possible RLS issue');
-        console.error('[saveActivity] Attempted to fetch ID:', insertedId);
-        console.error('[saveActivity] User ID:', user.id);
-        throw new Error(`Insert succeeded but record with ID ${insertedId} not found. This is likely an RLS policy issue - check that SELECT policies allow reading newly inserted records.`);
-      }
-
-      const inserted = fetchedData;
-      console.log('[saveActivity] ✅ Activity inserted and fetched successfully with ID:', inserted.id);
+      const inserted = insertData;
+      console.log('[saveActivity] ✅ Activity inserted with ID:', inserted.id);
 
       await logAction('create', 'attività', inserted.id, { title: activity.title })
       return dbActivityToType(inserted as any)
