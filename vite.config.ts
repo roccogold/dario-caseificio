@@ -21,16 +21,18 @@ export default defineConfig(({ mode }) => ({
     dedupe: ["react", "react-dom"],
   },
   build: {
-    // Forza un build pulito
+    // Forza un build pulito con hash unici
     rollupOptions: {
       output: {
-        // Genera nomi file deterministici ma unici
-        entryFileNames: `assets/[name]-[hash].js`,
-        chunkFileNames: `assets/[name]-[hash].js`,
-        assetFileNames: `assets/[name]-[hash].[ext]`,
+        // Usa hash completo per forzare nuovi nomi file ad ogni build
+        entryFileNames: `assets/[name]-[hash:8].js`,
+        chunkFileNames: `assets/[name]-[hash:8].js`,
+        assetFileNames: `assets/[name]-[hash:8].[ext]`,
       },
     },
     // Aumenta il limite di warning per file grandi (index.js è ~1.3MB)
     chunkSizeWarningLimit: 1500,
+    // Forza la generazione di source maps in produzione per debugging
+    sourcemap: false,
   },
 }));
