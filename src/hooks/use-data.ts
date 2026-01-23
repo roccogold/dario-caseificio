@@ -35,6 +35,7 @@ import {
   localActivities,
 } from "@/utils/localStorage";
 import { toast } from "sonner";
+import { generateUUID } from "@/lib/utils";
 
 // Determina se usare Supabase o localStorage
 const isProduction = import.meta.env.PROD;
@@ -236,7 +237,7 @@ export function useData() {
   const addCheeseType = useCallback(async (cheese: Omit<CheeseType, "id" | "createdAt">) => {
     const newCheese: CheeseType = {
       ...cheese,
-      id: `cheese-${Date.now()}`,
+      id: generateUUID(), // Usa UUID valido per il database
       createdAt: new Date(),
     };
 
@@ -357,7 +358,7 @@ export function useData() {
               const activityDescription = `Lotto: ${production.productionNumber} | ${productionCheese.liters}L`;
 
               const protocolActivity: Activity = {
-                id: `act-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                id: generateUUID(), // Usa UUID valido per il database
                 title: activityTitle,
                 description: activityDescription,
                 date: activityDate,
@@ -483,7 +484,7 @@ export function useData() {
     const totalLiters = production.cheeses.reduce((sum, c) => sum + c.liters, 0);
     const newProduction: Production = {
       ...production,
-      id: `prod-${Date.now()}`,
+      id: generateUUID(), // Usa UUID valido per il database
       totalLiters,
       createdAt: new Date(),
     };
@@ -528,7 +529,7 @@ export function useData() {
           const activityDescription = `Lotto: ${production.productionNumber} | ${productionCheese.liters}L`;
 
           const protocolActivity: Activity = {
-            id: `act-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            id: generateUUID(), // Usa UUID valido per il database
             title: activityTitle,
             description: activityDescription,
             date: activityDate,
@@ -694,7 +695,7 @@ export function useData() {
   const addActivity = useCallback(async (activity: Omit<Activity, "id" | "createdAt">) => {
     const newActivity: Activity = {
       ...activity,
-      id: `act-${Date.now()}`,
+      id: generateUUID(), // Usa UUID valido per il database
       createdAt: new Date(),
     };
 
