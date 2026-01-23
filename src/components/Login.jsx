@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { signIn, resetPassword, isAuthenticated } from '../utils/supabaseAuth'
 import { findUserByEmail, findUserByUsername, initializeUsers } from '../utils/userStorage'
 import { createSession, hashPassword } from '../utils/auth'
+import { logAction } from '../utils/supabaseStorage'
 import './Login.css'
 
 function Login() {
