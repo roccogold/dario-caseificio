@@ -44,6 +44,12 @@ function Login() {
         if (user.passwordHash === passwordHash) {
           // Crea sessione locale
           createSession(user)
+          // Log login (solo in produzione, quando Supabase è configurato)
+          try {
+            await logAction('login', 'user', user.id, { email: normalizedEmail })
+          } catch (err) {
+            console.warn('Failed to log login action:', err)
+          }
           // Reindirizza alla pagina principale
           navigate('/calendario', { replace: true })
           // Ricarica la pagina per aggiornare lo stato di autenticazione
@@ -57,6 +63,12 @@ function Login() {
         const result = await signIn(email, password)
         
         if (result.success) {
+          // Log login
+          try {
+            await logAction('login', 'user', result.user?.id || null, { email: email })
+          } catch (err) {
+            console.warn('Failed to log login action:', err)
+          }
           // Reindirizza alla pagina principale
           navigate('/calendario', { replace: true })
           // Ricarica la pagina per aggiornare lo stato di autenticazione

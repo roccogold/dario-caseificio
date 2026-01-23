@@ -25,7 +25,7 @@ async function getUserIP(): Promise<string> {
 /**
  * Log di un'azione
  */
-async function logAction(
+export async function logAction(
   action: string,
   entityType: string,
   entityId: string | null = null,
