@@ -209,10 +209,16 @@ export function useData() {
     });
 
     const unsubscribeActivities = subscribeToActivities((payload) => {
+      console.log('[useData] Real-time activity event:', payload.eventType, payload.new?.id || payload.old?.id);
+      
       if (payload.eventType === 'INSERT' && payload.new) {
         setActivities(prev => {
           const exists = prev.find(a => a.id === payload.new.id);
-          if (exists) return prev;
+          if (exists) {
+            console.log('[useData] ⚠️ Activity already exists in state, skipping duplicate:', payload.new.id);
+            return prev;
+          }
+          console.log('[useData] ✅ Adding activity from real-time subscription:', payload.new.id);
           return [...prev, payload.new as any];
         });
       } else if (payload.eventType === 'UPDATE' && payload.new) {
