@@ -191,14 +191,15 @@ export function typeProductionToDb(production: Omit<Production, "id" | "createdA
 
 export function typeActivityToDb(activity: Omit<Activity, "id" | "createdAt"> & { id?: string }): Partial<DbActivity> {
   return {
+    ...(activity.id && { id: activity.id }), // Includi l'ID se fornito (per insert con UUID pre-generato)
     date: activity.date.toISOString().split('T')[0], // YYYY-MM-DD
     title: activity.title,
     description: activity.description || null,
-    type: activity.type,
+    type: activity.type || null,
     recurrence: activity.recurrence || null,
     production_id: activity.productionId || null,
     cheese_type_id: activity.cheeseTypeId || null,
-    is_completed: activity.completed,
+    is_completed: activity.completed ?? false,
     completed_dates: activity.completedDates || null,
   };
 }

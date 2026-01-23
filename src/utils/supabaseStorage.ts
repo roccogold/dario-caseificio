@@ -271,33 +271,64 @@ export async function saveActivity(
     const dbData = typeActivityToDb(activity)
     
     if (!activity.id || activity.id.startsWith('temp-')) {
-      // Nuova attività
+      // Nuova attività - assicurati che l'ID sia incluso se fornito
+      const insertData = activity.id ? { ...dbData, id: activity.id } : dbData;
+      
+      console.log('[saveActivity] Inserting new activity:', { 
+        hasId: !!activity.id, 
+        id: activity.id,
+        title: activity.title,
+        type: activity.type 
+      });
+      
       const { data, error } = await supabase
         .from('attività')
-        .insert(dbData)
+        .insert(insertData)
         .select()
-        .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('[saveActivity] Insert error:', error);
+        throw error;
+      }
 
-      await logAction('create', 'attività', data.id, { title: activity.title })
-      return dbActivityToType(data as any)
+      if (!data || data.length === 0) {
+        throw new Error('Insert completed but no data returned');
+      }
+
+      // Prendi il primo risultato (dovrebbe essere l'unico)
+      const inserted = data[0];
+      console.log('[saveActivity] ✅ Activity inserted successfully:', inserted.id);
+
+      await logAction('create', 'attività', inserted.id, { title: activity.title })
+      return dbActivityToType(inserted as any)
     } else {
       // Update attività esistente
+      console.log('[saveActivity] Updating activity:', activity.id);
+      
       const { data, error } = await supabase
         .from('attività')
         .update(dbData)
         .eq('id', activity.id)
         .select()
-        .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('[saveActivity] Update error:', error);
+        throw error;
+      }
+
+      if (!data || data.length === 0) {
+        throw new Error(`Activity with id ${activity.id} not found for update`);
+      }
+
+      // Prendi il primo risultato
+      const updated = data[0];
+      console.log('[saveActivity] ✅ Activity updated successfully:', updated.id);
 
       await logAction('update', 'attività', activity.id, { title: activity.title })
-      return dbActivityToType(data as any)
+      return dbActivityToType(updated as any)
     }
   } catch (error) {
-    console.error('Error saving activity:', error)
+    console.error('[saveActivity] ❌ Error saving activity:', error)
     throw error
   }
 }
