@@ -244,7 +244,7 @@ export default function Calendario() {
     return (
       <div className="space-y-4">
         {/* Days of Week Header */}
-        <div className="grid grid-cols-7 gap-1 sm:gap-2 overflow-x-auto">
+        <div className="grid grid-cols-7 gap-2">
           {weekDays.map((day) => {
             const isSelected = isSameDay(day, selectedDate);
             const dayActivities = getActivitiesForDate(day);
@@ -272,7 +272,7 @@ export default function Calendario() {
                 <button
                   onClick={() => handleDateClick(day)}
                   className={cn(
-                    "flex-1 space-y-1.5 min-h-[150px] sm:min-h-[200px] rounded-lg border p-1.5 sm:p-2 text-left transition-all hover:border-primary hover:shadow-md",
+                    "flex-1 space-y-1.5 min-h-[200px] rounded-lg border p-2 text-left transition-all hover:border-primary hover:shadow-md",
                     isSelected
                       ? "border-primary bg-primary/5"
                       : "border-border bg-muted/20"
@@ -364,9 +364,9 @@ export default function Calendario() {
   // Month View Component
   const MonthView = () => {
     return (
-      <div className="space-y-2 overflow-x-auto">
+      <div className="space-y-2">
         {/* Days of Week */}
-        <div className="grid grid-cols-7 text-center min-w-[600px]">
+        <div className="grid grid-cols-7 text-center">
           {["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"].map((day) => (
             <div
               key={day}
@@ -378,7 +378,7 @@ export default function Calendario() {
         </div>
 
         {/* Calendar Grid */}
-        <div className="grid grid-cols-7 gap-1 min-w-[600px]">
+        <div className="grid grid-cols-7 gap-1">
           {calendarDays.map((day, index) => {
             const isSelected = isSameDay(day, selectedDate);
             const isCurrentMonth = isSameMonth(day, currentDate);
@@ -395,7 +395,7 @@ export default function Calendario() {
                 transition={{ delay: index * 0.01 }}
                 onClick={() => handleDateClick(day)}
                 className={cn(
-                  "relative min-h-[60px] sm:min-h-[80px] rounded-lg border p-1 sm:p-1.5 text-left transition-all hover:border-primary hover:shadow-sm",
+                  "relative min-h-[80px] rounded-lg border p-1.5 text-left transition-all hover:border-primary hover:shadow-sm",
                   !isCurrentMonth && "opacity-40",
                   isSelected
                     ? "border-primary bg-primary/10"
@@ -544,105 +544,81 @@ export default function Calendario() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl border border-border bg-card p-4 sm:p-6 shadow-card"
+          className="rounded-xl border border-border bg-card p-6 shadow-card"
         >
           {/* Navigation Bar */}
-          <div className="mb-6 space-y-4">
-            {/* Top Row: Date Navigation */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-2 flex-wrap">
-                <Button variant="outline" size="sm" onClick={goToToday} className="shrink-0">
-                  Oggi
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => navigateDate("prev")}
-                  className="shrink-0"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </Button>
-                <h2 className="font-serif text-base sm:text-lg font-semibold text-card-foreground capitalize text-center sm:text-left min-w-0 flex-1 sm:flex-initial sm:min-w-[200px]">
-                  {view === "day" && (
-                    <span className="block truncate sm:inline">
-                      {format(selectedDate, "EEEE d MMMM yyyy", { locale: it })}
-                    </span>
-                  )}
-                  {view === "week" && (
-                    <span className="block truncate sm:inline">
-                      Settimana {getWeek(currentDate, { locale: it })} - {format(currentDate, "MMMM yyyy", { locale: it })}
-                    </span>
-                  )}
-                  {view === "month" && (
-                    <span className="block truncate sm:inline">
-                      {format(currentDate, "MMMM yyyy", { locale: it })}
-                    </span>
-                  )}
-                </h2>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => navigateDate("next")}
-                  className="shrink-0"
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </Button>
-              </div>
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={goToToday}>
+                Oggi
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigateDate("prev")}
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+              <h2 className="font-serif text-lg font-semibold text-card-foreground capitalize min-w-[200px] text-center">
+                {view === "day" && format(selectedDate, "EEEE d MMMM yyyy", { locale: it })}
+                {view === "week" && `Settimana ${getWeek(currentDate, { locale: it })} - ${format(currentDate, "MMMM yyyy", { locale: it })}`}
+                {view === "month" && format(currentDate, "MMMM yyyy", { locale: it })}
+              </h2>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigateDate("next")}
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Button>
             </div>
 
-            {/* Bottom Row: View Selector and Action Buttons */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              {/* View Selector */}
-              <div className="flex gap-1 rounded-lg border border-border bg-muted/30 p-1 w-full sm:w-auto">
-                <Button
-                  variant={view === "day" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => handleViewChange("day")}
-                  className="flex-1 sm:flex-initial sm:px-4"
-                >
-                  Giorno
-                </Button>
-                <Button
-                  variant={view === "week" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => handleViewChange("week")}
-                  className="flex-1 sm:flex-initial sm:px-4"
-                >
-                  Settimana
-                </Button>
-                <Button
-                  variant={view === "month" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => handleViewChange("month")}
-                  className="flex-1 sm:flex-initial sm:px-4"
-                >
-                  Mese
-                </Button>
-              </div>
+            {/* View Selector */}
+            <div className="flex gap-1 rounded-lg border border-border bg-muted/30 p-1">
+              <Button
+                variant={view === "day" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => handleViewChange("day")}
+                className="flex-1"
+              >
+                Giorno
+              </Button>
+              <Button
+                variant={view === "week" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => handleViewChange("week")}
+                className="flex-1"
+              >
+                Settimana
+              </Button>
+              <Button
+                variant={view === "month" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => handleViewChange("month")}
+                className="flex-1"
+              >
+                Mese
+              </Button>
+            </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-2 flex-wrap">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsProductionDialogOpen(true)}
-                  className="flex-1 sm:flex-initial"
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  <span className="hidden xs:inline">Nuova Produzione</span>
-                  <span className="xs:hidden">Produzione</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsActivityDialogOpen(true)}
-                  className="flex-1 sm:flex-initial"
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  <span className="hidden xs:inline">Aggiungi Attività</span>
-                  <span className="xs:hidden">Attività</span>
-                </Button>
-              </div>
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsProductionDialogOpen(true)}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Nuova Produzione
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsActivityDialogOpen(true)}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Aggiungi Attività
+              </Button>
             </div>
           </div>
 
