@@ -154,14 +154,39 @@ export function typeCheeseToDb(cheese: Omit<CheeseType, "id" | "createdAt"> & { 
     : (cheese.yieldPerLiter ? cheese.yieldPerLiter * 100 : null);
 
   // Usa prices se presente, altrimenti null (opzionale) o legacy pricePerKg
-  const prices = cheese.prices || (cheese.pricePerKg ? {
-    price1: cheese.pricePerKg,
-    price2: 0,
-    price3: 0,
-    salesPercentage1: 100,
-    salesPercentage2: 0,
-    salesPercentage3: 0,
-  } : null);
+  // Se prices è un oggetto vuoto o ha tutti valori 0, lo salviamo comunque
+  let prices = null;
+  if (cheese.prices) {
+    // Se prices esiste, usalo anche se ha valori 0
+    prices = {
+      price1: cheese.prices.price1 || 0,
+      price2: cheese.prices.price2 || 0,
+      price3: cheese.prices.price3 || 0,
+      salesPercentage1: cheese.prices.salesPercentage1 || 0,
+      salesPercentage2: cheese.prices.salesPercentage2 || 0,
+      salesPercentage3: cheese.prices.salesPercentage3 || 0,
+    };
+  } else if (cheese.pricePerKg) {
+    // Fallback a legacy pricePerKg
+    prices = {
+      price1: cheese.pricePerKg,
+      price2: 0,
+      price3: 0,
+      salesPercentage1: 100,
+      salesPercentage2: 0,
+      salesPercentage3: 0,
+    };
+  }
+
+  // Gestisci defaultFields: se è un oggetto vuoto, salvalo come {} invece di null
+  const defaultFields = cheese.defaultFields && Object.keys(cheese.defaultFields).length > 0
+    ? cheese.defaultFields
+    : (cheese.defaultFields !== undefined ? {} : null);
+
+  // Gestisci customFields: se è un array vuoto, salvalo come [] invece di null
+  const customFields = cheese.customFields && cheese.customFields.length > 0
+    ? cheese.customFields
+    : (cheese.customFields !== undefined ? [] : null);
 
   return {
     ...(cheese.id && { id: cheese.id }), // Includi l'ID se fornito (per insert con UUID pre-generato)
@@ -170,8 +195,8 @@ export function typeCheeseToDb(cheese: Omit<CheeseType, "id" | "createdAt"> & { 
     protocol: cheese.protocol || [],
     yield_percentage: yieldPercentage,
     prices: prices,
-    default_fields: cheese.defaultFields || null,
-    custom_fields: cheese.customFields || null,
+    default_fields: defaultFields,
+    custom_fields: customFields,
     // Mantieni anche legacy fields per backward compatibility
     yield_liters_per_kg: cheese.yieldPerLiter ?? (yieldPercentage ? yieldPercentage / 100 : null),
     price_per_kg: cheese.pricePerKg ?? (prices ? prices.price1 : null),

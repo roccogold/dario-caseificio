@@ -187,29 +187,32 @@ export function EditCheeseDialog({
     const validProtocol = protocol.filter((p) => p.activity.trim());
     const sortedProtocol = [...validProtocol].sort((a, b) => a.day - b.day);
     
+    // Build defaultFields object, only including non-empty values
+    const defaultFieldsObj: Record<string, string> = {};
+    if (temperaturaCoagulazione.trim()) defaultFieldsObj.temperaturaCoagulazione = temperaturaCoagulazione.trim();
+    if (nomeFermento.trim()) defaultFieldsObj.nomeFermento = nomeFermento.trim();
+    if (quantitaFermento.trim()) defaultFieldsObj.quantitaFermento = quantitaFermento.trim();
+    if (muffe.trim()) defaultFieldsObj.muffe = muffe.trim();
+    if (quantitaMuffe.trim()) defaultFieldsObj.quantitaMuffe = quantitaMuffe.trim();
+    if (caglio.trim()) defaultFieldsObj.caglio = caglio.trim();
+    if (quantitaCaglio.trim()) defaultFieldsObj.quantitaCaglio = quantitaCaglio.trim();
+
     onUpdate(cheese.id, {
       name: name.trim(),
       color,
       ...(yieldValue !== undefined && { yieldPercentage: yieldValue }),
-      ...(hasAnyPrice && {
-        prices: {
-          price1: price1Value || 0,
-          price2: price2Value || 0,
-          price3: price3Value || 0,
-          salesPercentage1: salesPct1 || 0,
-          salesPercentage2: salesPct2 || 0,
-          salesPercentage3: salesPct3 || 0,
-        },
-      }),
-      defaultFields: {
-        temperaturaCoagulazione: temperaturaCoagulazione.trim() || undefined,
-        nomeFermento: nomeFermento.trim() || undefined,
-        quantitaFermento: quantitaFermento.trim() || undefined,
-        muffe: muffe.trim() || undefined,
-        quantitaMuffe: quantitaMuffe.trim() || undefined,
-        caglio: caglio.trim() || undefined,
-        quantitaCaglio: quantitaCaglio.trim() || undefined,
+      // Always include prices object, even if all values are 0
+      prices: {
+        price1: price1Value || 0,
+        price2: price2Value || 0,
+        price3: price3Value || 0,
+        salesPercentage1: salesPct1 || 0,
+        salesPercentage2: salesPct2 || 0,
+        salesPercentage3: salesPct3 || 0,
       },
+      // Always include defaultFields object (empty if no values)
+      defaultFields: defaultFieldsObj,
+      // Always include customFields array (empty if no values)
       customFields: customFields.filter(f => f.key.trim() || f.value.trim()),
       protocol: sortedProtocol,
     });
