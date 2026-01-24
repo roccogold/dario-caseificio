@@ -227,21 +227,25 @@ export default function Formaggi() {
 
                     {/* Stats */}
                     <div className="mt-4 space-y-2.5">
-                      <div className="flex items-center gap-2.5">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted flex-shrink-0">
-                          <Droplets className="h-4 w-4 text-muted-foreground" />
+                      {/* Resa - only show if there's a value */}
+                      {(cheese.yieldPercentage !== undefined && cheese.yieldPercentage !== null) || 
+                       (cheese.yieldPerLiter !== undefined && cheese.yieldPerLiter !== null && cheese.yieldPerLiter > 0) ? (
+                        <div className="flex items-center gap-2.5">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted flex-shrink-0">
+                            <Droplets className="h-4 w-4 text-muted-foreground" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-xs text-muted-foreground">Resa</p>
+                            <p className="text-sm font-medium">
+                              {cheese.yieldPercentage !== undefined && cheese.yieldPercentage !== null
+                                ? `${cheese.yieldPercentage}%` 
+                                : cheese.yieldPerLiter && cheese.yieldPerLiter > 0
+                                  ? `${(cheese.yieldPerLiter * 100).toFixed(1)}%` 
+                                  : null}
+                            </p>
+                          </div>
                         </div>
-                        <div className="flex-1">
-                          <p className="text-xs text-muted-foreground">Resa</p>
-                          <p className="text-sm font-medium">
-                            {cheese.yieldPercentage !== undefined 
-                              ? `${cheese.yieldPercentage}%` 
-                              : cheese.yieldPerLiter 
-                                ? `${(cheese.yieldPerLiter * 100).toFixed(1)}%` 
-                                : 'N/A'}
-                          </p>
-                        </div>
-                      </div>
+                      ) : null}
                       
                       {/* Prezzi */}
                       <div className="space-y-2.5">
