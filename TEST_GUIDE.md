@@ -21,8 +21,8 @@ Verificare che tutte le funzionalità dell'applicazione funzionino correttamente
 - [ ] Apri `http://localhost:8080/`
 - [ ] Verifica che appaia la pagina di login
 - [ ] Verifica che il logo frog e "DARIO" siano visibili
-- [ ] Inserisci email: `oscargoldschmidt@gmail.com`
-- [ ] Inserisci password: `pecorina`
+- [ ] Inserisci email: `admin@example.com` (o l'email configurata in `.env.local`)
+- [ ] Inserisci password: (usa la password configurata in `VITE_DEFAULT_PASSWORD` o creata in Supabase)
 - [ ] Clicca "Accedi"
 - [ ] **Risultato atteso**: Reindirizzamento a `/calendario` e caricamento dell'app
 
@@ -35,7 +35,7 @@ Verificare che tutte le funzionalità dell'applicazione funzionino correttamente
 - [ ] Inserisci un'email non esistente (es. `test@test.com`)
 - [ ] Clicca "Invia Istruzioni"
 - [ ] **Risultato atteso**: Messaggio "Email non trovata"
-- [ ] Inserisci email: `oscargoldschmidt@gmail.com`
+- [ ] Inserisci email: (usa l'email configurata nel tuo ambiente)
 - [ ] Clicca "Invia Istruzioni"
 - [ ] **Risultato atteso**: Messaggio "Il reset password non è disponibile in modalità sviluppo"
 

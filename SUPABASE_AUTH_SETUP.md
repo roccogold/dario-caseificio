@@ -15,8 +15,8 @@ Questa guida ti aiuterà a configurare l'autenticazione Supabase e le policy RLS
 1. Vai su **Authentication** → **Users**
 2. Clicca su **"Add user"** → **"Create new user"**
 3. Compila:
-   - **Email**: `oscargoldschmidt@gmail.com`
-   - **Password**: `pecorina`
+   - **Email**: (usa la tua email)
+   - **Password**: (crea una password sicura)
    - **Auto Confirm User**: ✅ (spunta questa opzione per non richiedere email verification)
 4. Clicca **"Create user"**
 
@@ -32,8 +32,8 @@ Questa guida ti aiuterà a configurare l'autenticazione Supabase e le policy RLS
 
 1. Apri l'applicazione (locale o Vercel)
 2. Prova a fare login con:
-   - **Email**: `oscargoldschmidt@gmail.com`
-   - **Password**: `pecorina`
+   - **Email**: (usa la tua email)
+   - **Password**: (crea una password sicura)
 3. Dovresti essere autenticato correttamente
 
 ## Cosa è cambiato

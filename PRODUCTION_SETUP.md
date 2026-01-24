@@ -73,7 +73,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ### In Sviluppo (localhost:8080)
 - Usa `localStorage` per autenticazione
-- Credenziali: `oscargoldschmidt@gmail.com` / `pecorina`
+- Credenziali: Configurare tramite variabili d'ambiente o Supabase Auth (vedi `.env.local`)
 - Dati salvati in `localStorage` del browser
 
 ### In Produzione (Vercel)
