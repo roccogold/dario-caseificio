@@ -38,6 +38,7 @@ export interface Activity {
   productionId?: string;
   cheeseTypeId?: string;
   completed: boolean;
+  completedDates?: string[];
   createdAt: Date;
 }
 

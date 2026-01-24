@@ -166,10 +166,11 @@ export async function loadProductions() {
     return (data || []).map(prod => ({
       id: prod.id,
       productionNumber: prod.production_number,
-      productionDate: prod.production_date,
+      date: prod.production_date ? new Date(prod.production_date) : new Date(),
       totalLiters: prod.total_liters || 0,
       cheeses: prod.cheeses || [],
-      notes: prod.notes || ''
+      notes: prod.notes || '',
+      createdAt: prod.created_at ? new Date(prod.created_at) : new Date()
     }))
   } catch (error) {
     console.error('Error loading productions:', error)
@@ -191,7 +192,7 @@ export async function saveProduction(production) {
         .from('produzioni')
         .insert({
           production_number: production.productionNumber,
-          production_date: production.productionDate,
+          production_date: production.date ? (production.date instanceof Date ? production.date.toISOString().split('T')[0] : production.date) : new Date().toISOString().split('T')[0],
           total_liters: production.totalLiters || 0,
           cheeses: production.cheeses || [],
           notes: production.notes || ''
@@ -211,7 +212,7 @@ export async function saveProduction(production) {
         .from('produzioni')
         .update({
           production_number: production.productionNumber,
-          production_date: production.productionDate,
+          production_date: production.date ? (production.date instanceof Date ? production.date.toISOString().split('T')[0] : production.date) : new Date().toISOString().split('T')[0],
           total_liters: production.totalLiters || 0,
           cheeses: production.cheeses || [],
           notes: production.notes || ''
@@ -272,11 +273,16 @@ export async function loadActivities() {
 
     return (data || []).map(activity => ({
       id: activity.id,
-      date: activity.date,
+      date: activity.date ? new Date(activity.date) : new Date(),
       title: activity.title,
       description: activity.description || '',
-      recurrence: activity.recurrence || 'none',
-      isCompleted: activity.is_completed || false
+      type: activity.type || 'one-time',
+      recurrence: activity.recurrence || undefined,
+      productionId: activity.production_id || undefined,
+      cheeseTypeId: activity.cheese_type_id || undefined,
+      completed: activity.is_completed || false,
+      completedDates: activity.completed_dates || [],
+      createdAt: activity.created_at ? new Date(activity.created_at) : new Date()
     }))
   } catch (error) {
     console.error('Error loading activities:', error)
@@ -297,11 +303,15 @@ export async function saveActivity(activity) {
       const { data, error } = await supabase
         .from('attività')
         .insert({
-          date: activity.date,
+          date: activity.date ? (activity.date instanceof Date ? activity.date.toISOString().split('T')[0] : activity.date) : new Date().toISOString().split('T')[0],
           title: activity.title,
           description: activity.description || '',
-          recurrence: activity.recurrence || 'none',
-          is_completed: activity.isCompleted || false
+          type: activity.type || 'one-time',
+          recurrence: activity.recurrence || null,
+          production_id: activity.productionId || null,
+          cheese_type_id: activity.cheeseTypeId || null,
+          is_completed: activity.completed || false,
+          completed_dates: activity.completedDates || []
         })
         .select()
         .single()
@@ -315,11 +325,15 @@ export async function saveActivity(activity) {
       const { data, error } = await supabase
         .from('attività')
         .update({
-          date: activity.date,
+          date: activity.date ? (activity.date instanceof Date ? activity.date.toISOString().split('T')[0] : activity.date) : new Date().toISOString().split('T')[0],
           title: activity.title,
           description: activity.description || '',
-          recurrence: activity.recurrence || 'none',
-          is_completed: activity.isCompleted || false
+          type: activity.type || 'one-time',
+          recurrence: activity.recurrence || null,
+          production_id: activity.productionId || null,
+          cheese_type_id: activity.cheeseTypeId || null,
+          is_completed: activity.completed || false,
+          completed_dates: activity.completedDates || []
         })
         .eq('id', activity.id)
         .select()
@@ -361,22 +375,39 @@ export async function deleteActivity(activityId) {
 /**
  * Segna un'attività come completata/non completata
  */
-export async function toggleActivityCompleted(activityId, isCompleted) {
+export async function toggleActivityCompleted(activityId, completed, completedDates = []) {
   if (!supabase) {
     throw new Error('Supabase non configurato')
   }
   try {
+    const updateData = { is_completed: completed }
+    if (completedDates && completedDates.length > 0) {
+      updateData.completed_dates = completedDates
+    }
+    
     const { data, error } = await supabase
       .from('attività')
-      .update({ is_completed: isCompleted })
+      .update(updateData)
       .eq('id', activityId)
       .select()
       .single()
 
     if (error) throw error
 
-    await logAction(isCompleted ? 'complete' : 'uncomplete', 'attività', activityId)
-    return data
+    await logAction(completed ? 'complete' : 'uncomplete', 'attività', activityId)
+    return {
+      id: data.id,
+      date: data.date ? new Date(data.date) : new Date(),
+      title: data.title,
+      description: data.description || '',
+      type: data.type || 'one-time',
+      recurrence: data.recurrence || undefined,
+      productionId: data.production_id || undefined,
+      cheeseTypeId: data.cheese_type_id || undefined,
+      completed: data.is_completed || false,
+      completedDates: data.completed_dates || [],
+      createdAt: data.created_at ? new Date(data.created_at) : new Date()
+    }
   } catch (error) {
     console.error('Error toggling activity completed:', error)
     throw error
