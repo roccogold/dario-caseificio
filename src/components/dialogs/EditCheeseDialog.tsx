@@ -638,11 +638,9 @@ export function EditCheeseDialog({
               </Button>
             </div>
             <div className="space-y-3">
-              {[...protocol].sort((a, b) => a.day - b.day).map((step, index) => {
-                // Trova l'indice originale nel protocollo non ordinato
-                const originalIndex = protocol.findIndex(p => p === step);
+              {protocol.map((step, index) => {
                 return (
-                <div key={originalIndex} className="flex gap-3 items-end">
+                <div key={index} className="flex gap-3 items-end">
                   <div className="flex flex-col gap-1.5 w-12 flex-shrink-0">
                     <Label className="text-xs font-medium text-foreground">Giorno</Label>
                     <Input
@@ -654,7 +652,7 @@ export function EditCheeseDialog({
                       onChange={(e) => {
                         const val = e.target.value;
                         const newDay = val === "" ? 0 : parseInt(val) || 0;
-                        updateProtocolStep(originalIndex, "day", newDay);
+                        updateProtocolStep(index, "day", newDay);
                       }}
                       placeholder="0"
                     />
@@ -667,7 +665,7 @@ export function EditCheeseDialog({
                       placeholder="Descrivi l'attività..."
                       value={step.activity}
                       onChange={(e) => {
-                        updateProtocolStep(originalIndex, "activity", e.target.value);
+                        updateProtocolStep(index, "activity", e.target.value);
                       }}
                     />
                   </div>
@@ -675,7 +673,7 @@ export function EditCheeseDialog({
                     type="button"
                     variant="ghost"
                     size="icon"
-                    onClick={() => removeProtocolStep(originalIndex)}
+                    onClick={() => removeProtocolStep(index)}
                     className="h-10 w-10 text-muted-foreground hover:text-destructive hover:bg-destructive/10 mb-0 flex-shrink-0 transition-colors"
                   >
                     <Trash2 className="h-4 w-4" />
