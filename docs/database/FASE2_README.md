@@ -7,13 +7,13 @@ La Fase 2 implementa la sicurezza completa dell'applicazione utilizzando **Row L
 ## ✅ Cosa è stato implementato
 
 ### 1. Script SQL per RLS Policies
-- **`FASE2_RLS_POLICIES.sql`** (nella root del progetto): Script completo per applicare le RLS policies
+- **`database/scripts/FASE2_RLS_POLICIES.sql`**: Script completo per applicare le RLS policies
   - Abilita RLS su tutte le tabelle (`formaggi`, `produzioni`, `attività`, `logs`)
   - Rimuove policy esistenti non sicure
   - Crea nuove policy che richiedono autenticazione per tutte le operazioni
   - Verifica finale delle policy create
 
-- **`FASE2_VERIFY_RLS.sql`** (nella root del progetto): Script di verifica
+- **`database/scripts/FASE2_VERIFY_RLS.sql`**: Script di verifica
   - Verifica che RLS sia abilitato
   - Conta le policy per tabella
   - Verifica che tutte le policy richiedano autenticazione
@@ -71,9 +71,9 @@ La Fase 2 implementa la sicurezza completa dell'applicazione utilizzando **Row L
 ### Step 1: Applicare le RLS Policies
 
 1. Vai su **Supabase Dashboard** → **SQL Editor**
-2. Esegui `FASE2_RLS_POLICIES.sql`
+2. Esegui `database/scripts/FASE2_RLS_POLICIES.sql`
 3. Verifica che non ci siano errori
-4. Esegui `FASE2_VERIFY_RLS.sql` per verificare che tutto sia corretto
+4. Esegui `database/scripts/FASE2_VERIFY_RLS.sql` per verificare che tutto sia corretto
 
 ### Step 2: Verificare l'Autenticazione
 
@@ -122,10 +122,10 @@ Dopo aver completato la Fase 2, puoi:
 ## 📚 File Creati/Modificati
 
 ### Nuovi File
-- `FASE2_RLS_POLICIES.sql`
-- `FASE2_VERIFY_RLS.sql`
+- `database/scripts/FASE2_RLS_POLICIES.sql`
+- `database/scripts/FASE2_VERIFY_RLS.sql`
 - `src/components/ProtectedRoute.tsx`
-- `FASE2_README.md` (questo file)
+- `docs/database/FASE2_README.md` (questo file)
 
 ### File Modificati
 - `src/App.tsx` - Aggiunto `ProtectedRoute` a tutte le route

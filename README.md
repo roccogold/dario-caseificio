@@ -141,30 +141,32 @@ The production build will be in the `dist` directory.
 ## 📁 Project Structure
 
 ```
-src/
-├── components/          # React components
-│   ├── dashboard/      # Dashboard widgets
-│   ├── dialogs/         # Modal dialogs (add/edit forms)
-│   ├── layout/          # Layout components (AppLayout, etc.)
-│   └── ui/              # Reusable UI components (shadcn-ui)
-├── hooks/               # Custom React hooks
-│   └── use-data.ts      # Main data management hook
-├── lib/                 # Utilities and adapters
-│   ├── adapters.ts      # Data transformation (DB ↔ TypeScript)
-│   └── utils.ts         # General utilities
-├── pages/               # Page components
-│   ├── Dashboard.tsx    # Main dashboard
-│   ├── Calendario.tsx   # Calendar view
-│   ├── Formaggi.tsx     # Cheese management
-│   ├── Produzioni.tsx   # Production history
-│   └── Statistiche.tsx  # Statistics and analytics
-├── types/               # TypeScript type definitions
-├── utils/               # Utility functions
-│   ├── supabase.ts      # Supabase client initialization
-│   ├── supabaseAuth.ts  # Authentication utilities
-│   ├── supabaseStorage.js # Data persistence layer
-│   └── generatePDF.ts   # PDF generation for cheese cards
-└── main.tsx             # Application entry point
+.
+├── src/                  # Source code
+│   ├── components/       # React components
+│   │   ├── dashboard/   # Dashboard widgets
+│   │   ├── dialogs/      # Modal dialogs (add/edit forms)
+│   │   ├── layout/       # Layout components (AppLayout, etc.)
+│   │   └── ui/           # Reusable UI components (shadcn-ui)
+│   ├── hooks/            # Custom React hooks
+│   ├── lib/              # Utilities and adapters
+│   ├── pages/            # Page components
+│   ├── types/            # TypeScript type definitions
+│   └── utils/            # Utility functions
+├── database/             # Database scripts
+│   └── scripts/          # SQL migration and setup scripts
+├── docs/                 # Documentation
+│   ├── setup/            # Setup guides
+│   ├── deployment/       # Deployment guides
+│   ├── database/        # Database documentation
+│   ├── testing/          # Testing guides
+│   ├── architecture/     # Architecture docs
+│   └── archive/          # Historical documentation
+├── scripts/              # Utility scripts
+│   ├── deploy.sh         # Deployment script
+│   └── START_DEV_SERVER.sh # Dev server startup
+├── public/               # Static assets
+└── [config files]        # Configuration files (package.json, vite.config.ts, etc.)
 ```
 
 ## 🔐 Security
@@ -232,9 +234,11 @@ The application uses Supabase (PostgreSQL) with the following main tables:
 - `attivitia` - Activities and tasks
 - `users` - User authentication (managed by Supabase Auth)
 
-See `supabase-schema.sql` for the complete schema definition.
+See `database/scripts/supabase-schema.sql` for the complete schema definition.
 
 For detailed database documentation, see [docs/database/](./docs/database/).
+
+All SQL scripts are located in [`database/scripts/`](./database/scripts/).
 
 ## 📄 License
 
