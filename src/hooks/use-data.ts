@@ -492,20 +492,27 @@ export function useData() {
         setCheeseTypes((prev) =>
           prev.map((c) => (c.id === id ? updated : c))
         );
+        logger.log('[updateCheeseType] ✅ Cheese updated successfully:', id);
       } else {
         localCheeses.update(id, updates);
         setCheeseTypes((prev) =>
           prev.map((c) => (c.id === id ? { ...c, ...updates } : c))
         );
+        logger.log('[updateCheeseType] ✅ Cheese updated in localStorage:', id);
       }
-    } catch (error) {
+    } catch (error: any) {
       logger.error('Error updating cheese:', error);
-      toast.error('Errore nell\'aggiornamento del formaggio');
-      // Fallback
-      localCheeses.update(id, updates);
-      setCheeseTypes((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, ...updates } : c))
-      );
+      const errorMessage = error?.message || 'Errore sconosciuto';
+      toast.error(`Errore nell'aggiornamento del formaggio: ${errorMessage}`);
+      
+      // Fallback solo in sviluppo
+      if (!isProduction) {
+        localCheeses.update(id, updates);
+        setCheeseTypes((prev) =>
+          prev.map((c) => (c.id === id ? { ...c, ...updates } : c))
+        );
+      }
+      throw error; // Rilancia l'errore per permettere al componente di gestirlo
     }
   }, [useSupabase, cheeseTypes, productions, activities]);
 

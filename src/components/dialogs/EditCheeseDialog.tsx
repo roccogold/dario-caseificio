@@ -184,7 +184,14 @@ export function EditCheeseDialog({
     }
 
     // Ordina il protocollo per giorno prima di salvare
-    const validProtocol = protocol.filter((p) => p.activity.trim());
+    // Filtra solo le attività con nome non vuoto
+    const validProtocol = protocol.filter((p) => p.activity && p.activity.trim().length > 0);
+    
+    if (validProtocol.length === 0 && protocol.length > 0) {
+      toast.error("Inserisci almeno un'attività per ogni fase del protocollo");
+      return;
+    }
+    
     const sortedProtocol = [...validProtocol].sort((a, b) => a.day - b.day);
     
     // Build defaultFields object, only including non-empty values
