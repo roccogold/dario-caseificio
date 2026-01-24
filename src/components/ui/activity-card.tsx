@@ -37,155 +37,158 @@ export function ActivityCard({
     ? (activity.completedDates || []).includes(format(currentDate, 'yyyy-MM-dd'))
     : activity.completed;
 
+  const getRecurrenceLabel = () => {
+    if (activity.type === "protocol") return "Protocollo";
+    if (activity.type === "one-time") return null;
+    if (activity.type === "recurring" && activity.recurrence) {
+      const labels: Record<string, string> = {
+        daily: "Ogni giorno",
+        weekly: "Settimanale", 
+        monthly: "Mensile",
+        quarterly: "Trimestrale",
+        semiannual: "Semestrale",
+        annual: "Annuale"
+      };
+      return labels[activity.recurrence] || null;
+    }
+    return null;
+  };
+
+  const recurrenceLabel = getRecurrenceLabel();
+
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, x: -10 }}
-      transition={{ duration: 0.2 }}
+      exit={{ opacity: 0, x: -8 }}
+      transition={{ duration: 0.15 }}
       className={cn(
-        "group relative flex items-start gap-4 rounded-xl p-4 transition-all duration-300",
+        "group flex items-center gap-3 py-2.5 px-3 rounded-lg transition-all duration-200 cursor-pointer",
         isCompleted
-          ? "bg-gradient-to-r from-success/10 to-success/5 border border-success/20"
-          : "bg-card border border-border hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5"
+          ? "bg-success/5"
+          : "hover:bg-muted/50"
       )}
+      onClick={onToggle}
     >
-      {/* Left accent bar */}
-      <div 
-        className={cn(
-          "absolute left-0 top-0 bottom-0 w-1 rounded-l-xl transition-colors duration-300",
-          isCompleted ? "bg-success" : "bg-primary/30"
-        )}
-      />
-
-      {/* Checkbox */}
+      {/* Compact Checkbox */}
       <button
-        onClick={onToggle}
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggle();
+        }}
         className={cn(
-          "relative mt-0.5 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full transition-all duration-300",
+          "relative flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border transition-all duration-200",
           isCompleted
-            ? "bg-gradient-to-br from-success to-success/80 text-success-foreground shadow-lg shadow-success/40 ring-4 ring-success/20"
-            : "bg-muted/50 border-2 border-dashed border-muted-foreground/30 hover:border-primary hover:bg-primary/10 hover:scale-105 hover:shadow-md"
+            ? "bg-success border-success text-success-foreground"
+            : "border-primary/40 hover:border-primary hover:bg-primary/5"
         )}
       >
         <motion.div
           initial={false}
           animate={{ 
             scale: isCompleted ? 1 : 0, 
-            opacity: isCompleted ? 1 : 0,
-            rotate: isCompleted ? 0 : -45
+            opacity: isCompleted ? 1 : 0
           }}
-          transition={{ type: "spring", stiffness: 400, damping: 20 }}
+          transition={{ type: "spring", stiffness: 500, damping: 30 }}
         >
-          <Check className="h-5 w-5 drop-shadow-sm" strokeWidth={3} />
+          <Check className="h-3 w-3" strokeWidth={2.5} />
         </motion.div>
-        {!isCompleted && (
-          <motion.div
-            className="absolute inset-0 rounded-full border-2 border-transparent"
-            whileHover={{ 
-              borderColor: "hsl(var(--primary))",
-              scale: 1.1
-            }}
-            transition={{ duration: 0.2 }}
-          />
-        )}
       </button>
 
-      {/* Content */}
-      <div className="flex-1 min-w-0 pl-1">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 flex-wrap">
-            {activity.type === "protocol" && cheeseTypeName && cheeseColor && (
-              <CheeseBadge
-                name={cheeseTypeName}
-                color={cheeseColor}
-                size="sm"
-              />
+      {/* Content - Single line layout */}
+      <div className="flex-1 min-w-0 flex items-center gap-2">
+        {/* Cheese badge for protocol */}
+        {activity.type === "protocol" && cheeseTypeName && cheeseColor && (
+          <CheeseBadge
+            name={cheeseTypeName}
+            color={cheeseColor}
+            size="sm"
+          />
+        )}
+        
+        {/* Cheese color dot for non-protocol */}
+        {activity.type !== "protocol" && cheeseColor && (
+          <span
+            className="h-2 w-2 rounded-full flex-shrink-0"
+            style={{ backgroundColor: cheeseColor }}
+          />
+        )}
+
+        {/* Title */}
+        <span
+          className={cn(
+            "font-serif text-sm truncate transition-all duration-200",
+            isCompleted 
+              ? "line-through text-muted-foreground/50" 
+              : "text-foreground"
+          )}
+        >
+          {activity.title}
+        </span>
+
+        {/* Description inline if short */}
+        {activity.description && (
+          <span className={cn(
+            "text-xs truncate hidden sm:inline",
+            isCompleted ? "text-muted-foreground/40" : "text-muted-foreground/70"
+          )}>
+            — {activity.description}
+          </span>
+        )}
+      </div>
+
+      {/* Right side: badges and actions */}
+      <div className="flex items-center gap-2 flex-shrink-0">
+        {/* Recurrence badge */}
+        {recurrenceLabel && (
+          <span className={cn(
+            "hidden sm:inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wide",
+            isCompleted 
+              ? "bg-success/10 text-success" 
+              : "bg-primary/10 text-primary"
+          )}>
+            <TypeIcon className="h-2.5 w-2.5" />
+            {recurrenceLabel}
+          </span>
+        )}
+
+        {/* Completed indicator */}
+        {isCompleted && (
+          <span className="text-[10px] font-medium text-success uppercase tracking-wide">
+            ✓
+          </span>
+        )}
+
+        {/* Action buttons */}
+        {activity.type !== "protocol" && (
+          <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+            {onEdit && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit();
+                }}
+                className="p-1 hover:bg-muted rounded transition-colors"
+                title="Modifica"
+              >
+                <Edit className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
+              </button>
             )}
-            <p
-              className={cn(
-                "font-medium text-base transition-all duration-300",
-                isCompleted 
-                  ? "line-through text-muted-foreground/60" 
-                  : "text-foreground"
-              )}
-            >
-              {activity.title}
-            </p>
-            {activity.type !== "protocol" && cheeseColor && (
-              <span
-                className="h-2.5 w-2.5 rounded-full ring-2 ring-background shadow-sm"
-                style={{ backgroundColor: cheeseColor }}
-              />
+            {onDelete && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete();
+                }}
+                className="p-1 hover:bg-destructive/10 rounded transition-colors"
+                title="Elimina"
+              >
+                <Trash2 className="h-3.5 w-3.5 text-destructive/60 hover:text-destructive" />
+              </button>
             )}
           </div>
-          {activity.type !== "protocol" && (
-            <div className="flex items-center gap-0.5">
-              {onEdit && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit();
-                  }}
-                  className="opacity-0 group-hover:opacity-100 transition-all duration-200 p-1.5 hover:bg-muted rounded-lg"
-                  title="Modifica attività"
-                >
-                  <Edit className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
-                </button>
-              )}
-              {onDelete && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete();
-                  }}
-                  className="opacity-0 group-hover:opacity-100 transition-all duration-200 p-1.5 hover:bg-destructive/10 rounded-lg"
-                  title="Elimina attività"
-                >
-                  <Trash2 className="h-4 w-4 text-destructive/70 hover:text-destructive transition-colors" />
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-        {activity.description && (
-          <p className={cn(
-            "mt-1.5 text-sm line-clamp-2 transition-colors duration-300",
-            isCompleted ? "text-muted-foreground/50" : "text-muted-foreground"
-          )}>
-            {activity.description}
-          </p>
         )}
-        <div className="mt-3 flex items-center gap-3">
-          <span className={cn(
-            "inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-md transition-colors duration-300",
-            isCompleted 
-              ? "bg-success/10 text-success border border-success/20" 
-              : "bg-muted text-muted-foreground"
-          )}>
-            <TypeIcon className={cn(
-              "h-3 w-3",
-              isCompleted && "text-success"
-            )} />
-            {activity.type === "protocol" && "Protocollo"}
-            {activity.type === "recurring" && activity.recurrence && (
-              activity.recurrence === "daily" ? "Giornaliero" :
-              activity.recurrence === "weekly" ? "Settimanale" :
-              activity.recurrence === "monthly" ? "Mensile" :
-              activity.recurrence === "quarterly" ? "Trimestrale" :
-              activity.recurrence === "semiannual" ? "Semestrale" :
-              activity.recurrence === "annual" ? "Annuale" : ""
-            )}
-            {activity.type === "one-time" && "Nessuna ricorrenza"}
-          </span>
-          {isCompleted && (
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-success">
-              <Check className="h-3 w-3" />
-              Completato
-            </span>
-          )}
-        </div>
       </div>
     </motion.div>
   );
