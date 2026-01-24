@@ -1,4 +1,4 @@
-import { CheeseType, Production, Activity, ProtocolStep, ProductionCheese } from "@/types";
+import type { CheeseType, Production, Activity, ProtocolStep, ProductionCheese, RecurrenceType } from "@/types";
 
 // ============================================
 // DATABASE TYPES (snake_case)
@@ -51,7 +51,7 @@ interface DbActivity {
   title: string;
   description: string | null;
   type: 'protocol' | 'recurring' | 'one-time' | null;
-  recurrence: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'semiannual' | 'annual' | 'none' | null;
+  recurrence: RecurrenceType | null;
   production_id: string | null;
   cheese_type_id: string | null;
   is_completed: boolean;
@@ -134,7 +134,7 @@ export function dbActivityToType(dbActivity: DbActivity): Activity {
     description: dbActivity.description || undefined,
     date: new Date(dbActivity.date),
     type: (dbActivity.type || 'one-time') as 'protocol' | 'recurring' | 'one-time',
-    recurrence: dbActivity.recurrence || undefined,
+    recurrence: (dbActivity.recurrence || undefined) as RecurrenceType | undefined,
     productionId: dbActivity.production_id || undefined,
     cheeseTypeId: dbActivity.cheese_type_id || undefined,
     completed: dbActivity.is_completed,
