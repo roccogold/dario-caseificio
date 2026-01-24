@@ -37,6 +37,11 @@ export default defineConfig(({ mode }) => ({
         // Force update on navigation
         skipWaiting: true,
         clientsClaim: true,
+        // Force cache refresh - delete old caches
+        cleanupOutdatedCaches: true,
+        // Don't cache index.html - always fetch fresh
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
