@@ -1026,8 +1026,30 @@ export function useData() {
       if (!a.date) return false;
       
       // Normalizza anche la data dell'attività
-      const activityDate = new Date(a.date);
+      // IMPORTANTE: Se la data è una stringa YYYY-MM-DD, parsala come data locale
+      let activityDate: Date;
+      if (a.date instanceof Date) {
+        activityDate = new Date(a.date);
+      } else if (typeof a.date === 'string' && a.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        // Parse as local date to avoid timezone issues
+        const [year, month, day] = a.date.split('-').map(Number);
+        activityDate = new Date(year, month - 1, day);
+      } else {
+        activityDate = new Date(a.date);
+      }
       activityDate.setHours(0, 0, 0, 0);
+      
+      // Debug logging (only in development)
+      if (import.meta.env.DEV && a.type === 'protocol') {
+        logger.log('[getActivitiesForDate] Comparing dates:', {
+          activityId: a.id,
+          activityTitle: a.title,
+          activityDateString: a.date,
+          activityDateParsed: format(activityDate, 'yyyy-MM-dd'),
+          normalizedDateString: format(normalizedDate, 'yyyy-MM-dd'),
+          isSame: isSameDay(activityDate, normalizedDate)
+        });
+      }
       
       // Attività one-time o protocol: solo se è lo stesso giorno
       if (!a.recurrence || a.recurrence === 'none' || a.type === 'protocol') {
