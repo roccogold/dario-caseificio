@@ -63,19 +63,33 @@ export function ActivityCard({
       <button
         onClick={onToggle}
         className={cn(
-          "relative mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg border-2 transition-all duration-300",
+          "relative mt-0.5 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full transition-all duration-300",
           isCompleted
-            ? "border-success bg-success text-success-foreground shadow-sm shadow-success/30"
-            : "border-muted-foreground/30 hover:border-primary hover:bg-primary/10 hover:scale-110"
+            ? "bg-gradient-to-br from-success to-success/80 text-success-foreground shadow-lg shadow-success/40 ring-4 ring-success/20"
+            : "bg-muted/50 border-2 border-dashed border-muted-foreground/30 hover:border-primary hover:bg-primary/10 hover:scale-105 hover:shadow-md"
         )}
       >
         <motion.div
           initial={false}
-          animate={{ scale: isCompleted ? 1 : 0, opacity: isCompleted ? 1 : 0 }}
-          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+          animate={{ 
+            scale: isCompleted ? 1 : 0, 
+            opacity: isCompleted ? 1 : 0,
+            rotate: isCompleted ? 0 : -45
+          }}
+          transition={{ type: "spring", stiffness: 400, damping: 20 }}
         >
-          <Check className="h-3.5 w-3.5" strokeWidth={3} />
+          <Check className="h-5 w-5 drop-shadow-sm" strokeWidth={3} />
         </motion.div>
+        {!isCompleted && (
+          <motion.div
+            className="absolute inset-0 rounded-full border-2 border-transparent"
+            whileHover={{ 
+              borderColor: "hsl(var(--primary))",
+              scale: 1.1
+            }}
+            transition={{ duration: 0.2 }}
+          />
+        )}
       </button>
 
       {/* Content */}
