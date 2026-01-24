@@ -167,15 +167,29 @@ export async function loadProductions() {
 
     if (error) throw error
 
-    return (data || []).map(prod => ({
-      id: prod.id,
-      productionNumber: prod.production_number,
-      date: prod.production_date ? new Date(prod.production_date) : new Date(),
-      totalLiters: prod.total_liters || 0,
-      cheeses: prod.cheeses || [],
-      notes: prod.notes || '',
-      createdAt: prod.created_at ? new Date(prod.created_at) : new Date()
-    }))
+    return (data || []).map(prod => {
+      // Fix timezone issue: parse date string as local date, not UTC
+      let productionDate = new Date();
+      if (prod.production_date) {
+        // If date is a string like "2026-01-24", parse it as local date
+        if (typeof prod.production_date === 'string' && prod.production_date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          const [year, month, day] = prod.production_date.split('-').map(Number);
+          productionDate = new Date(year, month - 1, day);
+        } else {
+          productionDate = new Date(prod.production_date);
+        }
+      }
+      
+      return {
+        id: prod.id,
+        productionNumber: prod.production_number,
+        date: productionDate,
+        totalLiters: prod.total_liters || 0,
+        cheeses: prod.cheeses || [],
+        notes: prod.notes || '',
+        createdAt: prod.created_at ? new Date(prod.created_at) : new Date()
+      };
+    })
   } catch (error) {
     console.error('Error loading productions:', error)
     return []
@@ -275,19 +289,33 @@ export async function loadActivities() {
 
     if (error) throw error
 
-    return (data || []).map(activity => ({
-      id: activity.id,
-      date: activity.date ? new Date(activity.date) : new Date(),
-      title: activity.title,
-      description: activity.description || '',
-      type: activity.type || 'one-time',
-      recurrence: activity.recurrence || undefined,
-      productionId: activity.production_id || undefined,
-      cheeseTypeId: activity.cheese_type_id || undefined,
-      completed: activity.is_completed || false,
-      completedDates: activity.completed_dates || [],
-      createdAt: activity.created_at ? new Date(activity.created_at) : new Date()
-    }))
+    return (data || []).map(activity => {
+      // Fix timezone issue: parse date string as local date, not UTC
+      let activityDate = new Date();
+      if (activity.date) {
+        // If date is a string like "2026-01-24", parse it as local date
+        if (typeof activity.date === 'string' && activity.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          const [year, month, day] = activity.date.split('-').map(Number);
+          activityDate = new Date(year, month - 1, day);
+        } else {
+          activityDate = new Date(activity.date);
+        }
+      }
+      
+      return {
+        id: activity.id,
+        date: activityDate,
+        title: activity.title,
+        description: activity.description || '',
+        type: activity.type || 'one-time',
+        recurrence: activity.recurrence || undefined,
+        productionId: activity.production_id || undefined,
+        cheeseTypeId: activity.cheese_type_id || undefined,
+        completed: activity.is_completed || false,
+        completedDates: activity.completed_dates || [],
+        createdAt: activity.created_at ? new Date(activity.created_at) : new Date()
+      };
+    })
   } catch (error) {
     console.error('Error loading activities:', error)
     return []
@@ -323,6 +351,7 @@ export async function saveActivity(activity) {
       if (error) throw error
 
       await logAction('create', 'attività', data.id, { title: activity.title })
+      // Return activity with correct date (already parsed correctly from activity object)
       return { id: data.id, ...activity }
     } else {
       // Update attività esistente
@@ -346,7 +375,27 @@ export async function saveActivity(activity) {
       if (error) throw error
 
       await logAction('update', 'attività', activity.id, { title: activity.title })
-      return data
+      
+      // Fix timezone issue: parse date string as local date, not UTC
+      let activityDate = activity.date; // Use original activity date which is already correct
+      if (data.date && typeof data.date === 'string' && data.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const [year, month, day] = data.date.split('-').map(Number);
+        activityDate = new Date(year, month - 1, day);
+      }
+      
+      return {
+        id: data.id,
+        date: activityDate,
+        title: data.title,
+        description: data.description || '',
+        type: data.type || 'one-time',
+        recurrence: data.recurrence || undefined,
+        productionId: data.production_id || undefined,
+        cheeseTypeId: data.cheese_type_id || undefined,
+        completed: data.is_completed || false,
+        completedDates: data.completed_dates || [],
+        createdAt: data.created_at ? new Date(data.created_at) : new Date()
+      }
     }
   } catch (error) {
     console.error('Error saving activity:', error)
@@ -399,9 +448,22 @@ export async function toggleActivityCompleted(activityId, completed, completedDa
     if (error) throw error
 
     await logAction(completed ? 'complete' : 'uncomplete', 'attività', activityId)
+    
+    // Fix timezone issue: parse date string as local date, not UTC
+    let activityDate = new Date();
+    if (data.date) {
+      // If date is a string like "2026-01-24", parse it as local date
+      if (typeof data.date === 'string' && data.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const [year, month, day] = data.date.split('-').map(Number);
+        activityDate = new Date(year, month - 1, day);
+      } else {
+        activityDate = new Date(data.date);
+      }
+    }
+    
     return {
       id: data.id,
-      date: data.date ? new Date(data.date) : new Date(),
+      date: activityDate,
       title: data.title,
       description: data.description || '',
       type: data.type || 'one-time',
