@@ -9,8 +9,10 @@ const RESET_TOKENS_STORAGE_KEY = 'cheese_production_reset_tokens'
  */
 export const initializeUsers = () => {
   const users = getUsers()
-  const defaultUsername = 'oscargoldschmidt@gmail.com'
-  const defaultPassword = 'pecorina'
+  // Use environment variables for default credentials (development only)
+  // In production, use Supabase Auth
+  const defaultUsername = import.meta.env.VITE_DEFAULT_USERNAME || 'admin@example.com'
+  const defaultPassword = import.meta.env.VITE_DEFAULT_PASSWORD || 'changeme'
   
   // Check if default user already exists
   let defaultUser = users.find(u => u.username === defaultUsername)
