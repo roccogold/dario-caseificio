@@ -44,7 +44,7 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
       exit={{ opacity: 0, x: -10 }}
       transition={{ duration: 0.15, ease: "easeOut" }}
       className={cn(
-        "group relative flex items-center gap-3 rounded-lg border border-border bg-card transition-all duration-200 hover:border-primary/20 hover:shadow-sm"
+        "group relative flex items-center gap-3 rounded-lg border border-border bg-card transition-all duration-200 hover:border-primary/20 hover:shadow-sm min-h-[44px]"
       )}
     >
       {/* Checkbox */}
@@ -69,7 +69,7 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
       </button>
 
       {/* Content */}
-      <div className="flex-1 min-w-0 flex items-center gap-3 py-2.5">
+      <div className="flex-1 min-w-0 flex items-center gap-3 py-2.5 pr-3">
         <div className="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
           {/* Cheese badge for protocol activities - same as production section */}
           {activity.type === "protocol" && cheeseTypeName && cheeseColor && (
@@ -106,43 +106,46 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
           )}
         </div>
 
-        {/* Protocol badge */}
-        {activity.type === "protocol" && (
-          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/40 text-xs text-muted-foreground flex-shrink-0">
-            <ClipboardList className="h-3 w-3" />
-            <span>Protocollo</span>
-          </span>
-        )}
+        {/* Right side - Protocol badge or Action icons placeholder */}
+        <div className="flex items-center flex-shrink-0 w-[80px] justify-end">
+          {/* Protocol badge */}
+          {activity.type === "protocol" && (
+            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/40 text-xs text-muted-foreground">
+              <ClipboardList className="h-3 w-3" />
+              <span>Protocollo</span>
+            </span>
+          )}
 
-        {/* Action icons - only visible on hover, hidden for protocol activities */}
-        {activity.type !== "protocol" && (
-          <div className="flex items-center gap-1 pr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            {onEdit && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit();
-                }}
-                className="flex items-center justify-center w-7 h-7 hover:bg-muted rounded transition-colors"
-                title="Modifica attività"
-              >
-                <Edit className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground transition-colors" />
-              </button>
-            )}
-            {onDelete && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete();
-                }}
-                className="flex items-center justify-center w-7 h-7 hover:bg-destructive/10 rounded transition-colors"
-                title="Elimina attività"
-              >
-                <Trash2 className="h-3.5 w-3.5 text-destructive/70 hover:text-destructive transition-colors" />
-              </button>
-            )}
-          </div>
-        )}
+          {/* Action icons - only visible on hover, hidden for protocol activities */}
+          {activity.type !== "protocol" && (
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              {onEdit && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit();
+                  }}
+                  className="flex items-center justify-center w-7 h-7 hover:bg-muted rounded transition-colors"
+                  title="Modifica attività"
+                >
+                  <Edit className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground transition-colors" />
+                </button>
+              )}
+              {onDelete && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete();
+                  }}
+                  className="flex items-center justify-center w-7 h-7 hover:bg-destructive/10 rounded transition-colors"
+                  title="Elimina attività"
+                >
+                  <Trash2 className="h-3.5 w-3.5 text-destructive/70 hover:text-destructive transition-colors" />
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </motion.div>
   );
