@@ -39,12 +39,24 @@ import { generateUUID } from "@/lib/utils";
 
 // Determina se usare Supabase o localStorage
 const isProduction = import.meta.env.PROD;
+// Check if we're on Lovable (treat as dev environment)
+const isLovableEnvironment = typeof window !== 'undefined' && (
+  window.location.hostname.includes('lovable.app') ||
+  window.location.hostname.includes('lovable.dev')
+);
+// Check if we're on a preview environment (Vercel Preview, etc.)
+const isPreviewEnvironment = typeof window !== 'undefined' && (
+  window.location.hostname.includes('vercel.app') ||
+  window.location.hostname.includes('preview')
+);
+// Real production = production build AND not Lovable AND not preview
+const isRealProduction = isProduction && !isLovableEnvironment && !isPreviewEnvironment;
 const hasSupabaseUrl = !!import.meta.env.VITE_SUPABASE_URL;
 const hasSupabaseKey = !!import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabaseInitialized = !!supabase;
 
-// In produzione, Supabase è OBBLIGATORIO - nessun fallback a localStorage
-if (isProduction) {
+// In produzione reale (non preview, non Lovable), Supabase è OBBLIGATORIO
+if (isRealProduction) {
   console.log('[useData] 🔍 Production mode check:');
   console.log('[useData]   - VITE_SUPABASE_URL:', hasSupabaseUrl ? '✅ Present' : '❌ MISSING');
   console.log('[useData]   - VITE_SUPABASE_ANON_KEY:', hasSupabaseKey ? '✅ Present' : '❌ MISSING');
@@ -67,9 +79,30 @@ if (isProduction) {
   }
   
   console.log('[useData] ✅ Production mode: Supabase configurato correttamente');
+} else if (isLovableEnvironment) {
+  // Lovable environment: treat as development (use localStorage)
+  console.log('[useData] 🎨 Lovable environment detected. Using development mode (localStorage).');
+  if (!hasSupabaseUrl || !hasSupabaseKey || !supabaseInitialized) {
+    console.log('[useData] ℹ️ Supabase not configured in Lovable. Using localStorage fallback (expected behavior).');
+  }
+} else if (isProduction && isPreviewEnvironment) {
+  // Preview environment: warn but don't block
+  console.warn('[useData] ⚠️ Preview environment detected. Supabase recommended but not required.');
+  if (!hasSupabaseUrl || !hasSupabaseKey || !supabaseInitialized) {
+    console.warn('[useData] ⚠️ Supabase not configured in preview. Using localStorage fallback.');
+    console.warn('[useData] 💡 To enable Supabase in preview, configure environment variables in your deployment platform.');
+  }
 }
 
-const useSupabase = isProduction ? true : (hasSupabaseUrl && hasSupabaseKey && supabaseInitialized);
+// Use Supabase if:
+// 1. Real production (always required)
+// 2. Preview/production build with Supabase configured (optional)
+// 3. Development/Lovable with Supabase configured (optional)
+const useSupabase = isRealProduction 
+  ? true 
+  : (isProduction && hasSupabaseUrl && hasSupabaseKey && supabaseInitialized)
+  ? true
+  : (!isProduction && hasSupabaseUrl && hasSupabaseKey && supabaseInitialized);
 
 console.log('[useData] Final decision - useSupabase:', useSupabase, '(isProduction:', isProduction, ')');
 
@@ -94,8 +127,8 @@ export function useData() {
     const loadData = async () => {
       setIsLoading(true);
       
-      // In produzione, FORZA il caricamento da Supabase
-      if (isProduction && !useSupabase) {
+      // In produzione reale, FORZA il caricamento da Supabase
+      if (isRealProduction && !useSupabase) {
         const errorMsg = '❌ ERRORE CRITICO: Supabase non configurato in produzione! Impossibile caricare i dati.';
         console.error('[useData]', errorMsg);
         toast.error(errorMsg);
@@ -248,8 +281,8 @@ export function useData() {
       // ❌ RIMOSSO: id: generateUUID(),
     };
 
-    // In produzione, FORZA l'uso di Supabase
-    if (isProduction && !useSupabase) {
+    // In produzione reale, FORZA l'uso di Supabase
+    if (isRealProduction && !useSupabase) {
       const errorMsg = '❌ ERRORE CRITICO: Supabase non configurato in produzione! Il formaggio NON può essere salvato.';
       console.error('[addCheeseType]', errorMsg);
       toast.error(errorMsg);
