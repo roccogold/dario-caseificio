@@ -54,10 +54,19 @@ export default function Produzioni() {
 
   const getCheeseType = (id: string) => cheeseTypes.find((c) => c.id === id);
 
+  // Helper function to check if date is valid
+  const isValidDate = (date: any): date is Date => {
+    return date instanceof Date && !isNaN(date.getTime());
+  };
+
   // Filter and sort productions
   const filteredProductions = useMemo(() => {
     return productions
       .filter((prod) => {
+        // Skip invalid dates
+        if (!isValidDate(prod.date)) {
+          return false;
+        }
         // Search filter
         if (searchQuery) {
           const searchLower = searchQuery.toLowerCase();
@@ -83,29 +92,44 @@ export default function Produzioni() {
           if (startDate && endDate) {
             const start = new Date(startDate);
             const end = new Date(endDate);
-            if (!isWithinInterval(prod.date, { start, end })) return false;
+            if (isValidDate(start) && isValidDate(end) && isValidDate(prod.date)) {
+              if (!isWithinInterval(prod.date, { start, end })) return false;
+            }
           } else if (startDate) {
             const start = new Date(startDate);
-            if (prod.date < start) return false;
+            if (isValidDate(start) && isValidDate(prod.date)) {
+              if (prod.date < start) return false;
+            }
           } else if (endDate) {
             const end = new Date(endDate);
-            if (prod.date > end) return false;
+            if (isValidDate(end) && isValidDate(prod.date)) {
+              if (prod.date > end) return false;
+            }
           }
         } else if (dateFilterType === "year") {
           if (yearFilter) {
             const year = parseInt(yearFilter);
-            if (!isSameYear(prod.date, new Date(year, 0, 1))) return false;
+            if (!isNaN(year) && isValidDate(prod.date)) {
+              if (!isSameYear(prod.date, new Date(year, 0, 1))) return false;
+            }
           }
         } else if (dateFilterType === "specific-day") {
           if (specificDay) {
             const day = new Date(specificDay);
-            if (!isSameDay(prod.date, day)) return false;
+            if (isValidDate(day) && isValidDate(prod.date)) {
+              if (!isSameDay(prod.date, day)) return false;
+            }
           }
         }
 
         return true;
       })
-      .sort((a, b) => b.date.getTime() - a.date.getTime());
+      .sort((a, b) => {
+        // Safe date comparison - handle invalid dates
+        const aTime = isValidDate(a.date) ? a.date.getTime() : 0;
+        const bTime = isValidDate(b.date) ? b.date.getTime() : 0;
+        return bTime - aTime;
+      });
   }, [productions, searchQuery, filterCheese, dateFilterType, startDate, endDate, yearFilter, specificDay, cheeseTypes]);
 
   return (
@@ -275,12 +299,20 @@ export default function Produzioni() {
                     <div className="flex items-center gap-4">
                       {/* Date */}
                       <div className="text-center">
-                        <div className="font-serif text-2xl font-semibold text-foreground">
-                          {format(production.date, "dd")}
-                        </div>
-                        <div className="text-xs uppercase text-muted-foreground">
-                          {format(production.date, "MMM yy", { locale: it })}
-                        </div>
+                        {isValidDate(production.date) ? (
+                          <>
+                            <div className="font-serif text-2xl font-semibold text-foreground">
+                              {format(production.date, "dd")}
+                            </div>
+                            <div className="text-xs uppercase text-muted-foreground">
+                              {format(production.date, "MMM yy", { locale: it })}
+                            </div>
+                          </>
+                        ) : (
+                          <div className="text-sm text-muted-foreground">
+                            Data non valida
+                          </div>
+                        )}
                       </div>
 
                       {/* Divider */}
