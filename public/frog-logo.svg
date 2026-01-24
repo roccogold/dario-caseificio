@@ -1,30 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <!-- Minimal modern frog logo -->
+  <!-- Modern minimal frog logo -->
   
-  <!-- Head/body - single smooth shape -->
-  <path 
-    d="M32 12 
-       C20 12 12 22 12 32 
-       C12 44 20 52 32 52 
-       C44 52 52 44 52 32 
-       C52 22 44 12 32 12"
-    fill="#5B7F5D"
-  />
+  <!-- Main body - smooth organic shape -->
+  <ellipse cx="32" cy="36" rx="20" ry="16" fill="#6B8E6B"/>
   
-  <!-- Eyes - simple circles positioned at top -->
-  <circle cx="22" cy="20" r="8" fill="#5B7F5D"/>
-  <circle cx="42" cy="20" r="8" fill="#5B7F5D"/>
+  <!-- Head connection -->
+  <ellipse cx="32" cy="28" rx="14" ry="10" fill="#6B8E6B"/>
+  
+  <!-- Eye bumps -->
+  <circle cx="22" cy="18" r="10" fill="#6B8E6B"/>
+  <circle cx="42" cy="18" r="10" fill="#6B8E6B"/>
   
   <!-- Eye whites -->
-  <circle cx="22" cy="20" r="5" fill="#FAFAFA"/>
-  <circle cx="42" cy="20" r="5" fill="#FAFAFA"/>
+  <circle cx="22" cy="18" r="6" fill="#FEFEFE"/>
+  <circle cx="42" cy="18" r="6" fill="#FEFEFE"/>
   
   <!-- Pupils -->
-  <circle cx="23" cy="20" r="2.5" fill="#2D3D2E"/>
-  <circle cx="43" cy="20" r="2.5" fill="#2D3D2E"/>
+  <circle cx="23.5" cy="18" r="3" fill="#2C3E2C"/>
+  <circle cx="43.5" cy="18" r="3" fill="#2C3E2C"/>
   
-  <!-- Subtle crown hint - three small dots -->
-  <circle cx="26" cy="10" r="1.5" fill="#C9A86C"/>
-  <circle cx="32" cy="7" r="2" fill="#C9A86C"/>
-  <circle cx="38" cy="10" r="1.5" fill="#C9A86C"/>
+  <!-- Eye shine -->
+  <circle cx="21" cy="16" r="1.2" fill="#FFFFFF"/>
+  <circle cx="41" cy="16" r="1.2" fill="#FFFFFF"/>
+  
+  <!-- Subtle smile -->
+  <path d="M26 38 Q32 42 38 38" stroke="#4A5D4A" stroke-width="2" fill="none" stroke-linecap="round"/>
+  
+  <!-- Crown - elegant minimal -->
+  <path d="M20 10 L24 4 L28 8 L32 2 L36 8 L40 4 L44 10" 
+        stroke="#C9A96C" 
+        stroke-width="2.5" 
+        fill="none" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+  
+  <!-- Crown gems -->
+  <circle cx="32" cy="4" r="1.5" fill="#E8C878"/>
 </svg>
