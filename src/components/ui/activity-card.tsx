@@ -3,6 +3,7 @@ import { Check, Edit, Trash2, CalendarDays, Repeat, ClipboardList } from "lucide
 import { cn } from "@/lib/utils";
 import { Activity } from "@/types";
 import { format } from "date-fns";
+import { forwardRef } from "react";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -14,7 +15,7 @@ interface ActivityCardProps {
   onDelete?: () => void;
 }
 
-export function ActivityCard({
+export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
   activity,
   cheeseColor,
   cheeseTypeName,
@@ -22,7 +23,7 @@ export function ActivityCard({
   currentDate = new Date(),
   onEdit,
   onDelete,
-}: ActivityCardProps) {
+}, ref) => {
   // Per attività ricorrenti, controlla se è completata per la data corrente
   const isCompleted = activity.recurrence && activity.recurrence !== 'none' as const && activity.type === 'recurring'
     ? (activity.completedDates || []).includes(format(currentDate, 'yyyy-MM-dd'))
@@ -56,6 +57,7 @@ export function ActivityCard({
 
   return (
     <motion.div
+      ref={ref}
       layout
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
@@ -185,4 +187,4 @@ export function ActivityCard({
       </div>
     </motion.div>
   );
-}
+});
