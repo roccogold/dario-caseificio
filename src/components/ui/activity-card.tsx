@@ -44,14 +44,14 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
       exit={{ opacity: 0, x: -10 }}
       transition={{ duration: 0.15, ease: "easeOut" }}
       className={cn(
-        "group relative flex items-center gap-3 rounded-lg border border-border bg-card transition-all duration-200 hover:border-primary/20 hover:shadow-sm h-[44px]"
+        "group relative flex items-center gap-3 rounded-lg border border-border bg-card transition-all duration-200 hover:border-primary/20 hover:shadow-sm h-[44px] pl-3"
       )}
     >
       {/* Checkbox */}
       <button
         onClick={handleToggle}
         className={cn(
-          "relative flex flex-shrink-0 items-center justify-center border-2 transition-all duration-150 ml-3 rounded cursor-pointer",
+          "relative flex flex-shrink-0 items-center justify-center border-2 transition-all duration-150 rounded cursor-pointer",
           isCompleted
             ? "h-2.5 w-2.5 border-success bg-success text-white shadow-sm"
             : "h-2.5 w-2.5 border-muted-foreground/30 bg-background hover:border-primary hover:bg-primary/5 active:scale-95"
