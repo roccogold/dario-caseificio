@@ -154,36 +154,38 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
           </div>
         </div>
 
-        {/* Action icons - only visible on hover */}
-        <div className="flex items-center gap-2 pr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-          {isCompleted && (
-            <Check className="h-4 w-4 text-success flex-shrink-0" />
-          )}
-          {onEdit && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit();
-              }}
-              className="flex items-center justify-center w-8 h-8 hover:bg-muted rounded transition-colors"
-              title="Modifica attività"
-            >
-              <Edit className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
-            </button>
-          )}
-          {onDelete && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete();
-              }}
-              className="flex items-center justify-center w-8 h-8 hover:bg-destructive/10 rounded transition-colors"
-              title="Elimina attività"
-            >
-              <Trash2 className="h-4 w-4 text-destructive/70 hover:text-destructive transition-colors" />
-            </button>
-          )}
-        </div>
+        {/* Action icons - only visible on hover, hidden for protocol activities */}
+        {activity.type !== "protocol" && (
+          <div className="flex items-center gap-2 pr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            {isCompleted && (
+              <Check className="h-4 w-4 text-success flex-shrink-0" />
+            )}
+            {onEdit && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit();
+                }}
+                className="flex items-center justify-center w-8 h-8 hover:bg-muted rounded transition-colors"
+                title="Modifica attività"
+              >
+                <Edit className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+              </button>
+            )}
+            {onDelete && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete();
+                }}
+                className="flex items-center justify-center w-8 h-8 hover:bg-destructive/10 rounded transition-colors"
+                title="Elimina attività"
+              >
+                <Trash2 className="h-4 w-4 text-destructive/70 hover:text-destructive transition-colors" />
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </motion.div>
   );

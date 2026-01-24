@@ -223,11 +223,11 @@ export default function Calendario() {
                             cheeseTypeName={cheeseType?.name}
                             onToggle={() => toggleActivity(activity.id, selectedDate)}
                             currentDate={selectedDate}
-                            onEdit={() => {
+                            onEdit={activity.type !== "protocol" ? () => {
                               setSelectedActivity(activity);
                               setIsEditActivityDialogOpen(true);
-                            }}
-                            onDelete={() => deleteActivity(activity.id)}
+                            } : undefined}
+                            onDelete={activity.type !== "protocol" ? () => deleteActivity(activity.id) : undefined}
                           />
                         );
                       })}
