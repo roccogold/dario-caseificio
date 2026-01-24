@@ -14,9 +14,12 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // In sviluppo, verifica anche l'autenticazione locale
+        // Check if Supabase is configured
+        const hasSupabase = !!(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
         const isDevelopment = import.meta.env.DEV || import.meta.env.MODE === 'development';
-        if (isDevelopment) {
+        
+        // In sviluppo o se Supabase non è configurato, usa autenticazione locale
+        if (isDevelopment || !hasSupabase) {
           // Import dinamico per evitare problemi di circolarità
           const { isAuthenticated: isLocalAuthenticated } = await import('@/utils/auth');
           const localAuth = isLocalAuthenticated();
@@ -27,11 +30,27 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
           }
         }
         
-        const authStatus = await isAuthenticated();
-        setAuthenticated(authStatus);
+        // In produzione con Supabase configurato, usa Supabase Auth
+        if (hasSupabase) {
+          const authStatus = await isAuthenticated();
+          setAuthenticated(authStatus);
+        } else {
+          // Fallback: se Supabase non è configurato in produzione, usa localStorage
+          const { isAuthenticated: isLocalAuthenticated } = await import('@/utils/auth');
+          const localAuth = isLocalAuthenticated();
+          setAuthenticated(localAuth);
+        }
       } catch (error) {
         console.error("Error checking authentication:", error);
-        setAuthenticated(false);
+        // Fallback to local auth on error
+        try {
+          const { isAuthenticated: isLocalAuthenticated } = await import('@/utils/auth');
+          const localAuth = isLocalAuthenticated();
+          setAuthenticated(localAuth);
+        } catch (fallbackError) {
+          console.error("Fallback auth error:", fallbackError);
+          setAuthenticated(false);
+        }
       } finally {
         setLoading(false);
       }

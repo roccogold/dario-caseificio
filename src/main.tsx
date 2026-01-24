@@ -1,3 +1,4 @@
+// Cache bust: 2026-01-XX - Force new service worker update
 import { createRoot } from "react-dom/client";
 import "@fontsource/eb-garamond/400.css";
 import "@fontsource/eb-garamond/500.css";
