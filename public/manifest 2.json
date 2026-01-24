@@ -1,0 +1,23 @@
+{
+  "name": "DARIO - Caseificio",
+  "short_name": "DARIO",
+  "description": "Sistema di gestione per caseificio artigianale",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#8B7355",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/frog-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}

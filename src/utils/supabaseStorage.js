@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { typeCheeseToDb, dbCheeseToType } from '@/lib/adapters'
 
 /**
  * Ottiene l'IP dell'utente (semplificato - in produzione usa un servizio esterno)
@@ -59,15 +60,8 @@ export async function loadCheeses() {
 
     if (error) throw error
 
-    // Converti gli ID da UUID a stringhe per compatibilità
-    return (data || []).map(cheese => ({
-      id: cheese.id,
-      name: cheese.name,
-      color: cheese.color,
-      protocol: cheese.protocol || [],
-      yieldLitersPerKg: cheese.yield_liters_per_kg ? parseFloat(cheese.yield_liters_per_kg) : null,
-      pricePerKg: cheese.price_per_kg ? parseFloat(cheese.price_per_kg) : null
-    }))
+    // Usa l'adapter per convertire dal formato DB al formato TypeScript
+    return (data || []).map(dbCheeseToType)
   } catch (error) {
     console.error('Error loading cheeses:', error)
     return []
@@ -82,35 +76,31 @@ export async function saveCheese(cheese) {
     throw new Error('Supabase non configurato')
   }
   try {
+    // Usa l'adapter per convertire dal formato TypeScript al formato DB
+    const dbData = typeCheeseToDb(cheese)
+    
     if (!cheese.id || cheese.id.startsWith('temp-') || typeof cheese.id === 'number') {
-      // Nuovo formaggio
+      // Nuovo formaggio - rimuovi l'ID se è temporaneo
+      const insertData = { ...dbData }
+      if (cheese.id && (cheese.id.startsWith('temp-') || typeof cheese.id === 'number')) {
+        delete insertData.id
+      }
+      
       const { data, error } = await supabase
         .from('formaggi')
-        .insert({
-          name: cheese.name,
-          color: cheese.color,
-          protocol: cheese.protocol || [],
-          yield_liters_per_kg: cheese.yieldLitersPerKg || null,
-          price_per_kg: cheese.pricePerKg || null
-        })
+        .insert(insertData)
         .select()
         .single()
 
       if (error) throw error
 
       await logAction('create', 'formaggio', data.id, { name: cheese.name })
-      return { id: data.id, ...cheese }
+      return dbCheeseToType(data)
     } else {
       // Update formaggio esistente
       const { data, error } = await supabase
         .from('formaggi')
-        .update({
-          name: cheese.name,
-          color: cheese.color,
-          protocol: cheese.protocol || [],
-          yield_liters_per_kg: cheese.yieldLitersPerKg || null,
-          price_per_kg: cheese.pricePerKg || null
-        })
+        .update(dbData)
         .eq('id', cheese.id)
         .select()
         .single()
@@ -118,7 +108,7 @@ export async function saveCheese(cheese) {
       if (error) throw error
 
       await logAction('update', 'formaggio', cheese.id, { name: cheese.name })
-      return data
+      return dbCheeseToType(data)
     }
   } catch (error) {
     console.error('Error saving cheese:', error)
