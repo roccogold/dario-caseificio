@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Activity } from "@/types";
 import { format } from "date-fns";
 import { forwardRef } from "react";
+import { CheeseBadge } from "@/components/ui/cheese-badge";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -55,8 +56,8 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
         className={cn(
           "relative flex flex-shrink-0 items-center justify-center border-2 transition-all duration-150 ml-3 rounded cursor-pointer",
           isCompleted
-            ? "h-3.5 w-3.5 border-success bg-success text-white shadow-sm"
-            : "h-3.5 w-3.5 border-muted-foreground/30 bg-background hover:border-primary hover:bg-primary/5 active:scale-95"
+            ? "h-3 w-3 border-success bg-success text-white shadow-sm"
+            : "h-3 w-3 border-muted-foreground/30 bg-background hover:border-primary hover:bg-primary/5 active:scale-95"
         )}
       >
         {isCompleted && (
@@ -65,7 +66,7 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
           >
-            <Check className="h-2 w-2" strokeWidth={3} />
+            <Check className="h-1.5 w-1.5" strokeWidth={3} />
           </motion.div>
         )}
       </button>
@@ -73,24 +74,13 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
       {/* Content */}
       <div className="flex-1 min-w-0 flex items-center gap-3 py-2.5">
         <div className="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
-          {/* Cheese badge for protocol activities - stable key to prevent flicker */}
+          {/* Cheese badge for protocol activities - same as production section */}
           {activity.type === "protocol" && cheeseTypeName && cheeseColor && (
-            <motion.span
-              layout="position"
-              key={`cheese-${activity.id}-${activity.cheeseTypeId}`}
-              initial={{ opacity: 1 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.1 }}
-              className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium flex-shrink-0 border"
-              style={{ 
-                backgroundColor: `${cheeseColor}15`,
-                borderColor: cheeseColor,
-                color: cheeseColor
-              }}
-            >
-              {cheeseTypeName}
-            </motion.span>
+            <CheeseBadge
+              name={cheeseTypeName}
+              color={cheeseColor}
+              size="sm"
+            />
           )}
           
           {/* Title */}
