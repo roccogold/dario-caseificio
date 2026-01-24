@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === "development" && componentTagger(),
     VitePWA({
-      registerType: "autoUpdate",
+      registerType: "prompt", // Change to prompt to force update
       includeAssets: ["frog-logo.svg", "favicon.ico"],
       manifest: {
         name: "DARIO - Caseificio",
@@ -34,6 +34,9 @@ export default defineConfig(({ mode }) => ({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
+        // Force update on navigation
+        skipWaiting: true,
+        clientsClaim: true,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
