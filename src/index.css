@@ -6,60 +6,9 @@
    Design System: Warm, earthy, elegant Italian craftsmanship aesthetic
 */
 
-/* Logo DARIO Fonts - Priority order: TC Galliard Bold > Garamond Premier Semibold Caption > Garamond Premier Semibold > Laurentian Semi Bold (fallback) */
-@font-face {
-  font-family: 'TC Galliard Bold';
-  src: url('/fonts/TCGalliard-Bold.woff2') format('woff2'),
-       url('/fonts/TCGalliard-Bold.woff') format('woff'),
-       url('/fonts/TCGalliard-Bold.otf') format('opentype'),
-       url('/fonts/TCGalliard-Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Garamond Premier Semibold Caption';
-  src: url('/fonts/GaramondPremierPro-SemiboldCaption.woff2') format('woff2'),
-       url('/fonts/GaramondPremierPro-SemiboldCaption.woff') format('woff'),
-       url('/fonts/GaramondPremierPro-SemiboldCaption.otf') format('opentype'),
-       url('/fonts/GaramondPremierPro-SemiboldCaption.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Garamond Premier Semibold';
-  src: url('/fonts/GaramondPremierPro-Semibold.woff2') format('woff2'),
-       url('/fonts/GaramondPremierPro-Semibold.woff') format('woff'),
-       url('/fonts/GaramondPremierPro-Semibold.otf') format('opentype'),
-       url('/fonts/GaramondPremierPro-Semibold.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Laurentian Semi Bold';
-  src: url('/fonts/LaurentianPro-SemiBold.woff2') format('woff2'),
-       url('/fonts/LaurentianPro-SemiBold.woff') format('woff'),
-       url('/fonts/LaurentianPro-SemiBold.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Versina Bold';
-  src: url('/fonts/Versina-Bold.woff2') format('woff2'),
-       url('/fonts/Versina-Bold.woff') format('woff'),
-       url('/fonts/Versina-Bold.otf') format('opentype'),
-       url('/fonts/Versina-Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
+/* Logo DARIO Fonts - Using @fontsource fonts (EB Garamond, Playfair Display) loaded in main.tsx */
+/* Removed custom font-face declarations for fonts that don't exist in /fonts/ directory */
+/* Fallback chain: Playfair Display > EB Garamond > Georgia > serif */
 
 @layer base {
   :root {

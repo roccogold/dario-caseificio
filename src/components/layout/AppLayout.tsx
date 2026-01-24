@@ -74,7 +74,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                   className="text-2xl tracking-widest uppercase"
                   style={{ 
                     color: '#8B7355',
-                    fontFamily: "'TC Galliard Bold', 'Garamond Premier Semibold Caption', 'Garamond Premier Semibold', 'Laurentian Semi Bold', 'EB Garamond', Georgia, serif",
+                    fontFamily: "'Playfair Display', 'EB Garamond', Georgia, serif",
                     fontWeight: 700,
                     letterSpacing: '0.1em'
                   }}

@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        serif: ["'TC Galliard Bold'", "'Garamond Premier Semibold Caption'", "'Garamond Premier Semibold'", "'Laurentian Semi Bold'", "'EB Garamond'", "Georgia", "serif"],
+            serif: ["'Playfair Display'", "'EB Garamond'", "Georgia", "serif"],
         sans: ["'EB Garamond'", "Georgia", "serif"],
       },
       colors: {
