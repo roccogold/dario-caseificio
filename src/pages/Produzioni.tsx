@@ -287,8 +287,8 @@ export default function Produzioni() {
                       <div className="h-12 w-px bg-border" />
 
                       {/* Info */}
-                      <div>
-                        <div className="flex items-center gap-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
                           <span className="font-medium text-foreground">
                             #{production.productionNumber}
                           </span>
@@ -296,18 +296,30 @@ export default function Produzioni() {
                             <FileText className="h-4 w-4 text-muted-foreground" />
                           )}
                         </div>
-                        <div className="mt-1.5 flex flex-wrap gap-1.5">
-                          {production.cheeses.map((cheese) => {
+                        {/* Cheese list with liters */}
+                        <div className="flex flex-wrap items-center gap-2">
+                          {production.cheeses.map((cheese, idx) => {
                             const type = getCheeseType(cheese.cheeseTypeId);
-                            return type ? (
-                              <CheeseBadge
-                                key={cheese.cheeseTypeId}
-                                name={type.name}
-                                color={type.color}
-                                liters={cheese.liters}
-                                size="sm"
-                              />
-                            ) : null;
+                            if (!type) return null;
+                            return (
+                              <div key={cheese.cheeseTypeId} className="flex items-center gap-1.5">
+                                <span
+                                  className="inline-flex items-center px-2 py-1 rounded text-xs font-medium"
+                                  style={{ 
+                                    backgroundColor: type.color,
+                                    color: '#000'
+                                  }}
+                                >
+                                  {type.name}
+                                </span>
+                                <span className="text-sm text-muted-foreground">
+                                  {cheese.liters}L
+                                </span>
+                                {idx < production.cheeses.length - 1 && (
+                                  <span className="text-muted-foreground/50">•</span>
+                                )}
+                              </div>
+                            );
                           })}
                         </div>
                       </div>
