@@ -121,18 +121,51 @@ export async function generateCheesePDF(cheese: CheeseType) {
   doc.text(cheese.name, margin + 5, yPosition + 8);
   yPosition += 20;
 
+  // Reset text color to normal after badge
+  doc.setTextColor(...textColor);
+
+  // Calcola la posizione X per allineare tutti i valori
+  // Usa la larghezza del testo più lungo per determinare la posizione
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  
+  // Calcola la larghezza massima per "Giorno X:" (usando un numero a 2 cifre come esempio)
+  const protocolLabelWidths = cheese.protocol && cheese.protocol.length > 0
+    ? cheese.protocol.map(step => doc.getTextWidth(`Giorno ${step.day}:`))
+    : [];
+  const maxProtocolLabelWidth = protocolLabelWidths.length > 0 ? Math.max(...protocolLabelWidths) : 0;
+  
+  const labelWidths = [
+    doc.getTextWidth('Resa:'),
+    doc.getTextWidth('Franco Caseificio:'),
+    doc.getTextWidth('Franco Cliente:'),
+    doc.getTextWidth('Vendita Diretta:'),
+    doc.getTextWidth('Temperatura Coagulazione:'),
+    doc.getTextWidth('Nome Fermento:'),
+    doc.getTextWidth('Muffe:'),
+    doc.getTextWidth('Caglio:'),
+    maxProtocolLabelWidth
+  ];
+  const maxLabelWidth = Math.max(...labelWidths);
+  const valueStartX = margin + 5 + maxLabelWidth + 5; // 5px di spazio tra label e valore
+
   // Sezione Resa
   doc.setFontSize(12);
-  doc.setTextColor(...textColor);
   doc.setFont('helvetica', 'bold');
   doc.text('Resa', margin, yPosition);
-  
+  yPosition += 8;
+
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Resa:', margin + 5, yPosition);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${cheese.yieldPercentage || (cheese.yieldPerLiter ? (cheese.yieldPerLiter * 100).toFixed(1) : 'N/A')}%`, margin + 40, yPosition);
-  yPosition += 10;
+  doc.text(`${cheese.yieldPercentage || (cheese.yieldPerLiter ? (cheese.yieldPerLiter * 100).toFixed(1) : 'N/A')}%`, valueStartX, yPosition);
+  yPosition += 6;
 
   // Sezione Prezzi
+  
   if (cheese.prices) {
+    doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.text('Prezzi e Percentuali di Vendita', margin, yPosition);
     yPosition += 8;
@@ -143,29 +176,31 @@ export async function generateCheesePDF(cheese: CheeseType) {
       doc.setFont('helvetica', 'bold');
       doc.text('Franco Caseificio:', margin + 5, yPosition);
       doc.setFont('helvetica', 'normal');
-      doc.text(`€ ${cheese.prices.price1.toFixed(2)}/kg (${cheese.prices.salesPercentage1}%)`, margin + 50, yPosition);
+      doc.text(`€ ${cheese.prices.price1.toFixed(2)}/kg (${cheese.prices.salesPercentage1}%)`, valueStartX, yPosition);
       yPosition += 6;
     }
     if (cheese.prices.price2 > 0) {
       doc.setFont('helvetica', 'bold');
       doc.text('Franco Cliente:', margin + 5, yPosition);
       doc.setFont('helvetica', 'normal');
-      doc.text(`€ ${cheese.prices.price2.toFixed(2)}/kg (${cheese.prices.salesPercentage2}%)`, margin + 50, yPosition);
+      doc.text(`€ ${cheese.prices.price2.toFixed(2)}/kg (${cheese.prices.salesPercentage2}%)`, valueStartX, yPosition);
       yPosition += 6;
     }
     if (cheese.prices.price3 > 0) {
       doc.setFont('helvetica', 'bold');
       doc.text('Vendita Diretta:', margin + 5, yPosition);
       doc.setFont('helvetica', 'normal');
-      doc.text(`€ ${cheese.prices.price3.toFixed(2)}/kg (${cheese.prices.salesPercentage3}%)`, margin + 50, yPosition);
+      doc.text(`€ ${cheese.prices.price3.toFixed(2)}/kg (${cheese.prices.salesPercentage3}%)`, valueStartX, yPosition);
       yPosition += 6;
     }
   } else if (cheese.pricePerKg) {
+    doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.text('Prezzo', margin, yPosition);
     yPosition += 8;
+    doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text(`€ ${cheese.pricePerKg.toFixed(2)}/kg`, margin + 5, yPosition);
+    doc.text(`€ ${cheese.pricePerKg.toFixed(2)}/kg`, valueStartX, yPosition);
     yPosition += 6;
   }
   yPosition += 5;
@@ -184,7 +219,7 @@ export async function generateCheesePDF(cheese: CheeseType) {
     yPosition += 8;
 
     doc.setFontSize(10);
-    const valueStartX = margin + 75; // Posizione fissa per tutti i valori
+    // Usa la stessa valueStartX calcolata sopra per allineare tutti i valori
     
     if (cheese.defaultFields.temperaturaCoagulazione) {
       doc.setFont('helvetica', 'bold');
@@ -197,40 +232,34 @@ export async function generateCheesePDF(cheese: CheeseType) {
       doc.setFont('helvetica', 'bold');
       doc.text('Nome Fermento:', margin + 5, yPosition);
       doc.setFont('helvetica', 'normal');
-      doc.text(cheese.defaultFields.nomeFermento, valueStartX, yPosition);
+      let fermentoText = cheese.defaultFields.nomeFermento;
       if (cheese.defaultFields.quantitaFermento) {
-        doc.setFont('helvetica', 'bold');
-        doc.text('Quantità:', valueStartX, yPosition + 6);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`${cheese.defaultFields.quantitaFermento} unità`, valueStartX + 25, yPosition + 6);
+        fermentoText += ` (${cheese.defaultFields.quantitaFermento} unità)`;
       }
-      yPosition += cheese.defaultFields.quantitaFermento ? 12 : 6;
+      doc.text(fermentoText, valueStartX, yPosition);
+      yPosition += 6;
     }
     if (cheese.defaultFields.muffe) {
       doc.setFont('helvetica', 'bold');
       doc.text('Muffe:', margin + 5, yPosition);
       doc.setFont('helvetica', 'normal');
-      doc.text(cheese.defaultFields.muffe, valueStartX, yPosition);
+      let muffeText = cheese.defaultFields.muffe;
       if (cheese.defaultFields.quantitaMuffe) {
-        doc.setFont('helvetica', 'bold');
-        doc.text('Quantità:', valueStartX, yPosition + 6);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`${cheese.defaultFields.quantitaMuffe} unità`, valueStartX + 25, yPosition + 6);
+        muffeText += ` (${cheese.defaultFields.quantitaMuffe} unità)`;
       }
-      yPosition += cheese.defaultFields.quantitaMuffe ? 12 : 6;
+      doc.text(muffeText, valueStartX, yPosition);
+      yPosition += 6;
     }
     if (cheese.defaultFields.caglio) {
       doc.setFont('helvetica', 'bold');
       doc.text('Caglio:', margin + 5, yPosition);
       doc.setFont('helvetica', 'normal');
-      doc.text(cheese.defaultFields.caglio, valueStartX, yPosition);
+      let caglioText = cheese.defaultFields.caglio;
       if (cheese.defaultFields.quantitaCaglio) {
-        doc.setFont('helvetica', 'bold');
-        doc.text('Quantità:', valueStartX, yPosition + 6);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`${cheese.defaultFields.quantitaCaglio} cc`, valueStartX + 25, yPosition + 6);
+        caglioText += ` (${cheese.defaultFields.quantitaCaglio} cc)`;
       }
-      yPosition += cheese.defaultFields.quantitaCaglio ? 12 : 6;
+      doc.text(caglioText, valueStartX, yPosition);
+      yPosition += 6;
     }
     yPosition += 5;
   }
@@ -248,11 +277,13 @@ export async function generateCheesePDF(cheese: CheeseType) {
     yPosition += 8;
 
     doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
     
     cheese.customFields.forEach((field) => {
       if (field.key && field.value) {
-        doc.text(`${field.key}: ${field.value}`, margin + 5, yPosition);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`${field.key}:`, margin + 5, yPosition);
+        doc.setFont('helvetica', 'normal');
+        doc.text(field.value, valueStartX, yPosition);
         yPosition += 6;
       }
     });
@@ -290,7 +321,7 @@ export async function generateCheesePDF(cheese: CheeseType) {
       doc.setFont('helvetica', 'bold');
       doc.text(`Giorno ${step.day}:`, margin + 5, yPosition);
       doc.setFont('helvetica', 'normal');
-      doc.text(step.activity, margin + 40, yPosition);
+      doc.text(step.activity, valueStartX, yPosition);
       yPosition += 6;
     });
   }

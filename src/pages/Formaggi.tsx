@@ -10,6 +10,14 @@ import {
   Trash2,
   Search,
   FileText,
+  Thermometer,
+  FlaskConical,
+  Leaf,
+  Beaker,
+  Package,
+  Factory,
+  User,
+  ShoppingCart,
 } from "lucide-react";
 import { useData } from "@/hooks/use-data";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -218,12 +226,12 @@ export default function Formaggi() {
                     </div>
 
                     {/* Stats */}
-                    <div className="mt-4 space-y-3">
-                      <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
+                    <div className="mt-4 space-y-2.5">
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted flex-shrink-0">
                           <Droplets className="h-4 w-4 text-muted-foreground" />
                         </div>
-                        <div>
+                        <div className="flex-1">
                           <p className="text-xs text-muted-foreground">Resa</p>
                           <p className="text-sm font-medium">
                             {cheese.yieldPercentage !== undefined 
@@ -236,52 +244,81 @@ export default function Formaggi() {
                       </div>
                       
                       {/* Prezzi */}
-                      <div className="space-y-2">
+                      <div className="space-y-2.5">
                         {cheese.prices ? (
                           <>
                             {cheese.prices.price1 > 0 && (
-                              <div className="flex items-center justify-between text-sm">
-                                <span className="text-muted-foreground">Franco Caseificio:</span>
-                                <span className="font-medium">€{cheese.prices.price1.toFixed(2)}/kg</span>
-                                {cheese.prices.salesPercentage1 > 0 && (
-                                  <span className="text-xs text-muted-foreground">({cheese.prices.salesPercentage1}%)</span>
-                                )}
+                              <div className="flex items-center gap-2.5 text-sm">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted flex-shrink-0">
+                                  <Factory className="h-4 w-4 text-muted-foreground" />
+                                </div>
+                                <div className="flex-1 flex items-center justify-between gap-2">
+                                  <span className="text-muted-foreground">Franco Caseificio:</span>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="font-medium">€ {cheese.prices.price1.toFixed(2)}/kg</span>
+                                    {cheese.prices.salesPercentage1 > 0 && (
+                                      <span className="text-xs text-muted-foreground">({cheese.prices.salesPercentage1}%)</span>
+                                    )}
+                                  </div>
+                                </div>
                               </div>
                             )}
                             {cheese.prices.price2 > 0 && (
-                              <div className="flex items-center justify-between text-sm">
-                                <span className="text-muted-foreground">Franco Cliente:</span>
-                                <span className="font-medium">€{cheese.prices.price2.toFixed(2)}/kg</span>
-                                {cheese.prices.salesPercentage2 > 0 && (
-                                  <span className="text-xs text-muted-foreground">({cheese.prices.salesPercentage2}%)</span>
-                                )}
+                              <div className="flex items-center gap-2.5 text-sm">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted flex-shrink-0">
+                                  <User className="h-4 w-4 text-muted-foreground" />
+                                </div>
+                                <div className="flex-1 flex items-center justify-between gap-2">
+                                  <span className="text-muted-foreground">Franco Cliente:</span>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="font-medium">€ {cheese.prices.price2.toFixed(2)}/kg</span>
+                                    {cheese.prices.salesPercentage2 > 0 && (
+                                      <span className="text-xs text-muted-foreground">({cheese.prices.salesPercentage2}%)</span>
+                                    )}
+                                  </div>
+                                </div>
                               </div>
                             )}
                             {cheese.prices.price3 > 0 && (
-                              <div className="flex items-center justify-between text-sm">
-                                <span className="text-muted-foreground">Vendita Diretta:</span>
-                                <span className="font-medium">€{cheese.prices.price3.toFixed(2)}/kg</span>
-                                {cheese.prices.salesPercentage3 > 0 && (
-                                  <span className="text-xs text-muted-foreground">({cheese.prices.salesPercentage3}%)</span>
-                                )}
+                              <div className="flex items-center gap-2.5 text-sm">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted flex-shrink-0">
+                                  <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+                                </div>
+                                <div className="flex-1 flex items-center justify-between gap-2">
+                                  <span className="text-muted-foreground">Vendita Diretta:</span>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="font-medium">€ {cheese.prices.price3.toFixed(2)}/kg</span>
+                                    {cheese.prices.salesPercentage3 > 0 && (
+                                      <span className="text-xs text-muted-foreground">({cheese.prices.salesPercentage3}%)</span>
+                                    )}
+                                  </div>
+                                </div>
                               </div>
                             )}
                           </>
                         ) : cheese.pricePerKg ? (
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Prezzo:</span>
-                            <span className="font-medium">€{cheese.pricePerKg.toFixed(2)}/kg</span>
+                          <div className="flex items-center gap-2.5 text-sm">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted flex-shrink-0">
+                              <Euro className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                            <div className="flex-1 flex items-center justify-between">
+                              <span className="text-muted-foreground">Prezzo:</span>
+                              <span className="font-medium">€ {cheese.pricePerKg.toFixed(2)}/kg</span>
+                            </div>
                           </div>
                         ) : null}
                       </div>
                     </div>
 
                     {/* Default Fields */}
-                    {cheese.defaultFields && (
+                    {cheese.defaultFields && Object.keys(cheese.defaultFields).length > 0 && (
                       <div className="mt-4 border-t border-border pt-4">
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                           {cheese.defaultFields.temperaturaCoagulazione && (
-                            <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-start gap-2.5">
+                              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted flex-shrink-0">
+                                <Thermometer className="h-4 w-4 text-muted-foreground" />
+                              </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs font-medium text-muted-foreground">
                                   Temperatura Coagulazione
@@ -293,7 +330,10 @@ export default function Formaggi() {
                             </div>
                           )}
                           {cheese.defaultFields.nomeFermento && (
-                            <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-start gap-2.5">
+                              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted flex-shrink-0">
+                                <FlaskConical className="h-4 w-4 text-muted-foreground" />
+                              </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs font-medium text-muted-foreground">
                                   Nome Fermento
@@ -306,7 +346,10 @@ export default function Formaggi() {
                             </div>
                           )}
                           {cheese.defaultFields.muffe && (
-                            <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-start gap-2.5">
+                              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted flex-shrink-0">
+                                <Leaf className="h-4 w-4 text-muted-foreground" />
+                              </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs font-medium text-muted-foreground">
                                   Muffe
@@ -319,7 +362,10 @@ export default function Formaggi() {
                             </div>
                           )}
                           {cheese.defaultFields.caglio && (
-                            <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-start gap-2.5">
+                              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted flex-shrink-0">
+                                <Beaker className="h-4 w-4 text-muted-foreground" />
+                              </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs font-medium text-muted-foreground">
                                   Caglio
@@ -338,9 +384,12 @@ export default function Formaggi() {
                     {/* Custom Fields */}
                     {cheese.customFields && cheese.customFields.length > 0 && (
                       <div className={`mt-4 border-t border-border pt-4 ${cheese.defaultFields ? '' : ''}`}>
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                           {cheese.customFields.map((field, index) => (
-                            <div key={index} className="flex items-start justify-between gap-2">
+                            <div key={index} className="flex items-start gap-2.5">
+                              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted flex-shrink-0">
+                                <Package className="h-4 w-4 text-muted-foreground" />
+                              </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs font-medium text-muted-foreground">
                                   {field.key || "Campo"}

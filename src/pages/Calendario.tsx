@@ -244,7 +244,7 @@ export default function Calendario() {
     return (
       <div className="space-y-4">
         {/* Days of Week Header */}
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-7 gap-1 sm:gap-2">
           {weekDays.map((day) => {
             const isSelected = isSameDay(day, selectedDate);
             const dayActivities = getActivitiesForDate(day);
@@ -366,7 +366,7 @@ export default function Calendario() {
     return (
       <div className="space-y-2">
         {/* Days of Week */}
-        <div className="grid grid-cols-7 text-center">
+        <div className="grid grid-cols-7 text-center gap-1 sm:gap-2">
           {["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"].map((day) => (
             <div
               key={day}
@@ -378,7 +378,7 @@ export default function Calendario() {
         </div>
 
         {/* Calendar Grid */}
-        <div className="grid grid-cols-7 gap-1">
+        <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
           {calendarDays.map((day, index) => {
             const isSelected = isSameDay(day, selectedDate);
             const isCurrentMonth = isSameMonth(day, currentDate);
@@ -547,19 +547,21 @@ export default function Calendario() {
           className="rounded-xl border border-border bg-card p-6 shadow-card"
         >
           {/* Navigation Bar */}
-          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={goToToday}>
+          <div className="mb-6 flex flex-wrap items-center gap-2 sm:gap-3">
+            {/* Date Navigation */}
+            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+              <Button variant="outline" size="sm" onClick={goToToday} className="flex-shrink-0">
                 Oggi
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => navigateDate("prev")}
+                className="flex-shrink-0"
               >
-                <ChevronLeft className="h-5 w-5" />
+                <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
-              <h2 className="font-serif text-lg font-semibold text-card-foreground capitalize min-w-[200px] text-center">
+              <h2 className="font-serif text-sm sm:text-base font-semibold text-card-foreground capitalize whitespace-nowrap">
                 {view === "day" && format(selectedDate, "EEEE d MMMM yyyy", { locale: it })}
                 {view === "week" && `Settimana ${getWeek(currentDate, { locale: it })} - ${format(currentDate, "MMMM yyyy", { locale: it })}`}
                 {view === "month" && format(currentDate, "MMMM yyyy", { locale: it })}
@@ -568,13 +570,14 @@ export default function Calendario() {
                 variant="ghost"
                 size="icon"
                 onClick={() => navigateDate("next")}
+                className="flex-shrink-0"
               >
-                <ChevronRight className="h-5 w-5" />
+                <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </div>
 
             {/* View Selector */}
-            <div className="flex gap-1 rounded-lg border border-border bg-muted/30 p-1">
+            <div className="flex gap-1 rounded-lg border border-border bg-muted/30 p-1 flex-shrink-0">
               <Button
                 variant={view === "day" ? "default" : "ghost"}
                 size="sm"
@@ -602,22 +605,23 @@ export default function Calendario() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-shrink-0 ml-auto">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setIsProductionDialogOpen(true)}
               >
-                <Plus className="mr-2 h-4 w-4" />
-                Nuova Produzione
+                <Factory className="mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">Nuova Produzione</span>
+                <span className="sm:hidden">Produzione</span>
               </Button>
               <Button
-                variant="outline"
                 size="sm"
                 onClick={() => setIsActivityDialogOpen(true)}
               >
                 <Plus className="mr-2 h-4 w-4" />
-                Aggiungi Attività
+                <span className="hidden sm:inline">Aggiungi Attività</span>
+                <span className="sm:hidden">Attività</span>
               </Button>
             </div>
           </div>
