@@ -82,5 +82,8 @@ export default defineConfig(({ mode }) => ({
     chunkSizeWarningLimit: 1500,
     // Forza la generazione di source maps in produzione per debugging
     sourcemap: false,
+    // Assicura che i CSS vengano estratti in file separati
+    cssCodeSplit: true,
+    cssMinify: true,
   },
 }));
