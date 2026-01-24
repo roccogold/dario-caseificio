@@ -633,6 +633,12 @@ export function useData() {
         
         savedProduction = await saveProduction(newProduction); // Supabase genererà l'UUID
         logger.log('[addProduction] ✅ Successfully saved to Supabase:', savedProduction.id);
+        logger.log('[addProduction] Saved production date:', {
+          original: production.date,
+          saved: savedProduction.date,
+          savedType: typeof savedProduction.date,
+          savedIsDate: savedProduction.date instanceof Date
+        });
         
         // ❌ RIMOSSO: setProductions((prev) => [...prev, savedProduction]);
         // La real-time subscription aggiungerà automaticamente la produzione
@@ -659,22 +665,30 @@ export function useData() {
 
         // Crea un'attività per ogni step del protocollo
         for (const protocolStep of cheeseType.protocol) {
-          // Parse production date as local date to avoid timezone issues
+          // IMPORTANTE: Usa savedProduction.date invece di production.date
+          // perché savedProduction.date è già parsato correttamente come data locale
           let productionDate: Date;
-          if (production.date instanceof Date) {
-            productionDate = new Date(production.date);
-          } else if (typeof production.date === 'string') {
+          if (savedProduction.date instanceof Date) {
+            productionDate = new Date(savedProduction.date);
+          } else if (typeof savedProduction.date === 'string') {
             // If it's a string like "2026-01-24", parse as local date
-            if (production.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
-              const [year, month, day] = production.date.split('-').map(Number);
+            if (savedProduction.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+              const [year, month, day] = savedProduction.date.split('-').map(Number);
               productionDate = new Date(year, month - 1, day);
             } else {
-              productionDate = new Date(production.date);
+              productionDate = new Date(savedProduction.date);
             }
           } else {
-            productionDate = new Date(production.date);
+            productionDate = new Date(savedProduction.date);
           }
           productionDate.setHours(0, 0, 0, 0);
+          
+          logger.log('[addProduction] Creating protocol activity:', {
+            step: protocolStep,
+            productionDate: format(productionDate, 'yyyy-MM-dd'),
+            activityDate: format(addDays(productionDate, protocolStep.day), 'yyyy-MM-dd'),
+            dayOffset: protocolStep.day
+          });
           
           const activityDate = addDays(productionDate, protocolStep.day);
           activityDate.setHours(0, 0, 0, 0);

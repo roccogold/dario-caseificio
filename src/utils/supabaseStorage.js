@@ -229,7 +229,19 @@ export async function saveProduction(production) {
       await logAction('create', 'produzione', data.id, { 
         production_number: production.productionNumber 
       })
-      return { id: data.id, ...production }
+      
+      // Fix timezone issue: parse date string as local date, not UTC
+      let productionDate = production.date;
+      if (data.production_date && typeof data.production_date === 'string' && data.production_date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const [year, month, day] = data.production_date.split('-').map(Number);
+        productionDate = new Date(year, month - 1, day);
+      }
+      
+      return { 
+        id: data.id, 
+        ...production,
+        date: productionDate // Use the correctly parsed local date
+      }
     } else {
       // Update produzione esistente
       const { data, error } = await supabase
@@ -250,7 +262,23 @@ export async function saveProduction(production) {
       await logAction('update', 'produzione', production.id, { 
         production_number: production.productionNumber 
       })
-      return data
+      
+      // Fix timezone issue: parse date string as local date, not UTC
+      let productionDate = production.date;
+      if (data.production_date && typeof data.production_date === 'string' && data.production_date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const [year, month, day] = data.production_date.split('-').map(Number);
+        productionDate = new Date(year, month - 1, day);
+      }
+      
+      return {
+        id: data.id,
+        productionNumber: data.production_number,
+        date: productionDate, // Use the correctly parsed local date
+        totalLiters: data.total_liters || 0,
+        cheeses: data.cheeses || [],
+        notes: data.notes || '',
+        createdAt: data.created_at ? new Date(data.created_at) : new Date()
+      }
     }
   } catch (error) {
     console.error('Error saving production:', error)
