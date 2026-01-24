@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   format,
@@ -63,7 +63,10 @@ export default function Calendario() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  const getCheeseType = (id: string) => cheeseTypes.find((c) => c.id === id);
+  const getCheeseType = useCallback((id: string | undefined) => {
+    if (!id) return null;
+    return cheeseTypes.find((c) => c.id === id) || null;
+  }, [cheeseTypes]);
 
   // Check if a date has activities or productions
   const hasEvents = (date: Date) => {
@@ -214,6 +217,7 @@ export default function Calendario() {
             <div className="space-y-2">
                     <AnimatePresence mode="popLayout">
                       {dayActivities.map((activity) => {
+                        // Stable cheeseType lookup - always returns null if not found, never undefined
                         const cheeseType = getCheeseType(activity.cheeseTypeId);
                         return (
                           <ActivityCard

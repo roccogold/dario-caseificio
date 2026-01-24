@@ -64,8 +64,8 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
         className={cn(
           "relative flex flex-shrink-0 items-center justify-center border-2 transition-all duration-150 ml-3 rounded cursor-pointer",
           isCompleted
-            ? "h-5 w-5 border-success bg-success text-white shadow-sm"
-            : "h-5 w-5 border-muted-foreground/30 bg-background hover:border-primary hover:bg-primary/5 active:scale-95"
+            ? "h-4 w-4 border-success bg-success text-white shadow-sm"
+            : "h-4 w-4 border-muted-foreground/30 bg-background hover:border-primary hover:bg-primary/5 active:scale-95"
         )}
       >
         {isCompleted && (
@@ -74,7 +74,7 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
           >
-            <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
+            <Check className="h-2.5 w-2.5" strokeWidth={3} />
           </motion.div>
         )}
       </button>
@@ -82,9 +82,15 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
       {/* Content */}
       <div className="flex-1 min-w-0 flex items-center gap-3 py-2.5">
         <div className="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
-          {/* Cheese badge for protocol activities */}
+          {/* Cheese badge for protocol activities - stable key to prevent flicker */}
           {activity.type === "protocol" && cheeseTypeName && cheeseColor && (
-            <span
+            <motion.span
+              layout="position"
+              key={`cheese-${activity.id}-${activity.cheeseTypeId}`}
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.1 }}
               className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium flex-shrink-0 border"
               style={{ 
                 backgroundColor: `${cheeseColor}15`,
@@ -93,7 +99,7 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
               }}
             >
               {cheeseTypeName}
-            </span>
+            </motion.span>
           )}
           
           {/* Title */}
