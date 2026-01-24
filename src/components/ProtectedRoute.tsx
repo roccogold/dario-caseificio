@@ -32,8 +32,8 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         
         // In produzione con Supabase configurato, usa Supabase Auth
         if (hasSupabase) {
-          const authStatus = await isAuthenticated();
-          setAuthenticated(authStatus);
+        const authStatus = await isAuthenticated();
+        setAuthenticated(authStatus);
         } else {
           // Fallback: se Supabase non è configurato in produzione, usa localStorage
           const { isAuthenticated: isLocalAuthenticated } = await import('@/utils/auth');
@@ -49,7 +49,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
           setAuthenticated(localAuth);
         } catch (fallbackError) {
           console.error("Fallback auth error:", fallbackError);
-          setAuthenticated(false);
+        setAuthenticated(false);
         }
       } finally {
         setLoading(false);

@@ -71,7 +71,7 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Suspense fallback={<PageSkeleton />}>
-                  <Calendario />
+                <Calendario />
                 </Suspense>
               </ProtectedRoute>
             } 
@@ -81,7 +81,7 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Suspense fallback={<PageSkeleton />}>
-                  <Formaggi />
+                <Formaggi />
                 </Suspense>
               </ProtectedRoute>
             } 
@@ -91,7 +91,7 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Suspense fallback={<PageSkeleton />}>
-                  <Produzioni />
+                <Produzioni />
                 </Suspense>
               </ProtectedRoute>
             } 
@@ -101,7 +101,7 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Suspense fallback={<PageSkeleton />}>
-                  <Statistiche />
+                <Statistiche />
                 </Suspense>
               </ProtectedRoute>
             } 

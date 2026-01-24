@@ -181,11 +181,11 @@ export async function loadProductions() {
       }
       
       return {
-        id: prod.id,
-        productionNumber: prod.production_number,
+      id: prod.id,
+      productionNumber: prod.production_number,
         date: productionDate,
-        totalLiters: prod.total_liters || 0,
-        cheeses: prod.cheeses || [],
+      totalLiters: prod.total_liters || 0,
+      cheeses: prod.cheeses || [],
         notes: prod.notes || '',
         createdAt: prod.created_at ? new Date(prod.created_at) : new Date()
       };
@@ -303,10 +303,10 @@ export async function loadActivities() {
       }
       
       return {
-        id: activity.id,
+      id: activity.id,
         date: activityDate,
-        title: activity.title,
-        description: activity.description || '',
+      title: activity.title,
+      description: activity.description || '',
         type: activity.type || 'one-time',
         recurrence: activity.recurrence || undefined,
         productionId: activity.production_id || undefined,

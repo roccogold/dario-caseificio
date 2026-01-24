@@ -545,26 +545,26 @@ export default function Calendario() {
         />
 
         {/* Main Calendar Area */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
           className="rounded-xl border border-border bg-card p-6 shadow-card"
-        >
+          >
           {/* Navigation Bar */}
           <div className="mb-6 flex flex-wrap items-center gap-2 sm:gap-3">
             {/* Date Navigation */}
             <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
               <Button variant="outline" size="sm" onClick={goToToday} className="flex-shrink-0">
-                Oggi
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
+                  Oggi
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
                 onClick={() => navigateDate("prev")}
                 className="flex-shrink-0"
-              >
+                >
                 <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
-              </Button>
+                </Button>
               <h2 className="font-serif text-sm sm:text-base font-semibold text-card-foreground capitalize whitespace-nowrap">
                 {view === "day" && format(selectedDate, "EEEE d MMMM yyyy", { locale: it })}
                 {view === "week" && `Settimana ${getWeek(currentDate, { locale: it })} - ${format(currentDate, "MMMM yyyy", { locale: it })}`}
@@ -600,7 +600,7 @@ export default function Calendario() {
               </Button>
               <Button
                 variant={view === "month" ? "default" : "ghost"}
-                size="sm"
+                                size="sm"
                 onClick={() => handleViewChange("month")}
                 className="flex-1"
               >
@@ -663,7 +663,7 @@ export default function Calendario() {
               </motion.div>
             )}
           </AnimatePresence>
-        </motion.div>
+          </motion.div>
       </div>
     </AppLayout>
   );
