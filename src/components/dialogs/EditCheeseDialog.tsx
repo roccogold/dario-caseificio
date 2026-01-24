@@ -639,18 +639,15 @@ export function EditCheeseDialog({
                   <div className="flex flex-col gap-1.5 w-12 flex-shrink-0">
                     <Label className="text-xs font-medium text-foreground">Giorno</Label>
                     <Input
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
+                      type="number"
+                      min="0"
                       autoComplete="off"
-                      className="w-12 h-10 text-sm font-medium text-center bg-background border-border"
-                      value={step.day === 0 ? "" : step.day}
+                      className="w-12 h-10 text-sm font-medium text-center bg-background border-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      value={step.day}
                       onChange={(e) => {
                         const val = e.target.value;
-                        if (val === "" || /^\d+$/.test(val)) {
-                          const newDay = val === "" ? 0 : parseInt(val) || 0;
-                          updateProtocolStep(originalIndex, "day", newDay);
-                        }
+                        const newDay = val === "" ? 0 : parseInt(val) || 0;
+                        updateProtocolStep(originalIndex, "day", newDay);
                       }}
                       placeholder="0"
                     />
