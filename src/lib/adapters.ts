@@ -178,10 +178,11 @@ export function typeCheeseToDb(cheese: Omit<CheeseType, "id" | "createdAt"> & { 
     };
   }
 
-  // Gestisci defaultFields: se è un oggetto vuoto, salvalo come {} invece di null
-  const defaultFields = cheese.defaultFields && Object.keys(cheese.defaultFields).length > 0
-    ? cheese.defaultFields
-    : (cheese.defaultFields !== undefined ? {} : null);
+  // Gestisci defaultFields: sempre usa quello fornito
+  // Se è undefined, usa null. Se è un oggetto (anche vuoto), usalo
+  const defaultFields = cheese.defaultFields !== undefined 
+    ? cheese.defaultFields  // Usa l'oggetto così com'è, anche se vuoto
+    : null;
 
   // Gestisci customFields: se è un array vuoto, salvalo come [] invece di null
   const customFields = cheese.customFields && cheese.customFields.length > 0

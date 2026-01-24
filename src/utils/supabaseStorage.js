@@ -79,6 +79,18 @@ export async function saveCheese(cheese) {
     // Usa l'adapter per convertire dal formato TypeScript al formato DB
     const dbData = typeCheeseToDb(cheese)
     
+    // Debug logging
+    console.log('[saveCheese] Input cheese:', {
+      name: cheese.name,
+      hasDefaultFields: !!cheese.defaultFields,
+      defaultFieldsKeys: cheese.defaultFields ? Object.keys(cheese.defaultFields) : [],
+      defaultFields: cheese.defaultFields
+    })
+    console.log('[saveCheese] Converted dbData:', {
+      name: dbData.name,
+      default_fields: dbData.default_fields
+    })
+    
     if (!cheese.id || cheese.id.startsWith('temp-') || typeof cheese.id === 'number') {
       // Nuovo formaggio - rimuovi l'ID se è temporaneo
       const insertData = { ...dbData }
