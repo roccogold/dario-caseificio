@@ -44,10 +44,7 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
       exit={{ opacity: 0, x: -10 }}
       transition={{ duration: 0.15, ease: "easeOut" }}
       className={cn(
-        "group relative flex items-center gap-3 rounded-lg border bg-card transition-all duration-200",
-        isCompleted
-          ? "border-success/30 bg-success/5"
-          : "border-border hover:border-primary/20 hover:shadow-sm"
+        "group relative flex items-center gap-3 rounded-lg border border-border bg-card transition-all duration-200 hover:border-primary/20 hover:shadow-sm"
       )}
     >
       {/* Checkbox */}
@@ -56,8 +53,8 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
         className={cn(
           "relative flex flex-shrink-0 items-center justify-center border-2 transition-all duration-150 ml-3 rounded cursor-pointer",
           isCompleted
-            ? "h-3 w-3 border-success bg-success text-white shadow-sm"
-            : "h-3 w-3 border-muted-foreground/30 bg-background hover:border-primary hover:bg-primary/5 active:scale-95"
+            ? "h-2.5 w-2.5 border-success bg-success text-white shadow-sm"
+            : "h-2.5 w-2.5 border-muted-foreground/30 bg-background hover:border-primary hover:bg-primary/5 active:scale-95"
         )}
       >
         {isCompleted && (
