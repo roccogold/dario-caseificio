@@ -49,23 +49,14 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
           : "border-border hover:border-primary/20 hover:shadow-sm"
       )}
     >
-      {/* Left accent bar - only for completed */}
-      {isCompleted && (
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: 3 }}
-          className="absolute left-0 top-0 bottom-0 bg-success rounded-l-lg"
-        />
-      )}
-
       {/* Checkbox */}
       <button
         onClick={handleToggle}
         className={cn(
           "relative flex flex-shrink-0 items-center justify-center border-2 transition-all duration-150 ml-3 rounded cursor-pointer",
           isCompleted
-            ? "h-4 w-4 border-success bg-success text-white shadow-sm"
-            : "h-4 w-4 border-muted-foreground/30 bg-background hover:border-primary hover:bg-primary/5 active:scale-95"
+            ? "h-3.5 w-3.5 border-success bg-success text-white shadow-sm"
+            : "h-3.5 w-3.5 border-muted-foreground/30 bg-background hover:border-primary hover:bg-primary/5 active:scale-95"
         )}
       >
         {isCompleted && (
@@ -74,7 +65,7 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
           >
-            <Check className="h-2.5 w-2.5" strokeWidth={3} />
+            <Check className="h-2 w-2" strokeWidth={3} />
           </motion.div>
         )}
       </button>
