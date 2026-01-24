@@ -33,7 +33,7 @@ export function ActivityCard({
   const TypeIcon = typeIcons[activity.type];
 
   // Per attività ricorrenti, controlla se è completata per la data corrente
-  const isCompleted = activity.recurrence && activity.recurrence !== 'none' && activity.type === 'recurring'
+  const isCompleted = activity.recurrence && activity.recurrence !== 'none' as const && activity.type === 'recurring'
     ? (activity.completedDates || []).includes(format(currentDate, 'yyyy-MM-dd'))
     : activity.completed;
 

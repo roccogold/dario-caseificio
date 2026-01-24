@@ -25,15 +25,18 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL !== 'your_supabase_project
     // In produzione, verifica che il client funzioni
     if (isProduction) {
       // Test rapido della connessione
-      supabase.from('formaggi').select('id').limit(1).then(({ error }) => {
-        if (error) {
-          console.error('[supabase] ❌ Connection test failed:', error);
-        } else {
-          console.log('[supabase] ✅ Connection test passed');
+      (async () => {
+        try {
+          const { error } = await supabase!.from('formaggi').select('id').limit(1);
+          if (error) {
+            console.error('[supabase] ❌ Connection test failed:', error);
+          } else {
+            console.log('[supabase] ✅ Connection test passed');
+          }
+        } catch (err) {
+          console.error('[supabase] ❌ Connection test error:', err);
         }
-      }).catch(err => {
-        console.error('[supabase] ❌ Connection test error:', err);
-      });
+      })();
     }
   } catch (error) {
     console.error('[supabase] ❌ Errore nella creazione del client Supabase:', error);

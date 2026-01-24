@@ -39,7 +39,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     checkAuth();
 
     // Ascolta i cambiamenti di autenticazione
-    const { unsubscribe } = onAuthStateChange((event, session) => {
+    const authListener = onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
         setAuthenticated(true);
         setLoading(false);
@@ -50,7 +50,12 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     });
 
     return () => {
-      unsubscribe();
+      // Handle both return types from onAuthStateChange
+      if ('unsubscribe' in authListener && typeof authListener.unsubscribe === 'function') {
+        authListener.unsubscribe();
+      } else if (authListener?.data?.subscription?.unsubscribe) {
+        authListener.data.subscription.unsubscribe();
+      }
     };
   }, []);
 

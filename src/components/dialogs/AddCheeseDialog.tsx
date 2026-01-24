@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { CHEESE_COLORS } from "@/lib/mock-data";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { CustomField, DefaultFields } from "@/types";
+import type { CustomField, DefaultFields } from "@/types";
 
 interface ProtocolStep {
   day: number;
