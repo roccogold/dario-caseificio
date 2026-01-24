@@ -211,6 +211,18 @@ npm run build
 - ESLint for code quality
 - Prettier for code formatting (via ESLint)
 
+## 📚 Documentation
+
+All project documentation is organized in the [`docs/`](./docs/) directory:
+
+- **[Setup Guides](./docs/setup/)** - Installation and configuration
+- **[Deployment Guides](./docs/deployment/)** - Deployment instructions
+- **[Database Documentation](./docs/database/)** - Schema and migrations
+- **[Testing Guides](./docs/testing/)** - Testing procedures
+- **[Architecture](./docs/architecture/)** - System design
+
+See [docs/README.md](./docs/README.md) for the complete documentation index.
+
 ## 🗄️ Database Schema
 
 The application uses Supabase (PostgreSQL) with the following main tables:
@@ -221,6 +233,8 @@ The application uses Supabase (PostgreSQL) with the following main tables:
 - `users` - User authentication (managed by Supabase Auth)
 
 See `supabase-schema.sql` for the complete schema definition.
+
+For detailed database documentation, see [docs/database/](./docs/database/).
 
 ## 📄 License
 

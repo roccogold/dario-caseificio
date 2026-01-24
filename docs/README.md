@@ -1,30 +1,60 @@
-# DARIO - Caseificio Documentation
+# DARIO - Documentation
 
-## Quick Start
+Welcome to the DARIO documentation. This directory contains all project documentation organized by category.
 
-See [QUICK_START.md](../QUICK_START.md) for getting started.
+## 📚 Documentation Structure
 
-## Setup
+### 🚀 [Setup](./setup/)
+Getting started guides and initial configuration:
+- **[Quick Start](./setup/QUICK_START.md)** - Get up and running quickly
+- **[Setup Guide](./setup/SETUP.md)** - Complete setup instructions
+- **[Node.js Setup](./setup/SETUP_NODE.md)** - Node.js environment configuration
+- **[Supabase Setup](./setup/SUPABASE_SETUP.md)** - Supabase database configuration
+- **[Supabase Auth Setup](./setup/SUPABASE_AUTH_SETUP.md)** - Authentication setup
+- **[Production Setup](./setup/PRODUCTION_SETUP.md)** - Production environment configuration
 
-- [SETUP.md](../SETUP.md) - Initial setup guide
-- [SUPABASE_SETUP.md](../SUPABASE_SETUP.md) - Supabase configuration
-- [PRODUCTION_SETUP.md](../PRODUCTION_SETUP.md) - Production deployment
+### 🚢 [Deployment](./deployment/)
+Deployment guides and workflows:
+- **[Deployment Workflow](./deployment/DEPLOYMENT_WORKFLOW.md)** - Complete deployment process
+- **[Vercel Setup](./deployment/VERCEL_SETUP_GUIDE.md)** - Vercel platform configuration
+- **[Deploy Guide](./deployment/DEPLOY.md)** - General deployment instructions
+- **[Production Deploy](./deployment/DEPLOY_PRODUCTION.md)** - Production deployment steps
 
-## Deployment
+### 🗄️ [Database](./database/)
+Database schema, migrations, and policies:
+- **[Phase 1: Schema Migration](./database/FASE1_README.md)** - Initial database schema setup
+- **[Phase 2: RLS Policies](./database/FASE2_README.md)** - Row Level Security policies
+- **[Schema Analysis](./database/SCHEMA_ANALYSIS.md)** - Database schema documentation
 
-- [DEPLOYMENT_WORKFLOW.md](../DEPLOYMENT_WORKFLOW.md) - Deployment process
-- [VERCEL_SETUP_GUIDE.md](../VERCEL_SETUP_GUIDE.md) - Vercel configuration
+### 🧪 [Testing](./testing/)
+Testing guides and procedures:
+- **[Test Guide](./testing/TEST_GUIDE.md)** - Complete testing checklist
+- **[Local Testing](./testing/LOCAL_TESTING_GUIDE.md)** - Local development testing
 
-## Database
+### 🏗️ [Architecture](./architecture/)
+System architecture and design:
+- **[Architecture Diagram](./architecture/ARCHITECTURE_DIAGRAM.md)** - System architecture overview
 
-- [FASE1_README.md](../FASE1_README.md) - Phase 1: Schema migration
-- [FASE2_README.md](../FASE2_README.md) - Phase 2: RLS policies
+### 📦 [Other](./other/)
+Additional documentation:
+- **[Lovable Prompt](./other/LOVABLE_PROMPT.md)** - Lovable platform configuration
 
-## Testing
+### 📁 [Archive](./archive/)
+Historical documentation and deprecated guides (kept for reference)
 
-- [TEST_GUIDE.md](../TEST_GUIDE.md) - Testing guide
-- [LOCAL_TESTING_GUIDE.md](../LOCAL_TESTING_GUIDE.md) - Local testing
+## 🔗 Quick Links
 
-## Architecture
+- **Main README**: [../README.md](../README.md) - Project overview and getting started
+- **GitHub Repository**: [roccogold/dario-caseificio](https://github.com/roccogold/dario-caseificio)
+- **Live Application**: [https://dario-caseificio.vercel.app/](https://dario-caseificio.vercel.app/)
 
-- [ARCHITECTURE_DIAGRAM.md](../ARCHITECTURE_DIAGRAM.md) - System architecture
+## 📝 Contributing
+
+When adding new documentation:
+1. Place files in the appropriate category folder
+2. Update this README with links to new documentation
+3. Follow the existing naming conventions (UPPERCASE_WITH_UNDERSCORES.md)
+
+---
+
+**Last Updated**: January 2026

@@ -16,14 +16,14 @@ Questa fase aggiorna lo schema del database Supabase per supportare tutte le nuo
 1. Vai su [Supabase Dashboard](https://app.supabase.com)
 2. Seleziona il tuo progetto
 3. Vai su **SQL Editor** (menu laterale)
-4. Apri il file `FASE1_SCHEMA_MIGRATION.sql`
+4. Apri il file `FASE1_SCHEMA_MIGRATION.sql` (nella root del progetto)
 5. Copia e incolla tutto il contenuto nell'editor SQL
 6. Clicca su **Run** (o premi `Cmd/Ctrl + Enter`)
 
 ### Step 2: Verificare la Migrazione
 
 1. Sempre in **SQL Editor**
-2. Apri il file `FASE1_VERIFY_SCHEMA.sql`
+2. Apri il file `FASE1_VERIFY_SCHEMA.sql` (nella root del progetto)
 3. Copia e incolla tutto il contenuto
 4. Clicca su **Run**
 5. Controlla i risultati:

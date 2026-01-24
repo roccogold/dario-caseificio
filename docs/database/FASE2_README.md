@@ -7,13 +7,13 @@ La Fase 2 implementa la sicurezza completa dell'applicazione utilizzando **Row L
 ## ✅ Cosa è stato implementato
 
 ### 1. Script SQL per RLS Policies
-- **`FASE2_RLS_POLICIES.sql`**: Script completo per applicare le RLS policies
+- **`FASE2_RLS_POLICIES.sql`** (nella root del progetto): Script completo per applicare le RLS policies
   - Abilita RLS su tutte le tabelle (`formaggi`, `produzioni`, `attività`, `logs`)
   - Rimuove policy esistenti non sicure
   - Crea nuove policy che richiedono autenticazione per tutte le operazioni
   - Verifica finale delle policy create
 
-- **`FASE2_VERIFY_RLS.sql`**: Script di verifica
+- **`FASE2_VERIFY_RLS.sql`** (nella root del progetto): Script di verifica
   - Verifica che RLS sia abilitato
   - Conta le policy per tabella
   - Verifica che tutte le policy richiedano autenticazione
