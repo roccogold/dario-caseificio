@@ -36,6 +36,7 @@ import {
 } from "@/utils/localStorage";
 import { toast } from "sonner";
 import { generateUUID } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 
 // Determina se usare Supabase o localStorage
 const isProduction = import.meta.env.PROD;
@@ -62,9 +63,9 @@ const hasSupabaseUrl = !!import.meta.env.VITE_SUPABASE_URL;
 const hasSupabaseKey = !!import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabaseInitialized = !!supabase;
 
-// Debug logging
+// Debug logging (only in development)
 if (typeof window !== 'undefined') {
-  console.log('[useData] Environment check:', {
+  logger.log('[useData] Environment check:', {
     hostname: window.location.hostname,
     isProduction,
     isLovableEnvironment,
@@ -81,10 +82,10 @@ const finalIsPreview = finalEnvCheck.isPreview;
 const finalIsRealProduction = isProduction && !finalIsLovable && !finalIsPreview;
 
 if (finalIsRealProduction) {
-  console.log('[useData] 🔍 Production mode check:');
-  console.log('[useData]   - VITE_SUPABASE_URL:', hasSupabaseUrl ? '✅ Present' : '❌ MISSING');
-  console.log('[useData]   - VITE_SUPABASE_ANON_KEY:', hasSupabaseKey ? '✅ Present' : '❌ MISSING');
-  console.log('[useData]   - supabase client:', supabaseInitialized ? '✅ Initialized' : '❌ NOT INITIALIZED');
+  logger.log('[useData] 🔍 Production mode check:');
+  logger.log('[useData]   - VITE_SUPABASE_URL:', hasSupabaseUrl ? '✅ Present' : '❌ MISSING');
+  logger.log('[useData]   - VITE_SUPABASE_ANON_KEY:', hasSupabaseKey ? '✅ Present' : '❌ MISSING');
+  logger.log('[useData]   - supabase client:', supabaseInitialized ? '✅ Initialized' : '❌ NOT INITIALIZED');
   
   if (!hasSupabaseUrl || !hasSupabaseKey || !supabaseInitialized) {
     const errorMsg = `❌ FATAL: Supabase non configurato in produzione!
@@ -97,24 +98,24 @@ if (finalIsRealProduction) {
     2. Aggiungi VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY
     3. Redeploy l'applicazione`;
     
-    console.error('[useData]', errorMsg);
+    logger.error('[useData]', errorMsg);
     toast.error(errorMsg);
     throw new Error('Supabase deve essere configurato in produzione');
   }
   
-  console.log('[useData] ✅ Production mode: Supabase configurato correttamente');
+  logger.log('[useData] ✅ Production mode: Supabase configurato correttamente');
 } else if (finalIsLovable) {
   // Lovable environment: treat as development (use localStorage)
-  console.log('[useData] 🎨 Lovable environment detected. Using development mode (localStorage).');
+  logger.log('[useData] 🎨 Lovable environment detected. Using development mode (localStorage).');
   if (!hasSupabaseUrl || !hasSupabaseKey || !supabaseInitialized) {
-    console.log('[useData] ℹ️ Supabase not configured in Lovable. Using localStorage fallback (expected behavior).');
+    logger.log('[useData] ℹ️ Supabase not configured in Lovable. Using localStorage fallback (expected behavior).');
   }
 } else if (isProduction && isPreviewEnvironment) {
   // Preview environment: warn but don't block
-  console.warn('[useData] ⚠️ Preview environment detected. Supabase recommended but not required.');
+  logger.warn('[useData] ⚠️ Preview environment detected. Supabase recommended but not required.');
   if (!hasSupabaseUrl || !hasSupabaseKey || !supabaseInitialized) {
-    console.warn('[useData] ⚠️ Supabase not configured in preview. Using localStorage fallback.');
-    console.warn('[useData] 💡 To enable Supabase in preview, configure environment variables in your deployment platform.');
+    logger.warn('[useData] ⚠️ Supabase not configured in preview. Using localStorage fallback.');
+    logger.warn('[useData] 💡 To enable Supabase in preview, configure environment variables in your deployment platform.');
   }
 }
 
@@ -128,14 +129,14 @@ const useSupabase = isRealProduction
   ? true
   : (!isProduction && hasSupabaseUrl && hasSupabaseKey && supabaseInitialized);
 
-console.log('[useData] Final decision - useSupabase:', useSupabase, '(isProduction:', isProduction, ')');
+logger.log('[useData] Final decision - useSupabase:', useSupabase, '(isProduction:', isProduction, ')');
 
-// Log per debugging
+// Log per debugging (only in development)
 if (isProduction) {
-  console.log('[useData] ✅ Production mode: Supabase OBBLIGATORIO');
-  console.log('[useData] VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL ? '✅ Configured' : '❌ Missing');
-  console.log('[useData] supabase client:', supabase ? '✅ Initialized' : '❌ Not initialized');
-  console.log('[useData] Using Supabase:', useSupabase ? '✅ Yes' : '❌ No');
+  logger.log('[useData] ✅ Production mode: Supabase OBBLIGATORIO');
+  logger.log('[useData] VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL ? '✅ Configured' : '❌ Missing');
+  logger.log('[useData] supabase client:', supabase ? '✅ Initialized' : '❌ Not initialized');
+  logger.log('[useData] Using Supabase:', useSupabase ? '✅ Yes' : '❌ No');
 }
 
 export function useData() {
@@ -159,13 +160,13 @@ export function useData() {
       
       // Skip error if we're on Lovable (treat as dev)
       if (runtimeIsLovable) {
-        console.log('[useData] 🎨 Lovable detected at runtime. Using localStorage (no Supabase required).');
+        logger.log('[useData] 🎨 Lovable detected at runtime. Using localStorage (no Supabase required).');
       }
       
       // In produzione reale, FORZA il caricamento da Supabase
       if (runtimeIsRealProduction && !useSupabase) {
         const errorMsg = '❌ ERRORE CRITICO: Supabase non configurato in produzione! Impossibile caricare i dati.';
-        console.error('[useData]', errorMsg);
+        logger.error('[useData]', errorMsg);
         toast.error(errorMsg);
         setIsLoading(false);
         return;
@@ -173,7 +174,7 @@ export function useData() {
       
       try {
         if (useSupabase) {
-          console.log('[useData] 🔵 Loading data from Supabase...');
+          logger.log('[useData] 🔵 Loading data from Supabase...');
           if (!supabase) {
             throw new Error('Supabase client non inizializzato');
           }
@@ -185,7 +186,7 @@ export function useData() {
             loadActivities(),
           ]);
           
-          console.log('[useData] ✅ Loaded from Supabase:', {
+          logger.log('[useData] ✅ Loaded from Supabase:', {
             cheeses: cheeses.length,
             productions: prods.length,
             activities: acts.length
@@ -196,7 +197,7 @@ export function useData() {
           setActivities(acts);
         } else {
           // Solo in sviluppo locale
-          console.log('[useData] Loading data from localStorage (development mode)');
+          logger.log('[useData] Loading data from localStorage (development mode)');
           const localCheesesData = localCheeses.load();
           const localProductionsData = localProductions.load();
           const localActivitiesData = localActivities.load();
@@ -206,8 +207,8 @@ export function useData() {
           setActivities(localActivitiesData);
         }
       } catch (error: any) {
-        console.error('[useData] ❌ Error loading data:', error);
-        console.error('[useData] Error details:', {
+        logger.error('[useData] ❌ Error loading data:', error);
+        logger.error('[useData] Error details:', {
           message: error?.message,
           code: error?.code,
           details: error?.details,
@@ -218,7 +219,7 @@ export function useData() {
           // In produzione, NON fare fallback - mostra errore fatale
           const errorMsg = `❌ ERRORE CRITICO: Impossibile caricare i dati dal database: ${error?.message || 'Errore sconosciuto'}`;
           toast.error(errorMsg);
-          console.error('[useData] FATAL: Cannot load from database in production');
+          logger.error('[useData] FATAL: Cannot load from database in production');
           // Non impostare i dati - lascia gli array vuoti
         } else {
           // Solo in sviluppo, fallback a localStorage
@@ -277,16 +278,16 @@ export function useData() {
     });
 
     const unsubscribeActivities = subscribeToActivities((payload) => {
-      console.log('[useData] Real-time activity event:', payload.eventType, payload.new?.id || payload.old?.id);
+      logger.log('[useData] Real-time activity event:', payload.eventType, payload.new?.id || payload.old?.id);
       
       if (payload.eventType === 'INSERT' && payload.new) {
         setActivities(prev => {
           const exists = prev.find(a => a.id === payload.new.id);
           if (exists) {
-            console.log('[useData] ⚠️ Activity already exists in state, skipping duplicate:', payload.new.id);
+            logger.log('[useData] ⚠️ Activity already exists in state, skipping duplicate:', payload.new.id);
             return prev;
           }
-          console.log('[useData] ✅ Adding activity from real-time subscription:', payload.new.id);
+          logger.log('[useData] ✅ Adding activity from real-time subscription:', payload.new.id);
           return [...prev, payload.new as any];
         });
       } else if (payload.eventType === 'UPDATE' && payload.new) {
@@ -319,14 +320,14 @@ export function useData() {
     // In produzione reale, FORZA l'uso di Supabase
     if (isRealProduction && !useSupabase) {
       const errorMsg = '❌ ERRORE CRITICO: Supabase non configurato in produzione! Il formaggio NON può essere salvato.';
-      console.error('[addCheeseType]', errorMsg);
+      logger.error('[addCheeseType]', errorMsg);
       toast.error(errorMsg);
       throw new Error('Supabase non configurato in produzione');
     }
 
     try {
       if (useSupabase) {
-        console.log('[addCheeseType] 🔵 Attempting to save to Supabase:', { 
+        logger.log('[addCheeseType] 🔵 Attempting to save to Supabase:', { 
           name: newCheese.name, 
           hasYield: !!newCheese.yieldPercentage, 
           hasPrices: !!newCheese.prices,
@@ -338,7 +339,7 @@ export function useData() {
         }
         
         const saved = await saveCheese(newCheese); // Supabase genererà l'UUID
-        console.log('[addCheeseType] ✅ Successfully saved to Supabase:', saved.id);
+        logger.log('[addCheeseType] ✅ Successfully saved to Supabase:', saved.id);
         
         // ❌ RIMOSSO: setCheeseTypes((prev) => [...prev, saved]);
         // La real-time subscription aggiungerà automaticamente il formaggio
@@ -350,15 +351,15 @@ export function useData() {
           ...newCheese,
           id: generateUUID(),
         } as CheeseType;
-        console.log('[addCheeseType] Using localStorage (development mode)');
+        logger.log('[addCheeseType] Using localStorage (development mode)');
         localCheeses.add(cheeseWithId);
         setCheeseTypes((prev) => [...prev, cheeseWithId]);
         return cheeseWithId;
       }
     } catch (error: any) {
-      console.error('[addCheeseType] ❌ Error saving cheese:', error);
+      logger.error('[addCheeseType] ❌ Error saving cheese:', error);
       const errorMessage = error?.message || 'Errore sconosciuto';
-      console.error('[addCheeseType] Error details:', { 
+      logger.error('[addCheeseType] Error details:', { 
         message: errorMessage, 
         code: error?.code,
         details: error?.details,
@@ -410,7 +411,7 @@ export function useData() {
               try {
                 await deleteActivityFromSupabase(activity.id);
               } catch (err) {
-                console.error('Error deleting old protocol activity:', err);
+                logger.error('Error deleting old protocol activity:', err);
               }
             } else {
               localActivities.delete(activity.id);
@@ -455,7 +456,7 @@ export function useData() {
               try {
                 if (useSupabase) {
                   const savedActivity = await saveActivity(protocolActivity);
-                  console.log('[updateCheeseType] ✅ Protocol activity created:', savedActivity.title);
+                  logger.log('[updateCheeseType] ✅ Protocol activity created:', savedActivity.title);
                   
                   // ❌ RIMOSSO: setActivities - la subscription lo fa automaticamente
                   // setActivities((prev) => {
@@ -478,7 +479,7 @@ export function useData() {
                   });
                 }
               } catch (error) {
-                console.error('Error creating new protocol activity:', error);
+                logger.error('Error creating new protocol activity:', error);
               }
             }
           }
@@ -498,7 +499,7 @@ export function useData() {
         );
       }
     } catch (error) {
-      console.error('Error updating cheese:', error);
+      logger.error('Error updating cheese:', error);
       toast.error('Errore nell\'aggiornamento del formaggio');
       // Fallback
       localCheeses.update(id, updates);
@@ -525,7 +526,7 @@ export function useData() {
           try {
             await deleteActivityFromSupabase(activity.id);
           } catch (err) {
-            console.error('Error deleting related activity:', err);
+            logger.error('Error deleting related activity:', err);
           }
         }
         setActivities((prev) => prev.filter((a) => a.cheeseTypeId !== id));
@@ -540,7 +541,7 @@ export function useData() {
         setActivities((prev) => prev.filter((a) => a.cheeseTypeId !== id));
       }
     } catch (error: any) {
-      console.error('[deleteCheeseType] ❌ Error deleting cheese:', error);
+      logger.error('[deleteCheeseType] ❌ Error deleting cheese:', error);
       const errorMessage = error?.message || 'Errore sconosciuto';
       
       if (isProduction) {
@@ -581,13 +582,13 @@ export function useData() {
     try {
       let savedProduction: Production;
       if (useSupabase) {
-        console.log('[addProduction] Attempting to save to Supabase:', { 
+        logger.log('[addProduction] Attempting to save to Supabase:', { 
           productionNumber: newProduction.productionNumber, 
           totalLiters: newProduction.totalLiters 
         });
         
         savedProduction = await saveProduction(newProduction); // Supabase genererà l'UUID
-        console.log('[addProduction] ✅ Successfully saved to Supabase:', savedProduction.id);
+        logger.log('[addProduction] ✅ Successfully saved to Supabase:', savedProduction.id);
         
         // ❌ RIMOSSO: setProductions((prev) => [...prev, savedProduction]);
         // La real-time subscription aggiungerà automaticamente la produzione
@@ -597,7 +598,7 @@ export function useData() {
           ...newProduction,
           id: generateUUID(),
         } as Production;
-        console.log('[addProduction] Using localStorage (development mode)');
+        logger.log('[addProduction] Using localStorage (development mode)');
         localProductions.add(productionWithId);
         setProductions((prev) => [...prev, productionWithId]);
         savedProduction = productionWithId;
@@ -645,7 +646,7 @@ export function useData() {
         try {
           if (useSupabase) {
             const savedActivity = await saveActivity(protocolActivity);
-            console.log('[addProduction] ✅ Protocol activity created:', savedActivity.title, 'on', format(savedActivity.date, 'yyyy-MM-dd'));
+            logger.log('[addProduction] ✅ Protocol activity created:', savedActivity.title, 'on', format(savedActivity.date, 'yyyy-MM-dd'));
             
             // ❌ RIMOSSO: setActivities - la subscription lo fa automaticamente
             // setActivities((prev) => {
@@ -666,10 +667,10 @@ export function useData() {
               if (exists) return prev;
               return [...prev, activityWithId];
             });
-            console.log('[addProduction] ✅ Protocol activity created:', activityWithId.title, 'on', format(activityWithId.date, 'yyyy-MM-dd'));
+            logger.log('[addProduction] ✅ Protocol activity created:', activityWithId.title, 'on', format(activityWithId.date, 'yyyy-MM-dd'));
           }
         } catch (error: any) {
-          console.error('[addProduction] ❌ Error creating protocol activity:', error, protocolActivity);
+          logger.error('[addProduction] ❌ Error creating protocol activity:', error, protocolActivity);
           if (isProduction) {
             toast.error(`Errore nel salvataggio dell'attività del protocollo: ${protocolActivity.title}`);
             throw error;
@@ -680,7 +681,7 @@ export function useData() {
 
       return savedProduction;
     } catch (error: any) {
-      console.error('[addProduction] ❌ Error adding production:', error);
+      logger.error('[addProduction] ❌ Error adding production:', error);
       const errorMessage = error?.message || 'Errore sconosciuto';
       
       if (isProduction) {
@@ -730,7 +731,7 @@ export function useData() {
         );
       }
     } catch (error) {
-      console.error('Error updating production:', error);
+      logger.error('Error updating production:', error);
       toast.error('Errore nell\'aggiornamento della produzione');
       localProductions.update(id, updates);
       setProductions((prev) =>
@@ -765,7 +766,7 @@ export function useData() {
           try {
             await deleteActivityFromSupabase(activity.id);
           } catch (err) {
-            console.error('Error deleting related activity:', err);
+            logger.error('Error deleting related activity:', err);
           }
         }
         setActivities((prev) => prev.filter((a) => a.productionId !== id));
@@ -780,7 +781,7 @@ export function useData() {
         setActivities((prev) => prev.filter((a) => a.productionId !== id));
       }
     } catch (error) {
-      console.error('Error deleting production:', error);
+      logger.error('Error deleting production:', error);
       toast.error('Errore nell\'eliminazione della produzione');
       localProductions.delete(id);
       setProductions((prev) => prev.filter((p) => p.id !== id));
@@ -805,7 +806,7 @@ export function useData() {
         // ❌ BUG FIX: NON passare l'ID a saveActivity per nuove attività
         // saveActivity controlla se activity.id esiste per decidere tra INSERT e UPDATE
         // Se passiamo un ID, fa UPDATE invece di INSERT → errore PGRST116
-        console.log('[addActivity] Attempting to save to Supabase (new activity, no ID):', { 
+        logger.log('[addActivity] Attempting to save to Supabase (new activity, no ID):', { 
           title: activity.title, 
           type: activity.type 
         });
@@ -814,7 +815,7 @@ export function useData() {
         // createdAt viene gestito da saveActivity
         const saved = await saveActivity(activity);
         
-        console.log('[addActivity] ✅ Successfully saved to Supabase:', saved.id);
+        logger.log('[addActivity] ✅ Successfully saved to Supabase:', saved.id);
         
         // ❌ BUG FIX: NON aggiungere manualmente l'attività allo stato
         // La real-time subscription la aggiungerà automaticamente quando riceve l'evento INSERT
@@ -835,13 +836,13 @@ export function useData() {
           id: generateUUID(),
           createdAt: new Date(),
         };
-        console.log('[addActivity] Using localStorage (development mode)');
+        logger.log('[addActivity] Using localStorage (development mode)');
         localActivities.add(newActivity);
         setActivities((prev) => [...prev, newActivity]);
         return newActivity;
       }
     } catch (error: any) {
-      console.error('[addActivity] ❌ Error adding activity:', error);
+      logger.error('[addActivity] ❌ Error adding activity:', error);
       const errorMessage = error?.message || 'Errore sconosciuto';
       
       if (isProduction) {
@@ -879,7 +880,7 @@ export function useData() {
         );
       }
     } catch (error) {
-      console.error('Error updating activity:', error);
+      logger.error('Error updating activity:', error);
       toast.error('Errore nell\'aggiornamento dell\'attività');
       localActivities.update(id, updates);
       setActivities((prev) =>
@@ -918,7 +919,7 @@ export function useData() {
           );
         }
       } catch (error) {
-        console.error('Error toggling activity:', error);
+        logger.error('Error toggling activity:', error);
         toast.error('Errore nell\'aggiornamento dell\'attività');
         localActivities.toggleDate(id, dateStr);
         setActivities((prev) =>
@@ -942,7 +943,7 @@ export function useData() {
           );
         }
       } catch (error) {
-        console.error('Error toggling activity:', error);
+        logger.error('Error toggling activity:', error);
         toast.error('Errore nell\'aggiornamento dell\'attività');
         localActivities.toggle(id);
         setActivities((prev) =>
@@ -962,7 +963,7 @@ export function useData() {
         setActivities((prev) => prev.filter((a) => a.id !== id));
       }
     } catch (error: any) {
-      console.error('[deleteActivity] ❌ Error deleting activity:', error);
+      logger.error('[deleteActivity] ❌ Error deleting activity:', error);
       const errorMessage = error?.message || 'Errore sconosciuto';
       
       if (isProduction) {

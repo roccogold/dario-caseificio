@@ -1,4 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import { logger } from '@/lib/logger'
 
 // Questi valori devono essere configurati con le credenziali del tuo progetto Supabase
 // In produzione: variabili d'ambiente Vercel
@@ -20,7 +21,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL !== 'your_supabase_project
         }
       }
     })
-    console.log('[supabase] ✅ Client initialized successfully');
+    logger.log('[supabase] ✅ Client initialized successfully');
     
     // In produzione, verifica che il client funzioni
     if (isProduction) {
@@ -29,28 +30,28 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL !== 'your_supabase_project
         try {
           const { error } = await supabase!.from('formaggi').select('id').limit(1);
           if (error) {
-            console.error('[supabase] ❌ Connection test failed:', error);
+            logger.error('[supabase] ❌ Connection test failed:', error);
           } else {
-            console.log('[supabase] ✅ Connection test passed');
+            logger.log('[supabase] ✅ Connection test passed');
           }
         } catch (err) {
-          console.error('[supabase] ❌ Connection test error:', err);
+          logger.error('[supabase] ❌ Connection test error:', err);
         }
       })();
     }
   } catch (error) {
-    console.error('[supabase] ❌ Errore nella creazione del client Supabase:', error);
+    logger.error('[supabase] ❌ Errore nella creazione del client Supabase:', error);
     if (isProduction) {
-      console.error('[supabase] FATAL: Cannot initialize Supabase in production!');
+      logger.error('[supabase] FATAL: Cannot initialize Supabase in production!');
     }
   }
 } else {
   if (isProduction) {
-    console.error('[supabase] ❌ FATAL: Supabase non configurato in produzione!');
-    console.error('[supabase] SUPABASE_URL:', SUPABASE_URL ? 'Present' : 'MISSING');
-    console.error('[supabase] SUPABASE_ANON_KEY:', SUPABASE_ANON_KEY ? 'Present' : 'MISSING');
+    logger.error('[supabase] ❌ FATAL: Supabase non configurato in produzione!');
+    logger.error('[supabase] SUPABASE_URL:', SUPABASE_URL ? 'Present' : 'MISSING');
+    logger.error('[supabase] SUPABASE_ANON_KEY:', SUPABASE_ANON_KEY ? 'Present' : 'MISSING');
   } else {
-    console.warn('[supabase] ⚠️ Supabase non configurato. Usa localStorage come fallback (development mode).');
+    logger.warn('[supabase] ⚠️ Supabase non configurato. Usa localStorage come fallback (development mode).');
   }
 }
 

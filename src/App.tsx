@@ -16,14 +16,29 @@ const Produzioni = lazy(() => import("./pages/Produzioni"));
 const Statistiche = lazy(() => import("./pages/Statistiche"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
-// Loading fallback component
+// Loading fallback component with improved design
 const PageSkeleton = () => (
-  <div className="p-8 space-y-6">
-    <Skeleton className="h-10 w-64" />
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {[1, 2, 3, 4, 5, 6].map((i) => (
-        <Skeleton key={i} className="h-32 w-full" />
-      ))}
+  <div className="min-h-screen bg-background">
+    <div className="p-8 space-y-8">
+      {/* Header skeleton */}
+      <div className="space-y-3">
+        <Skeleton className="h-10 w-64" />
+        <Skeleton className="h-4 w-96" />
+      </div>
+      
+      {/* Content grid skeleton */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div key={i} className="space-y-3 rounded-xl border border-border p-6">
+            <Skeleton className="h-6 w-3/4" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-5/6" />
+            <div className="pt-2">
+              <Skeleton className="h-20 w-full rounded-lg" />
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   </div>
 );
