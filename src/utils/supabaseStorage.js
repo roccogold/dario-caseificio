@@ -357,6 +357,33 @@ export async function loadActivities() {
 }
 
 /**
+ * Helper function to format a date as YYYY-MM-DD in local timezone
+ * This avoids timezone issues when converting to ISO string
+ */
+function formatDateLocal(date) {
+  if (!date) return new Date().toISOString().split('T')[0];
+  
+  if (typeof date === 'string') {
+    // If already a string in YYYY-MM-DD format, return it
+    if (date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      return date;
+    }
+    // Otherwise parse it first
+    date = new Date(date);
+  }
+  
+  if (!(date instanceof Date) || isNaN(date.getTime())) {
+    return new Date().toISOString().split('T')[0];
+  }
+  
+  // Format as YYYY-MM-DD in local timezone
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/**
  * Salva un'attività (create o update)
  */
 export async function saveActivity(activity) {
@@ -364,12 +391,28 @@ export async function saveActivity(activity) {
     throw new Error('Supabase non configurato')
   }
   try {
+    // Format date in local timezone to avoid UTC conversion issues
+    const dateString = formatDateLocal(activity.date);
+    
+    // Debug logging (only in development)
+    if (import.meta.env.DEV) {
+      console.log('[saveActivity] Saving activity:', {
+        id: activity.id,
+        title: activity.title,
+        originalDate: activity.date,
+        originalDateType: typeof activity.date,
+        originalDateIsDate: activity.date instanceof Date,
+        formattedDate: dateString,
+        protocolDay: activity.type === 'protocol' ? 'protocol activity' : 'not protocol'
+      });
+    }
+    
     if (!activity.id || activity.id.startsWith('temp-') || typeof activity.id === 'number') {
       // Nuova attività
       const { data, error } = await supabase
         .from('attività')
         .insert({
-          date: activity.date ? (activity.date instanceof Date ? activity.date.toISOString().split('T')[0] : activity.date) : new Date().toISOString().split('T')[0],
+          date: dateString,
           title: activity.title,
           description: activity.description || '',
           type: activity.type || 'one-time',
@@ -385,14 +428,36 @@ export async function saveActivity(activity) {
       if (error) throw error
 
       await logAction('create', 'attività', data.id, { title: activity.title })
+      
+      // Fix timezone issue: parse date string as local date, not UTC
+      let activityDate = activity.date; // Use original activity date which is already correct
+      if (data.date && typeof data.date === 'string' && data.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const [year, month, day] = data.date.split('-').map(Number);
+        activityDate = new Date(year, month - 1, day);
+      }
+      
+      if (import.meta.env.DEV) {
+        console.log('[saveActivity] ✅ Activity created:', {
+          id: data.id,
+          title: data.title,
+          dbDate: data.date,
+          parsedDate: formatDateLocal(activityDate),
+          originalDate: formatDateLocal(activity.date)
+        });
+      }
+      
       // Return activity with correct date (already parsed correctly from activity object)
-      return { id: data.id, ...activity }
+      return { 
+        id: data.id, 
+        ...activity,
+        date: activityDate // Use the correctly parsed local date
+      }
     } else {
       // Update attività esistente
       const { data, error } = await supabase
         .from('attività')
         .update({
-          date: activity.date ? (activity.date instanceof Date ? activity.date.toISOString().split('T')[0] : activity.date) : new Date().toISOString().split('T')[0],
+          date: dateString,
           title: activity.title,
           description: activity.description || '',
           type: activity.type || 'one-time',
@@ -415,6 +480,16 @@ export async function saveActivity(activity) {
       if (data.date && typeof data.date === 'string' && data.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
         const [year, month, day] = data.date.split('-').map(Number);
         activityDate = new Date(year, month - 1, day);
+      }
+      
+      if (import.meta.env.DEV) {
+        console.log('[saveActivity] ✅ Activity updated:', {
+          id: data.id,
+          title: data.title,
+          dbDate: data.date,
+          parsedDate: formatDateLocal(activityDate),
+          originalDate: formatDateLocal(activity.date)
+        });
       }
       
       return {
