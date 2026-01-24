@@ -3,7 +3,7 @@ import { Check, Edit, Trash2, ClipboardList } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Activity } from "@/types";
 import { format } from "date-fns";
-import { forwardRef, useState } from "react";
+import { forwardRef } from "react";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -24,22 +24,14 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
   onEdit,
   onDelete,
 }, ref) => {
-  const [isToggling, setIsToggling] = useState(false);
-  
   // Per attività ricorrenti, controlla se è completata per la data corrente
   const isCompleted = activity.recurrence && activity.recurrence !== 'none' as const && activity.type === 'recurring'
     ? (activity.completedDates || []).includes(format(currentDate, 'yyyy-MM-dd'))
     : activity.completed;
 
-  const handleToggle = async (e: React.MouseEvent) => {
+  const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsToggling(true);
-    try {
-      await onToggle();
-    } finally {
-      // Small delay to ensure smooth animation
-      setTimeout(() => setIsToggling(false), 150);
-    }
+    onToggle(); // Ora è sincrono, nessun await necessario
   };
 
   return (
@@ -54,8 +46,7 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
         "group relative flex items-center gap-3 rounded-lg border bg-card transition-all duration-200",
         isCompleted
           ? "border-success/30 bg-success/5"
-          : "border-border hover:border-primary/20 hover:shadow-sm",
-        isToggling && "pointer-events-none opacity-75"
+          : "border-border hover:border-primary/20 hover:shadow-sm"
       )}
     >
       {/* Left accent bar - only for completed */}
@@ -70,9 +61,8 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
       {/* Checkbox */}
       <button
         onClick={handleToggle}
-        disabled={isToggling}
         className={cn(
-          "relative flex flex-shrink-0 items-center justify-center border-2 transition-all duration-200 ml-3 rounded",
+          "relative flex flex-shrink-0 items-center justify-center border-2 transition-all duration-150 ml-3 rounded cursor-pointer",
           isCompleted
             ? "h-5 w-5 border-success bg-success text-white shadow-sm"
             : "h-5 w-5 border-muted-foreground/30 bg-background hover:border-primary hover:bg-primary/5 active:scale-95"

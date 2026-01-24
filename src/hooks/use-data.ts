@@ -889,7 +889,7 @@ export function useData() {
     }
   }, [useSupabase, activities]);
 
-  const toggleActivity = useCallback(async (id: string, date?: Date) => {
+  const toggleActivity = useCallback((id: string, date?: Date) => {
     const activity = activities.find(a => a.id === id);
     if (!activity) return;
 
@@ -903,68 +903,19 @@ export function useData() {
         ? completedDates.filter(d => d !== dateStr)
         : [...completedDates, dateStr];
 
-      // Optimistic update - aggiorna immediatamente l'UI
+      // Update solo locale - non salvare nel DB
       setActivities((prev) =>
         prev.map((a) => (a.id === id ? { ...a, completedDates: newCompletedDates } : a))
       );
-
-      try {
-        if (useSupabase) {
-          // Per Supabase, aggiorna l'attività con completedDates in background
-          const current = activities.find(a => a.id === id);
-          if (!current) return;
-          const updated = await saveActivity({ ...current, completedDates: newCompletedDates, id });
-          // Aggiorna con i dati dal server (per sincronizzazione)
-          setActivities((prev) =>
-            prev.map((a) => (a.id === id ? updated : a))
-          );
-        } else {
-          localActivities.toggleDate(id, dateStr);
-        }
-      } catch (error) {
-        // Rollback in caso di errore
-        logger.error('Error toggling activity:', error);
-        toast.error('Errore nell\'aggiornamento dell\'attività');
-        setActivities((prev) =>
-          prev.map((a) => (a.id === id ? { ...a, completedDates } : a))
-        );
-        if (!useSupabase) {
-          localActivities.toggleDate(id, dateStr);
-        }
-      }
     } else {
       // Per attività one-time e protocol, usa completed normale
+      // Update solo locale - non salvare is_completed nel DB
       const newCompleted = !activity.completed;
-
-      // Optimistic update - aggiorna immediatamente l'UI
       setActivities((prev) =>
         prev.map((a) => (a.id === id ? { ...a, completed: newCompleted } : a))
       );
-
-      try {
-        if (useSupabase) {
-          // Aggiorna in background
-          const updated = await toggleActivityCompleted(id, newCompleted);
-          // Aggiorna con i dati dal server (per sincronizzazione)
-          setActivities((prev) =>
-            prev.map((a) => (a.id === id ? updated : a))
-          );
-        } else {
-          localActivities.toggle(id);
-        }
-      } catch (error) {
-        // Rollback in caso di errore
-        logger.error('Error toggling activity:', error);
-        toast.error('Errore nell\'aggiornamento dell\'attività');
-        setActivities((prev) =>
-          prev.map((a) => (a.id === id ? { ...a, completed: activity.completed } : a))
-        );
-        if (!useSupabase) {
-          localActivities.toggle(id);
-        }
-      }
     }
-  }, [useSupabase, activities]);
+  }, [activities]);
 
   const deleteActivity = useCallback(async (id: string) => {
     try {
