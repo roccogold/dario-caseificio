@@ -67,7 +67,7 @@ export default function Formaggi() {
               {cheeseTypes.length} formaggi totali
             </p>
           </div>
-          <Button className="gap-2" onClick={() => setIsAddDialogOpen(true)}>
+          <Button className="gap-2 w-full sm:w-auto" onClick={() => setIsAddDialogOpen(true)}>
             <Plus className="h-4 w-4" />
             Nuovo Formaggio
           </Button>
@@ -144,7 +144,7 @@ export default function Formaggi() {
             }
           />
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
             <AnimatePresence mode="popLayout">
               {filteredCheeseTypes.map((cheese, index) => (
                 <motion.div

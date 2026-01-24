@@ -203,6 +203,8 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'EB Garamond', Georgia, serif;
+    /* Improve touch targets on mobile */
+    -webkit-tap-highlight-color: transparent;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -210,8 +212,18 @@
     @apply font-medium tracking-tight;
   }
   
-  body {
-    font-family: 'EB Garamond', Georgia, serif;
+  /* Ensure minimum touch target size (44x44px) */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Improve text rendering on mobile */
+  @media (max-width: 768px) {
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
   }
 }
 

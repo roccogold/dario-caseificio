@@ -26,7 +26,7 @@ export default function Dashboard() {
 
   return (
     <AppLayout>
-      <div className="space-y-8">
+      <div className="space-y-6">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -41,15 +41,15 @@ export default function Dashboard() {
               {format(today, "EEEE d MMMM yyyy", { locale: it })}
             </p>
           </div>
-          <div className="flex gap-3">
-            <Link to="/calendario">
-              <Button variant="outline" className="gap-2">
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Link to="/calendario" className="w-full sm:w-auto">
+              <Button variant="outline" className="gap-2 w-full sm:w-auto">
                 <Calendar className="h-4 w-4" />
                 Calendario
               </Button>
             </Link>
-            <Link to="/calendario?new=true">
-              <Button className="gap-2">
+            <Link to="/calendario?new=true" className="w-full sm:w-auto">
+              <Button className="gap-2 w-full sm:w-auto">
                 <Plus className="h-4 w-4" />
                 Nuova Produzione
               </Button>
@@ -61,9 +61,9 @@ export default function Dashboard() {
         <QuickStats productions={productions} />
 
         {/* Main Content Grid */}
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {/* Activities - Takes 2 columns */}
-          <div className="lg:col-span-2">
+          <div className="md:col-span-2 lg:col-span-2">
             <TodayActivities
               activities={todayActivities}
               cheeseTypes={cheeseTypes}

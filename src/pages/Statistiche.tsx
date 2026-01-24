@@ -270,7 +270,7 @@ export default function Statistiche() {
           </div>
 
           {/* Filters */}
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             {/* Year Selector */}
             <div className="flex items-center gap-2 rounded-lg border border-border bg-card p-1">
               <Button
@@ -356,7 +356,7 @@ export default function Statistiche() {
         </motion.div>
 
         {/* Stats Cards */}
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
           <StatCard
             title="Litri Totali"
             value={yearlyTotals.totalLiters}

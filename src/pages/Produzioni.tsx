@@ -132,7 +132,7 @@ export default function Produzioni() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-wrap"
+          className="flex flex-col gap-3 sm:flex-row sm:items-center md:flex-wrap"
         >
           <div className="relative sm:w-64 flex-shrink-0">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -144,7 +144,7 @@ export default function Produzioni() {
             />
           </div>
           <Select value={filterCheese} onValueChange={setFilterCheese}>
-            <SelectTrigger className="w-full sm:w-48 flex-shrink-0">
+            <SelectTrigger className="w-full sm:w-48 md:w-56 flex-shrink-0">
               <Filter className="mr-2 h-4 w-4" />
               <SelectValue placeholder="Tutti i formaggi" />
             </SelectTrigger>
@@ -171,7 +171,7 @@ export default function Produzioni() {
             setYearFilter("");
             setSpecificDay("");
           }}>
-            <SelectTrigger className="w-full sm:w-48 flex-shrink-0">
+            <SelectTrigger className="w-full sm:w-48 md:w-56 flex-shrink-0">
               <Calendar className="mr-2 h-4 w-4" />
               <SelectValue placeholder="Filtra per data" />
             </SelectTrigger>

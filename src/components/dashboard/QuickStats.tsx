@@ -47,7 +47,7 @@ export function QuickStats({ productions }: QuickStatsProps) {
     : 0;
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
       <StatCard
         title="Litri Questo Mese"
         value={currentMonthLiters}

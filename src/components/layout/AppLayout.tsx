@@ -155,7 +155,8 @@ export function AppLayout({ children }: AppLayoutProps) {
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-muted"
+            className="flex h-11 w-11 items-center justify-center rounded-lg hover:bg-muted touch-manipulation"
+            aria-label="Toggle menu"
           >
             {mobileMenuOpen ? (
               <X className="h-5 w-5" />
