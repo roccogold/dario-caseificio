@@ -49,7 +49,7 @@ export function AddProductionDialog({
   const [productionNumber, setProductionNumber] = useState("");
   const [cheeses, setCheeses] = useState<CheeseEntry[]>(() => {
     if (cheeseTypes.length > 0) {
-      return [{ cheeseTypeId: cheeseTypes[0].id, liters: 50 }];
+      return [{ cheeseTypeId: cheeseTypes[0].id, liters: 0 }];
     }
     return [{ cheeseTypeId: "", liters: 0 }];
   });
@@ -59,7 +59,7 @@ export function AddProductionDialog({
     setDate(format(selectedDate, "yyyy-MM-dd"));
     setProductionNumber("");
     if (cheeseTypes.length > 0) {
-      setCheeses([{ cheeseTypeId: cheeseTypes[0].id, liters: 50 }]);
+      setCheeses([{ cheeseTypeId: cheeseTypes[0].id, liters: 0 }]);
     } else {
       setCheeses([{ cheeseTypeId: "", liters: 0 }]);
     }
@@ -126,7 +126,7 @@ export function AddProductionDialog({
     if (availableCheeses.length > 0) {
       setCheeses([
         ...cheeses,
-        { cheeseTypeId: availableCheeses[0].id, liters: 50 },
+        { cheeseTypeId: availableCheeses[0].id, liters: 0 },
       ]);
     } else {
       toast.error("Hai già aggiunto tutti i tipi di formaggio disponibili");

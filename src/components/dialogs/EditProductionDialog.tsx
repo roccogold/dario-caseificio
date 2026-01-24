@@ -112,7 +112,7 @@ export function EditProductionDialog({
     if (availableCheeses.length > 0) {
       setCheeses([
         ...cheeses,
-        { cheeseTypeId: availableCheeses[0].id, liters: 50 },
+        { cheeseTypeId: availableCheeses[0].id, liters: 0 },
       ]);
     } else {
       toast.error("Hai già aggiunto tutti i tipi di formaggio disponibili");
