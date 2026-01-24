@@ -1,15 +1,32 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { Skeleton } from "@/components/ui/skeleton";
+import { KeyboardShortcutsProvider } from "@/components/KeyboardShortcuts";
 import Index from "./pages/Index";
-import Calendario from "./pages/Calendario";
-import Formaggi from "./pages/Formaggi";
-import Produzioni from "./pages/Produzioni";
-import Statistiche from "./pages/Statistiche";
-import NotFound from "./pages/NotFound";
+
+// Lazy load pages for code splitting
+const Calendario = lazy(() => import("./pages/Calendario"));
+const Formaggi = lazy(() => import("./pages/Formaggi"));
+const Produzioni = lazy(() => import("./pages/Produzioni"));
+const Statistiche = lazy(() => import("./pages/Statistiche"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+// Loading fallback component
+const PageSkeleton = () => (
+  <div className="p-8 space-y-6">
+    <Skeleton className="h-10 w-64" />
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {[1, 2, 3, 4, 5, 6].map((i) => (
+        <Skeleton key={i} className="h-32 w-full" />
+      ))}
+    </div>
+  </div>
+);
 
 const queryClient = new QueryClient();
 
@@ -24,6 +41,7 @@ const App = () => (
           v7_relativeSplatPath: true,
         }}
       >
+        <KeyboardShortcutsProvider />
         <Routes>
           <Route 
             path="/" 
@@ -37,7 +55,9 @@ const App = () => (
             path="/calendario" 
             element={
               <ProtectedRoute>
-                <Calendario />
+                <Suspense fallback={<PageSkeleton />}>
+                  <Calendario />
+                </Suspense>
               </ProtectedRoute>
             } 
           />
@@ -45,7 +65,9 @@ const App = () => (
             path="/formaggi" 
             element={
               <ProtectedRoute>
-                <Formaggi />
+                <Suspense fallback={<PageSkeleton />}>
+                  <Formaggi />
+                </Suspense>
               </ProtectedRoute>
             } 
           />
@@ -53,7 +75,9 @@ const App = () => (
             path="/produzioni" 
             element={
               <ProtectedRoute>
-                <Produzioni />
+                <Suspense fallback={<PageSkeleton />}>
+                  <Produzioni />
+                </Suspense>
               </ProtectedRoute>
             } 
           />
@@ -61,12 +85,21 @@ const App = () => (
             path="/statistiche" 
             element={
               <ProtectedRoute>
-                <Statistiche />
+                <Suspense fallback={<PageSkeleton />}>
+                  <Statistiche />
+                </Suspense>
               </ProtectedRoute>
             } 
           />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+          <Route 
+            path="*" 
+            element={
+              <Suspense fallback={<PageSkeleton />}>
+                <NotFound />
+              </Suspense>
+            } 
+          />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

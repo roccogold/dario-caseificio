@@ -98,7 +98,7 @@ if (finalIsRealProduction) {
     3. Redeploy l'applicazione`;
     
     console.error('[useData]', errorMsg);
-    alert(errorMsg); // Mostra alert anche all'utente
+    toast.error(errorMsg);
     throw new Error('Supabase deve essere configurato in produzione');
   }
   

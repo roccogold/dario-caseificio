@@ -43,6 +43,7 @@ export function ActivityCard({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -10 }}
+      transition={{ duration: 0.2 }}
       className={cn(
         "group relative flex items-start gap-4 rounded-xl p-4 transition-all duration-300",
         isCompleted
@@ -146,10 +147,13 @@ export function ActivityCard({
           <span className={cn(
             "inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-md transition-colors duration-300",
             isCompleted 
-              ? "bg-success/10 text-success" 
+              ? "bg-success/10 text-success border border-success/20" 
               : "bg-muted text-muted-foreground"
           )}>
-            <TypeIcon className="h-3 w-3" />
+            <TypeIcon className={cn(
+              "h-3 w-3",
+              isCompleted && "text-success"
+            )} />
             {activity.type === "protocol" && "Protocollo"}
             {activity.type === "recurring" && activity.recurrence && (
               activity.recurrence === "daily" ? "Giornaliero" :
@@ -162,8 +166,9 @@ export function ActivityCard({
             {activity.type === "one-time" && "Nessuna ricorrenza"}
           </span>
           {isCompleted && (
-            <span className="text-xs text-success font-medium">
-              ✓ Completato
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-success">
+              <Check className="h-3 w-3" />
+              Completato
             </span>
           )}
         </div>
