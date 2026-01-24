@@ -189,11 +189,25 @@ export function typeCheeseToDb(cheese: Omit<CheeseType, "id" | "createdAt"> & { 
     ? cheese.customFields
     : (cheese.customFields !== undefined ? [] : null);
 
+  // Assicurati che il protocollo sia sempre un array, anche se undefined
+  const protocol = Array.isArray(cheese.protocol) ? cheese.protocol : [];
+  
+  // Debug logging (only in development)
+  if (import.meta.env.DEV && cheese.protocol !== undefined) {
+    console.log('[typeCheeseToDb] Protocol conversion:', {
+      input: cheese.protocol,
+      inputType: typeof cheese.protocol,
+      isArray: Array.isArray(cheese.protocol),
+      output: protocol,
+      length: protocol.length
+    });
+  }
+  
   return {
     ...(cheese.id && { id: cheese.id }), // Includi l'ID se fornito (per insert con UUID pre-generato)
     name: cheese.name,
     color: cheese.color,
-    protocol: cheese.protocol || [],
+    protocol: protocol, // Usa sempre un array, anche se vuoto
     yield_percentage: yieldPercentage,
     prices: prices,
     default_fields: defaultFields,

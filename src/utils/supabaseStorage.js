@@ -82,13 +82,19 @@ export async function saveCheese(cheese) {
     // Debug logging (only in development)
     if (import.meta.env.DEV) {
       console.log('[saveCheese] Input cheese:', {
+        id: cheese.id,
         name: cheese.name,
+        protocol: cheese.protocol,
+        protocolLength: cheese.protocol?.length,
         hasDefaultFields: !!cheese.defaultFields,
         defaultFieldsKeys: cheese.defaultFields ? Object.keys(cheese.defaultFields) : [],
         defaultFields: cheese.defaultFields
       })
       console.log('[saveCheese] Converted dbData:', {
+        id: dbData.id,
         name: dbData.name,
+        protocol: dbData.protocol,
+        protocolLength: dbData.protocol?.length,
         default_fields: dbData.default_fields
       })
     }

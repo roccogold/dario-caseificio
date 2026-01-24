@@ -194,6 +194,16 @@ export function EditCheeseDialog({
     
     const sortedProtocol = [...validProtocol].sort((a, b) => a.day - b.day);
     
+    // Debug: log del protocollo prima del salvataggio
+    if (import.meta.env.DEV) {
+      console.log('[EditCheeseDialog] Protocol before save:', {
+        original: protocol,
+        valid: validProtocol,
+        sorted: sortedProtocol,
+        cheeseId: cheese.id
+      });
+    }
+    
     // Build defaultFields object, only including non-empty values
     const defaultFieldsObj: Record<string, string> = {};
     if (temperaturaCoagulazione.trim()) defaultFieldsObj.temperaturaCoagulazione = temperaturaCoagulazione.trim();
@@ -204,7 +214,7 @@ export function EditCheeseDialog({
     if (caglio.trim()) defaultFieldsObj.caglio = caglio.trim();
     if (quantitaCaglio.trim()) defaultFieldsObj.quantitaCaglio = quantitaCaglio.trim();
 
-    onUpdate(cheese.id, {
+    const updateData = {
       name: name.trim(),
       color,
       ...(yieldValue !== undefined && { yieldPercentage: yieldValue }),
@@ -222,7 +232,18 @@ export function EditCheeseDialog({
       // Always include customFields array (empty if no values)
       customFields: customFields.filter(f => f.key.trim() || f.value.trim()),
       protocol: sortedProtocol,
-    });
+    };
+    
+    // Debug: log dei dati che vengono passati a onUpdate
+    if (import.meta.env.DEV) {
+      console.log('[EditCheeseDialog] Calling onUpdate with:', {
+        id: cheese.id,
+        updateData,
+        protocolInUpdate: updateData.protocol
+      });
+    }
+
+    onUpdate(cheese.id, updateData);
 
     toast.success(`${name} aggiornato con successo!`);
     onOpenChange(false);

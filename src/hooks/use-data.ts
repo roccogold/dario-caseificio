@@ -501,13 +501,35 @@ export function useData() {
         }
       }
 
+      // Debug: log degli updates prima del salvataggio
+      logger.log('[updateCheeseType] Updates received:', {
+        id,
+        hasProtocol: updates.protocol !== undefined,
+        protocol: updates.protocol,
+        protocolLength: updates.protocol?.length,
+        allUpdates: updates
+      });
+      
       // Aggiorna il formaggio
       if (useSupabase) {
-        const updated = await saveCheese({ ...current, ...updates, id });
+        const cheeseToSave = { ...current, ...updates, id };
+        logger.log('[updateCheeseType] Cheese to save:', {
+          id: cheeseToSave.id,
+          name: cheeseToSave.name,
+          protocol: cheeseToSave.protocol,
+          protocolLength: cheeseToSave.protocol?.length
+        });
+        
+        const updated = await saveCheese(cheeseToSave);
+        logger.log('[updateCheeseType] ✅ Cheese updated successfully:', {
+          id: updated.id,
+          name: updated.name,
+          protocol: updated.protocol,
+          protocolLength: updated.protocol?.length
+        });
         setCheeseTypes((prev) =>
           prev.map((c) => (c.id === id ? updated : c))
         );
-        logger.log('[updateCheeseType] ✅ Cheese updated successfully:', id);
       } else {
         localCheeses.update(id, updates);
         setCheeseTypes((prev) =>
