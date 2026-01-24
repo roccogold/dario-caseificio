@@ -63,7 +63,7 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
           >
-            <Check className="h-1.5 w-1.5" strokeWidth={3} />
+            <Check className="h-2 w-2" strokeWidth={3} />
           </motion.div>
         )}
       </button>
