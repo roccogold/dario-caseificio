@@ -112,14 +112,23 @@ The application will be available at `http://localhost:8080`
 
 ### Environment Variables
 
-Create a `.env.local` file in the root directory:
+Create a `.env.local` file in the root directory (this file is gitignored):
 
 ```env
+# Supabase Configuration (Required for production)
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Development Default User (Optional, only for local development)
+# In production, use Supabase Auth instead
+VITE_DEFAULT_USERNAME=admin@example.com
+VITE_DEFAULT_PASSWORD=changeme
 ```
 
-**⚠️ Important**: Never commit `.env.local` or any file containing credentials to version control.
+**⚠️ Security**: 
+- Never commit `.env.local` or any file containing credentials to version control
+- All sensitive values are stored in environment variables
+- The `.gitignore` file is configured to exclude all `.env*` files
 
 ### Build for Production
 
