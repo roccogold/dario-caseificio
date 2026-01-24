@@ -39,24 +39,48 @@ import { generateUUID } from "@/lib/utils";
 
 // Determina se usare Supabase o localStorage
 const isProduction = import.meta.env.PROD;
-// Check if we're on Lovable (treat as dev environment)
-const isLovableEnvironment = typeof window !== 'undefined' && (
-  window.location.hostname.includes('lovable.app') ||
-  window.location.hostname.includes('lovable.dev')
-);
-// Check if we're on a preview environment (Vercel Preview, etc.)
-const isPreviewEnvironment = typeof window !== 'undefined' && (
-  window.location.hostname.includes('vercel.app') ||
-  window.location.hostname.includes('preview')
-);
+
+// Helper function to check environment at runtime
+function checkEnvironment() {
+  if (typeof window === 'undefined') return { isLovable: false, isPreview: false };
+  
+  const hostname = window.location.hostname || '';
+  const isLovable = hostname.includes('lovable.app') || hostname.includes('lovable.dev');
+  const isPreview = hostname.includes('vercel.app') || hostname.includes('preview');
+  
+  return { isLovable, isPreview };
+}
+
+// Check environment (will be re-checked in components if needed)
+const envCheck = checkEnvironment();
+const isLovableEnvironment = envCheck.isLovable;
+const isPreviewEnvironment = envCheck.isPreview;
+
 // Real production = production build AND not Lovable AND not preview
 const isRealProduction = isProduction && !isLovableEnvironment && !isPreviewEnvironment;
 const hasSupabaseUrl = !!import.meta.env.VITE_SUPABASE_URL;
 const hasSupabaseKey = !!import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabaseInitialized = !!supabase;
 
+// Debug logging
+if (typeof window !== 'undefined') {
+  console.log('[useData] Environment check:', {
+    hostname: window.location.hostname,
+    isProduction,
+    isLovableEnvironment,
+    isPreviewEnvironment,
+    isRealProduction
+  });
+}
+
 // In produzione reale (non preview, non Lovable), Supabase è OBBLIGATORIO
-if (isRealProduction) {
+// BUT: Don't show alert/throw if we're on Lovable (check again to be sure)
+const finalEnvCheck = checkEnvironment();
+const finalIsLovable = finalEnvCheck.isLovable;
+const finalIsPreview = finalEnvCheck.isPreview;
+const finalIsRealProduction = isProduction && !finalIsLovable && !finalIsPreview;
+
+if (finalIsRealProduction) {
   console.log('[useData] 🔍 Production mode check:');
   console.log('[useData]   - VITE_SUPABASE_URL:', hasSupabaseUrl ? '✅ Present' : '❌ MISSING');
   console.log('[useData]   - VITE_SUPABASE_ANON_KEY:', hasSupabaseKey ? '✅ Present' : '❌ MISSING');
@@ -79,7 +103,7 @@ if (isRealProduction) {
   }
   
   console.log('[useData] ✅ Production mode: Supabase configurato correttamente');
-} else if (isLovableEnvironment) {
+} else if (finalIsLovable) {
   // Lovable environment: treat as development (use localStorage)
   console.log('[useData] 🎨 Lovable environment detected. Using development mode (localStorage).');
   if (!hasSupabaseUrl || !hasSupabaseKey || !supabaseInitialized) {
@@ -127,8 +151,19 @@ export function useData() {
     const loadData = async () => {
       setIsLoading(true);
       
+      // Re-check environment at runtime (in case window wasn't available at module load)
+      const runtimeEnv = checkEnvironment();
+      const runtimeIsLovable = runtimeEnv.isLovable;
+      const runtimeIsPreview = runtimeEnv.isPreview;
+      const runtimeIsRealProduction = isProduction && !runtimeIsLovable && !runtimeIsPreview;
+      
+      // Skip error if we're on Lovable (treat as dev)
+      if (runtimeIsLovable) {
+        console.log('[useData] 🎨 Lovable detected at runtime. Using localStorage (no Supabase required).');
+      }
+      
       // In produzione reale, FORZA il caricamento da Supabase
-      if (isRealProduction && !useSupabase) {
+      if (runtimeIsRealProduction && !useSupabase) {
         const errorMsg = '❌ ERRORE CRITICO: Supabase non configurato in produzione! Impossibile caricare i dati.';
         console.error('[useData]', errorMsg);
         toast.error(errorMsg);
