@@ -44,7 +44,7 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
       exit={{ opacity: 0, x: -10 }}
       transition={{ duration: 0.15, ease: "easeOut" }}
       className={cn(
-        "group relative flex items-center gap-3 rounded-lg border border-border bg-card transition-all duration-200 hover:border-primary/20 hover:shadow-sm min-h-[44px]"
+        "group relative flex items-center gap-3 rounded-lg border border-border bg-card transition-all duration-200 hover:border-primary/20 hover:shadow-sm h-[44px]"
       )}
     >
       {/* Checkbox */}
@@ -69,8 +69,8 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
       </button>
 
       {/* Content */}
-      <div className="flex-1 min-w-0 flex items-center gap-3 py-2.5 pr-3">
-        <div className="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
+      <div className="flex-1 min-w-0 flex items-center gap-3 pr-3 h-full">
+        <div className="flex-1 min-w-0 flex items-center gap-2">
           {/* Cheese badge for protocol activities - same as production section */}
           {activity.type === "protocol" && cheeseTypeName && cheeseColor && (
             <CheeseBadge
