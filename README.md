@@ -242,7 +242,14 @@ All SQL scripts are located in [`database/scripts/`](./database/scripts/).
 
 ## 📄 License
 
-This project is private and proprietary software built for Corzano e Paterno.
+Copyright (c) 2026 Corzano e Paterno - All Rights Reserved
+
+This project is proprietary software built for Corzano e Paterno. 
+
+**No permission is granted** to use, copy, modify, or distribute this software 
+without express written permission from Corzano e Paterno.
+
+See [LICENSE](./LICENSE) for full terms.
 
 ## 👨‍💻 Built By
 
