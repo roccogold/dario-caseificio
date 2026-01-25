@@ -336,24 +336,26 @@ export default function Statistiche() {
               <button
                 onClick={() => setViewType("annual")}
                 className={cn(
-                  "relative z-10 flex-1 px-5 text-sm font-serif font-medium transition-colors duration-200 rounded-full h-full flex items-center justify-center",
+                  "relative z-10 flex-1 text-sm font-serif font-medium transition-colors duration-200 rounded-full h-full flex items-center justify-center px-4",
+                  "leading-tight tracking-normal",
                   viewType === "annual"
                     ? "text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                Annuale
+                <span className="block">Annuale</span>
               </button>
               <button
                 onClick={() => setViewType("monthly")}
                 className={cn(
-                  "relative z-10 flex-1 px-5 text-sm font-serif font-medium transition-colors duration-200 rounded-full h-full flex items-center justify-center",
+                  "relative z-10 flex-1 text-sm font-serif font-medium transition-colors duration-200 rounded-full h-full flex items-center justify-center px-4",
+                  "leading-tight tracking-normal",
                   viewType === "monthly"
                     ? "text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                Mensile
+                <span className="block">Mensile</span>
               </button>
             </div>
           </div>
