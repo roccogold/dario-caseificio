@@ -318,14 +318,14 @@ export default function Statistiche() {
             </Select>
 
             {/* Monthly/Annual Toggle - Clean segmented control style */}
-            <div className="flex rounded-xl bg-muted/50 p-1 h-9">
+            <div className="flex rounded-2xl bg-muted/50 p-1.5 h-10">
               <button
                 onClick={() => setViewType("annual")}
                 className={cn(
-                  "flex-1 px-4 text-sm font-serif transition-all duration-200 h-full flex items-center justify-center rounded-lg",
+                  "flex-1 px-5 py-1.5 text-sm font-serif font-medium transition-all duration-200 flex items-center justify-center rounded-xl",
                   viewType === "annual"
                     ? "bg-[#8B5A3C] text-[#F5E6D3] shadow-sm"
-                    : "bg-transparent text-muted-foreground hover:text-foreground"
+                    : "bg-transparent text-[#8B5A3C] hover:text-[#6B4430]"
                 )}
               >
                 Annuale
@@ -333,10 +333,10 @@ export default function Statistiche() {
               <button
                 onClick={() => setViewType("monthly")}
                 className={cn(
-                  "flex-1 px-4 text-sm font-serif transition-all duration-200 h-full flex items-center justify-center rounded-lg",
+                  "flex-1 px-5 py-1.5 text-sm font-serif font-medium transition-all duration-200 flex items-center justify-center rounded-xl",
                   viewType === "monthly"
                     ? "bg-[#8B5A3C] text-[#F5E6D3] shadow-sm"
-                    : "bg-transparent text-muted-foreground hover:text-foreground"
+                    : "bg-transparent text-[#8B5A3C] hover:text-[#6B4430]"
                 )}
               >
                 Mensile
