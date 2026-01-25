@@ -138,7 +138,7 @@ function Login() {
                 className="text-2xl tracking-widest uppercase"
                 style={{ 
                   color: '#8B7355',
-                  fontFamily: "'Playfair Display', 'EB Garamond', Georgia, serif",
+                  fontFamily: "'Alegreya', 'EB Garamond', Georgia, serif",
                   fontWeight: 700,
                   letterSpacing: '0.1em'
                 }}
@@ -146,8 +146,13 @@ function Login() {
                 DARIO
               </span>
               <span 
-                className="text-xs tracking-wide font-serif"
-                style={{ color: '#A68B6F' }}
+                className="text-xs tracking-wide"
+                style={{ 
+                  color: '#8B2E3D',
+                  fontFamily: "'Lora', 'EB Garamond', Georgia, serif",
+                  fontStyle: 'italic',
+                  fontWeight: 400
+                }}
               >
                 Corzano e Paterno
               </span>

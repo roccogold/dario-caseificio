@@ -27,6 +27,7 @@ import {
   Factory,
   CheckCircle2,
   Circle,
+  ClipboardList,
 } from "lucide-react";
 import { useData } from "@/hooks/use-data";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -623,7 +624,7 @@ export default function Calendario() {
                 size="sm"
                 onClick={() => setIsActivityDialogOpen(true)}
               >
-                <Plus className="mr-2 h-4 w-4" />
+                <ClipboardList className="mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">Aggiungi Attività</span>
                 <span className="sm:hidden">Attività</span>
               </Button>

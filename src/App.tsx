@@ -14,6 +14,8 @@ const Calendario = lazy(() => import("./pages/Calendario"));
 const Formaggi = lazy(() => import("./pages/Formaggi"));
 const Produzioni = lazy(() => import("./pages/Produzioni"));
 const Statistiche = lazy(() => import("./pages/Statistiche"));
+const LogoPreview = lazy(() => import("./pages/LogoPreview"));
+const SubtitlePreview = lazy(() => import("./pages/SubtitlePreview"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Loading fallback component with improved design
@@ -102,6 +104,26 @@ const App = () => (
               <ProtectedRoute>
                 <Suspense fallback={<PageSkeleton />}>
                 <Statistiche />
+                </Suspense>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/logo-preview" 
+            element={
+              <ProtectedRoute>
+                <Suspense fallback={<PageSkeleton />}>
+                <LogoPreview />
+                </Suspense>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/subtitle-preview" 
+            element={
+              <ProtectedRoute>
+                <Suspense fallback={<PageSkeleton />}>
+                <SubtitlePreview />
                 </Suspense>
               </ProtectedRoute>
             } 

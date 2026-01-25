@@ -74,7 +74,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                   className="text-2xl tracking-widest uppercase"
                   style={{ 
                     color: '#8B7355',
-                    fontFamily: "'Playfair Display', 'EB Garamond', Georgia, serif",
+                    fontFamily: "'Alegreya', 'EB Garamond', Georgia, serif",
                     fontWeight: 700,
                     letterSpacing: '0.1em'
                   }}
@@ -82,8 +82,13 @@ export function AppLayout({ children }: AppLayoutProps) {
                   DARIO
                 </span>
                 <span 
-                  className="text-xs tracking-wide font-serif"
-                  style={{ color: '#A68B6F' }}
+                  className="text-xs tracking-wide"
+                  style={{ 
+                    color: '#8B2E3D',
+                    fontFamily: "'Lora', 'EB Garamond', Georgia, serif",
+                    fontStyle: 'italic',
+                    fontWeight: 400
+                  }}
                 >
                   Corzano e Paterno
                 </span>
@@ -144,7 +149,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               className="text-lg tracking-widest uppercase"
               style={{ 
                 color: '#8B7355',
-                fontFamily: "'TC Galliard Bold', 'Garamond Premier Semibold Caption', 'Garamond Premier Semibold', 'Laurentian Semi Bold', 'EB Garamond', Georgia, serif",
+                fontFamily: "'Alegreya', 'EB Garamond', Georgia, serif",
                 fontWeight: 700,
                 letterSpacing: '0.1em'
               }}
