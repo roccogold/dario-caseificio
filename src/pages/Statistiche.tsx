@@ -323,14 +323,23 @@ export default function Statistiche() {
                 type="button"
                 onClick={() => setViewType("annual")}
                 className={cn(
-                  "px-5 h-9 text-sm font-serif font-medium transition-all duration-200",
-                  "flex items-center justify-center leading-none",
-                  "min-w-0",
+                  "px-5 text-sm font-serif font-medium transition-all duration-200",
+                  "flex items-center justify-center",
+                  "min-w-0 flex-1",
                   viewType === "annual"
                     ? "bg-[#8C7A6B] text-white"
                     : "bg-transparent text-[#8C7A6B]"
                 )}
-                style={{ lineHeight: '1' }}
+                style={{ 
+                  height: '36px',
+                  minHeight: '36px',
+                  lineHeight: '1',
+                  paddingTop: '0',
+                  paddingBottom: '0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
               >
                 Annuale
               </button>
@@ -338,14 +347,23 @@ export default function Statistiche() {
                 type="button"
                 onClick={() => setViewType("monthly")}
                 className={cn(
-                  "px-5 h-9 text-sm font-serif font-medium transition-all duration-200",
-                  "flex items-center justify-center leading-none",
-                  "min-w-0",
+                  "px-5 text-sm font-serif font-medium transition-all duration-200",
+                  "flex items-center justify-center",
+                  "min-w-0 flex-1",
                   viewType === "monthly"
                     ? "bg-[#8C7A6B] text-white"
                     : "bg-transparent text-[#8C7A6B]"
                 )}
-                style={{ lineHeight: '1' }}
+                style={{ 
+                  height: '36px',
+                  minHeight: '36px',
+                  lineHeight: '1',
+                  paddingTop: '0',
+                  paddingBottom: '0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
               >
                 Mensile
               </button>
