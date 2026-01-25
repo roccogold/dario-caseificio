@@ -271,7 +271,7 @@ export default function Statistiche() {
           {/* Filters - Compact and consistent with other pages */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             {/* Year Selector */}
-            <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-0.5">
+            <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-0.5 h-9">
               <Button
                 variant="ghost"
                 size="icon"
@@ -318,11 +318,11 @@ export default function Statistiche() {
             </Select>
 
             {/* Monthly/Annual Toggle - Clean segmented control style */}
-            <div className="flex rounded-2xl bg-background border border-border shadow-sm overflow-hidden">
+            <div className="flex rounded-2xl bg-background border border-border shadow-sm overflow-hidden h-9">
               <button
                 onClick={() => setViewType("annual")}
                 className={cn(
-                  "flex-1 px-4 py-2 text-sm font-serif transition-all rounded-2xl",
+                  "flex-1 px-4 text-sm font-serif transition-all rounded-2xl h-full flex items-center justify-center",
                   viewType === "annual"
                     ? "bg-[#8B5A3C] text-[#F5E6D3]"
                     : "bg-background text-muted-foreground hover:text-foreground"
@@ -333,7 +333,7 @@ export default function Statistiche() {
               <button
                 onClick={() => setViewType("monthly")}
                 className={cn(
-                  "flex-1 px-4 py-2 text-sm font-serif transition-all rounded-2xl",
+                  "flex-1 px-4 text-sm font-serif transition-all rounded-2xl h-full flex items-center justify-center",
                   viewType === "monthly"
                     ? "bg-[#8B5A3C] text-[#F5E6D3]"
                     : "bg-background text-muted-foreground hover:text-foreground"
