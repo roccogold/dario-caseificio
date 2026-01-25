@@ -271,7 +271,7 @@ export default function Statistiche() {
           {/* Filters - Compact and consistent with other pages */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             {/* Year Selector */}
-            <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-0.5 h-9">
+            <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-0.5 h-[38px]">
               <Button
                 variant="ghost"
                 size="icon"
@@ -301,7 +301,7 @@ export default function Statistiche() {
                 setSelectedCheeseId(value === "all" ? null : value)
               }
             >
-              <SelectTrigger className="w-[160px] sm:w-[180px] h-9 text-sm">
+              <SelectTrigger className="w-[160px] sm:w-[180px] h-[38px] text-sm">
                 <div className="flex items-center gap-1.5">
                   <Milk className="h-3.5 w-3.5 text-muted-foreground" />
                   <SelectValue placeholder="Tutti i formaggi" />
@@ -318,7 +318,7 @@ export default function Statistiche() {
             </Select>
 
             {/* Monthly/Annual Toggle - Clean segmented control style */}
-            <div className="flex rounded-2xl bg-background border border-border shadow-sm overflow-hidden h-9">
+            <div className="flex rounded-2xl bg-background border border-border shadow-sm overflow-hidden h-[38px]">
               <button
                 onClick={() => setViewType("annual")}
                 className={cn(
