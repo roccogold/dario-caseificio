@@ -317,24 +317,30 @@ export default function Statistiche() {
               </SelectContent>
             </Select>
 
-            {/* Monthly/Annual Toggle - Consistent with Calendar view selector */}
-            <div className="flex gap-1 rounded-lg border border-border bg-muted/30 p-1">
-              <Button
-                variant={viewType === "annual" ? "default" : "ghost"}
-                size="sm"
+            {/* Monthly/Annual Toggle - Clean segmented control style */}
+            <div className="flex rounded-lg bg-background border border-border shadow-sm overflow-hidden">
+              <button
                 onClick={() => setViewType("annual")}
-                className="flex-1 text-xs sm:text-sm font-serif"
+                className={cn(
+                  "flex-1 px-4 py-2 text-sm font-serif transition-all",
+                  viewType === "annual"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-background text-muted-foreground hover:text-foreground"
+                )}
               >
                 Annuale
-              </Button>
-              <Button
-                variant={viewType === "monthly" ? "default" : "ghost"}
-                size="sm"
+              </button>
+              <button
                 onClick={() => setViewType("monthly")}
-                className="flex-1 text-xs sm:text-sm font-serif"
+                className={cn(
+                  "flex-1 px-4 py-2 text-sm font-serif transition-all",
+                  viewType === "monthly"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-background text-muted-foreground hover:text-foreground"
+                )}
               >
                 Mensile
-              </Button>
+              </button>
             </div>
           </div>
         </motion.div>
