@@ -317,24 +317,37 @@ export default function Statistiche() {
               </SelectContent>
             </Select>
 
-            {/* Monthly/Annual Toggle - Consistent with Calendar view selector */}
-            <div className="flex gap-1 rounded-lg border border-border bg-muted/30 p-1">
-              <Button
-                variant={viewType === "annual" ? "default" : "ghost"}
-                size="sm"
+            {/* Monthly/Annual Toggle - Elegant artisan style */}
+            <div className="relative flex rounded-full border border-border/50 bg-card p-1 shadow-sm">
+              {/* Sliding indicator */}
+              <div
+                className={cn(
+                  "absolute top-1 bottom-1 rounded-full bg-primary transition-all duration-300 ease-out",
+                  viewType === "annual" ? "left-1 w-[calc(50%-2px)]" : "left-[calc(50%+1px)] w-[calc(50%-2px)]"
+                )}
+              />
+              <button
                 onClick={() => setViewType("annual")}
-                className="flex-1 text-xs sm:text-sm font-serif"
+                className={cn(
+                  "relative z-10 px-4 py-1.5 text-xs sm:text-sm font-serif font-medium rounded-full transition-colors duration-300",
+                  viewType === "annual"
+                    ? "text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
               >
                 Annuale
-              </Button>
-              <Button
-                variant={viewType === "monthly" ? "default" : "ghost"}
-                size="sm"
+              </button>
+              <button
                 onClick={() => setViewType("monthly")}
-                className="flex-1 text-xs sm:text-sm font-serif"
+                className={cn(
+                  "relative z-10 px-4 py-1.5 text-xs sm:text-sm font-serif font-medium rounded-full transition-colors duration-300",
+                  viewType === "monthly"
+                    ? "text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
               >
                 Mensile
-              </Button>
+              </button>
             </div>
           </div>
         </motion.div>
