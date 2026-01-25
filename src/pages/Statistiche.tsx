@@ -271,22 +271,22 @@ export default function Statistiche() {
           {/* Filters - Compact and consistent with other pages */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             {/* Year Selector */}
-            <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-0.5 h-9">
+            <div className="flex items-center gap-1 rounded-lg border border-border bg-background h-9 px-1">
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8"
+                className="h-7 w-7"
                 onClick={() => setSelectedYear((y) => y - 1)}
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
               </Button>
-              <span className="min-w-[3.5rem] text-center text-sm font-serif font-semibold px-2">
+              <span className="min-w-[3.5rem] text-center text-sm font-serif font-semibold">
                 {selectedYear}
               </span>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8"
+                className="h-7 w-7"
                 onClick={() => setSelectedYear((y) => y + 1)}
                 disabled={selectedYear >= new Date().getFullYear()}
               >
@@ -301,7 +301,7 @@ export default function Statistiche() {
                 setSelectedCheeseId(value === "all" ? null : value)
               }
             >
-              <SelectTrigger className="w-[160px] sm:w-[180px] h-9 text-sm">
+              <SelectTrigger className="w-[160px] sm:w-[180px] h-9 text-sm rounded-lg">
                 <div className="flex items-center gap-1.5">
                   <Milk className="h-3.5 w-3.5 text-muted-foreground" />
                   <SelectValue placeholder="Tutti i formaggi" />
@@ -318,11 +318,11 @@ export default function Statistiche() {
             </Select>
 
             {/* Monthly/Annual Toggle - Clean segmented control style */}
-            <div className="flex rounded-2xl bg-background border border-border shadow-sm overflow-hidden h-9">
+            <div className="flex rounded-lg bg-background border border-border overflow-hidden h-9">
               <button
                 onClick={() => setViewType("annual")}
                 className={cn(
-                  "flex-1 px-4 text-sm font-serif transition-all rounded-2xl h-full flex items-center justify-center",
+                  "flex-1 px-4 text-sm font-serif transition-all h-full flex items-center justify-center",
                   viewType === "annual"
                     ? "bg-[#8B5A3C] text-[#F5E6D3]"
                     : "bg-background text-muted-foreground hover:text-foreground"
@@ -333,7 +333,7 @@ export default function Statistiche() {
               <button
                 onClick={() => setViewType("monthly")}
                 className={cn(
-                  "flex-1 px-4 text-sm font-serif transition-all rounded-2xl h-full flex items-center justify-center",
+                  "flex-1 px-4 text-sm font-serif transition-all h-full flex items-center justify-center",
                   viewType === "monthly"
                     ? "bg-[#8B5A3C] text-[#F5E6D3]"
                     : "bg-background text-muted-foreground hover:text-foreground"
