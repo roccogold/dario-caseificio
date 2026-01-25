@@ -317,46 +317,30 @@ export default function Statistiche() {
               </SelectContent>
             </Select>
 
-            {/* Monthly/Annual Toggle - Recreated from scratch */}
-            <div className="relative inline-flex rounded-full bg-muted/60 p-1 h-9 border border-border/50">
-              {/* Sliding indicator */}
-              <motion.div
-                className="absolute top-1 bottom-1 rounded-full bg-primary shadow-sm"
-                initial={false}
-                animate={{
-                  left: viewType === "annual" ? "4px" : "50%",
-                  width: viewType === "annual" ? "calc(50% - 4px)" : "calc(50% - 4px)",
-                }}
-                transition={{
-                  type: "spring",
-                  stiffness: 500,
-                  damping: 30,
-                }}
-              />
+            {/* Monthly/Annual Toggle - Simple and clean */}
+            <div className="inline-flex rounded-lg bg-muted/40 border border-border/60 h-9 overflow-hidden">
               <button
+                type="button"
                 onClick={() => setViewType("annual")}
                 className={cn(
-                  "relative z-10 flex-1 text-sm font-serif font-medium transition-colors duration-200 rounded-full",
-                  "h-full w-full flex items-center justify-center",
-                  "px-4 py-0 m-0",
-                  "leading-none",
+                  "px-5 h-9 text-sm font-serif font-medium transition-all duration-200",
+                  "flex items-center justify-center",
                   viewType === "annual"
-                    ? "text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-[#8C735C] text-white"
+                    : "bg-transparent text-muted-foreground"
                 )}
               >
                 Annuale
               </button>
               <button
+                type="button"
                 onClick={() => setViewType("monthly")}
                 className={cn(
-                  "relative z-10 flex-1 text-sm font-serif font-medium transition-colors duration-200 rounded-full",
-                  "h-full w-full flex items-center justify-center",
-                  "px-4 py-0 m-0",
-                  "leading-none",
+                  "px-5 h-9 text-sm font-serif font-medium transition-all duration-200",
+                  "flex items-center justify-center",
                   viewType === "monthly"
-                    ? "text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-[#8C735C] text-white"
+                    : "bg-transparent text-muted-foreground"
                 )}
               >
                 Mensile
