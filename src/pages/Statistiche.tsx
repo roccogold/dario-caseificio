@@ -318,17 +318,19 @@ export default function Statistiche() {
             </Select>
 
             {/* Monthly/Annual Toggle - Simple and clean */}
-            <div className="inline-flex rounded-lg bg-muted/40 border border-border/60 h-9 overflow-hidden">
+            <div className="inline-flex rounded-xl bg-[#F5F2ED] border border-border/60 h-9 overflow-hidden">
               <button
                 type="button"
                 onClick={() => setViewType("annual")}
                 className={cn(
                   "px-5 h-9 text-sm font-serif font-medium transition-all duration-200",
-                  "flex items-center justify-center",
+                  "flex items-center justify-center leading-none",
+                  "min-w-0",
                   viewType === "annual"
-                    ? "bg-[#8C735C] text-white"
-                    : "bg-transparent text-muted-foreground"
+                    ? "bg-[#8C7A6B] text-white"
+                    : "bg-transparent text-[#8C7A6B]"
                 )}
+                style={{ lineHeight: '1' }}
               >
                 Annuale
               </button>
@@ -337,11 +339,13 @@ export default function Statistiche() {
                 onClick={() => setViewType("monthly")}
                 className={cn(
                   "px-5 h-9 text-sm font-serif font-medium transition-all duration-200",
-                  "flex items-center justify-center",
+                  "flex items-center justify-center leading-none",
+                  "min-w-0",
                   viewType === "monthly"
-                    ? "bg-[#8C735C] text-white"
-                    : "bg-transparent text-muted-foreground"
+                    ? "bg-[#8C7A6B] text-white"
+                    : "bg-transparent text-[#8C7A6B]"
                 )}
+                style={{ lineHeight: '1' }}
               >
                 Mensile
               </button>
