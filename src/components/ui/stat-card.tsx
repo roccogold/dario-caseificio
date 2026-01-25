@@ -58,14 +58,14 @@ export function StatCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: delay / 1000 }}
       className={cn(
-        "group relative overflow-hidden rounded-xl border border-border bg-card p-6 shadow-card transition-all duration-300 hover:shadow-card-hover",
+        "group relative overflow-hidden rounded-xl border border-border bg-card p-4 sm:p-6 shadow-card transition-all duration-300 hover:shadow-card-hover",
         className
       )}
     >
       <div className="flex items-start justify-between">
-        <div className="space-y-2">
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <p className="font-serif text-3xl font-semibold tracking-tight text-card-foreground">
+        <div className="space-y-1.5 sm:space-y-2 flex-1 min-w-0">
+          <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">{title}</p>
+          <p className="font-serif text-2xl sm:text-3xl font-semibold tracking-tight text-card-foreground">
             {prefix}
             {displayValue.toLocaleString("it-IT")}
             {suffix}
@@ -86,7 +86,7 @@ export function StatCard({
           )}
         </div>
         {icon && (
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted/50 text-muted-foreground transition-colors group-hover:bg-primary/10 group-hover:text-primary">
+          <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-muted/50 text-muted-foreground transition-colors group-hover:bg-primary/10 group-hover:text-primary flex-shrink-0 ml-2">
             {icon}
           </div>
         )}

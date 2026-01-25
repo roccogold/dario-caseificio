@@ -258,36 +258,36 @@ export default function Statistiche() {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+          className="space-y-4"
         >
           <div>
-            <h1 className="font-serif text-3xl font-semibold text-foreground">
+            <h1 className="font-serif text-2xl sm:text-3xl font-semibold text-foreground">
               Statistiche
             </h1>
-            <p className="mt-1 text-muted-foreground">
+            <p className="mt-1 text-sm sm:text-base text-muted-foreground">
               Analisi della produzione
             </p>
           </div>
 
-          {/* Filters */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          {/* Filters - Mobile optimized */}
+          <div className="space-y-3">
             {/* Year Selector */}
-            <div className="flex items-center gap-2 rounded-lg border border-border bg-card p-1">
+            <div className="flex items-center justify-center sm:justify-start gap-2 rounded-lg border border-border bg-card p-1 w-full sm:w-auto">
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-10 w-10"
+                className="h-10 w-10 sm:h-10 sm:w-10"
                 onClick={() => setSelectedYear((y) => y - 1)}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="min-w-[4rem] text-center font-serif font-semibold">
+              <span className="min-w-[4rem] text-center font-serif font-semibold text-base sm:text-base">
                 {selectedYear}
               </span>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-10 w-10"
+                className="h-10 w-10 sm:h-10 sm:w-10"
                 onClick={() => setSelectedYear((y) => y + 1)}
                 disabled={selectedYear >= new Date().getFullYear()}
               >
@@ -295,79 +295,82 @@ export default function Statistiche() {
               </Button>
             </div>
 
-            {/* Cheese Filter */}
-            <Select
-              value={selectedCheeseId || "all"}
-              onValueChange={(value) =>
-                setSelectedCheeseId(value === "all" ? null : value)
-              }
-            >
-              <SelectTrigger className="w-[180px]">
-                <div className="flex items-center gap-2">
-                  <Milk className="h-4 w-4 text-muted-foreground" />
-                  <SelectValue placeholder="Tutti i formaggi" />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tutti i formaggi</SelectItem>
-                {cheeseTypes.map((cheese) => (
-                  <SelectItem key={cheese.id} value={cheese.id}>
-                    {cheese.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {/* Cheese Filter and Toggle - Side by side on mobile */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              {/* Cheese Filter */}
+              <Select
+                value={selectedCheeseId || "all"}
+                onValueChange={(value) =>
+                  setSelectedCheeseId(value === "all" ? null : value)
+                }
+              >
+                <SelectTrigger className="w-full sm:w-[180px] h-10 sm:h-10">
+                  <div className="flex items-center gap-2">
+                    <Milk className="h-4 w-4 text-muted-foreground" />
+                    <SelectValue placeholder="Tutti i formaggi" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tutti i formaggi</SelectItem>
+                  {cheeseTypes.map((cheese) => (
+                    <SelectItem key={cheese.id} value={cheese.id}>
+                      {cheese.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            {/* Monthly/Annual Toggle */}
-            <ToggleGroup
-              type="single"
-              value={viewType}
-              onValueChange={(value) => {
-                if (value) setViewType(value as "annual" | "monthly");
-              }}
-              className="border border-border rounded-lg bg-muted/30 p-1 gap-0"
-            >
-              <ToggleGroupItem
-                value="annual"
-                aria-label="Annual view"
-                className={cn(
-                  "px-4 py-2 font-serif rounded-md transition-all",
-                  viewType === "annual"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "bg-transparent text-muted-foreground hover:text-foreground"
-                )}
+              {/* Monthly/Annual Toggle */}
+              <ToggleGroup
+                type="single"
+                value={viewType}
+                onValueChange={(value) => {
+                  if (value) setViewType(value as "annual" | "monthly");
+                }}
+                className="border border-border rounded-lg bg-muted/30 p-1 gap-0 w-full sm:w-auto"
               >
-                Annuale
-              </ToggleGroupItem>
-              <ToggleGroupItem
-                value="monthly"
-                aria-label="Monthly view"
-                className={cn(
-                  "px-4 py-2 font-serif rounded-md transition-all",
-                  viewType === "monthly"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "bg-transparent text-muted-foreground hover:text-foreground"
-                )}
-              >
-                Mensile
-              </ToggleGroupItem>
-            </ToggleGroup>
+                <ToggleGroupItem
+                  value="annual"
+                  aria-label="Annual view"
+                  className={cn(
+                    "px-4 py-2 font-serif rounded-md transition-all flex-1 sm:flex-none text-sm sm:text-base",
+                    viewType === "annual"
+                      ? "bg-background text-foreground shadow-sm"
+                      : "bg-transparent text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Annuale
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="monthly"
+                  aria-label="Monthly view"
+                  className={cn(
+                    "px-4 py-2 font-serif rounded-md transition-all flex-1 sm:flex-none text-sm sm:text-base",
+                    viewType === "monthly"
+                      ? "bg-background text-foreground shadow-sm"
+                      : "bg-transparent text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Mensile
+                </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
           </div>
         </motion.div>
 
         {/* Stats Cards */}
-        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
           <StatCard
             title="Litri Totali"
             value={yearlyTotals.totalLiters}
             suffix=" L"
-            icon={<Droplets className="h-6 w-6" />}
+            icon={<Droplets className="h-5 w-5 sm:h-6 sm:w-6" />}
             delay={0}
           />
           <StatCard
             title="Produzioni"
             value={yearlyTotals.totalProductions}
-            icon={<Factory className="h-6 w-6" />}
+            icon={<Factory className="h-5 w-5 sm:h-6 sm:w-6" />}
             delay={100}
           />
         </div>
@@ -377,12 +380,12 @@ export default function Statistiche() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="rounded-xl border border-border bg-card p-6 shadow-card"
+          className="rounded-xl border border-border bg-card p-4 sm:p-6 shadow-card"
         >
-            <h2 className="mb-6 font-serif text-xl font-semibold text-card-foreground">
+            <h2 className="mb-4 sm:mb-6 font-serif text-lg sm:text-xl font-semibold text-card-foreground">
               {viewType === "annual" ? "Andamento Produzione" : `Produzione Mensile (${selectedYear})`}
             </h2>
-            <div className="h-[350px]">
+            <div className="h-[280px] sm:h-[350px]">
               <ResponsiveContainer width="100%" height="100%">
                 {viewType === "annual" ? (
                   <AreaChart data={chartData}>
@@ -398,13 +401,15 @@ export default function Statistiche() {
                     />
                     <XAxis
                       dataKey="month"
-                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
                       axisLine={{ stroke: "hsl(var(--border))" }}
+                      interval={0}
                     />
                     <YAxis
-                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
                       axisLine={{ stroke: "hsl(var(--border))" }}
                       tickFormatter={(value) => `${value}L`}
+                      width={40}
                     />
                     <Tooltip
                       content={<CustomAreaTooltip cheeseTypes={cheeseTypes} />}
@@ -463,13 +468,15 @@ export default function Statistiche() {
                     />
                     <XAxis
                       dataKey="month"
-                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
                       axisLine={{ stroke: "hsl(var(--border))" }}
+                      interval={0}
                     />
                     <YAxis
-                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
                       axisLine={{ stroke: "hsl(var(--border))" }}
                       tickFormatter={(value) => `${value}L`}
+                      width={40}
                     />
                     <Tooltip
                       content={<CustomTooltip cheeseTypes={cheeseTypes} />}

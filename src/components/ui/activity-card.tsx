@@ -69,21 +69,22 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
       </button>
 
       {/* Content */}
-      <div className="flex-1 min-w-0 flex items-center gap-3 pr-3 h-full">
-        <div className="flex-1 min-w-0 flex items-center gap-2">
+      <div className="flex-1 min-w-0 flex items-center gap-2 sm:gap-3 pr-2 sm:pr-3 h-full">
+        <div className="flex-1 min-w-0 flex items-center gap-1.5 sm:gap-2 flex-wrap sm:flex-nowrap">
           {/* Cheese badge for protocol activities - same as production section */}
           {activity.type === "protocol" && cheeseTypeName && cheeseColor && (
             <CheeseBadge
               name={cheeseTypeName}
               color={cheeseColor}
               size="sm"
+              className="flex-shrink-0"
             />
           )}
           
           {/* Title */}
           <span
             className={cn(
-              "text-sm font-medium transition-colors duration-200",
+              "text-sm font-medium transition-colors duration-200 flex-shrink-0",
               isCompleted 
                 ? "text-muted-foreground/50" 
                 : "text-foreground"
@@ -95,9 +96,9 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
           {/* Description */}
           {activity.description && (
             <>
-              <span className="text-muted-foreground/40">·</span>
+              <span className="text-muted-foreground/40 hidden sm:inline">·</span>
               <span className={cn(
-                "text-sm text-muted-foreground/70 transition-colors duration-200",
+                "text-xs sm:text-sm text-muted-foreground/70 transition-colors duration-200 truncate",
                 isCompleted && "text-muted-foreground/40"
               )}>
                 {activity.description}
@@ -107,12 +108,12 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
         </div>
 
         {/* Right side - Protocol badge or Action icons placeholder */}
-        <div className="flex items-center flex-shrink-0 w-[80px] justify-end">
+        <div className="flex items-center flex-shrink-0 w-auto sm:w-[80px] justify-end">
           {/* Protocol badge */}
           {activity.type === "protocol" && (
-            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/40 text-xs text-muted-foreground">
-              <ClipboardList className="h-3 w-3" />
-              <span>Protocollo</span>
+            <span className="inline-flex items-center gap-1 px-1.5 sm:gap-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md bg-muted/40 text-[10px] sm:text-xs text-muted-foreground">
+              <ClipboardList className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+              <span className="hidden sm:inline">Protocollo</span>
             </span>
           )}
 

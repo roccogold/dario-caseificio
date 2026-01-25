@@ -552,42 +552,68 @@ export default function Calendario() {
           className="rounded-xl border border-border bg-card p-6 shadow-card"
           >
           {/* Navigation Bar */}
-          <div className="mb-6 flex flex-wrap items-center gap-2 sm:gap-3">
-            {/* Date Navigation */}
-            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-              <Button variant="outline" size="sm" onClick={goToToday} className="flex-shrink-0">
+          <div className="mb-6 space-y-3">
+            {/* Top Row: Date Navigation and Action Buttons */}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              {/* Date Navigation */}
+              <div className="flex items-center gap-1 sm:gap-2 flex-1 min-w-0">
+                <Button variant="outline" size="sm" onClick={goToToday} className="flex-shrink-0 h-9 sm:h-8">
                   Oggi
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
-                onClick={() => navigateDate("prev")}
-                className="flex-shrink-0"
+                  onClick={() => navigateDate("prev")}
+                  className="flex-shrink-0 h-9 w-9 sm:h-8 sm:w-8"
                 >
-                <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
-              <h2 className="font-serif text-sm sm:text-base font-semibold text-card-foreground capitalize whitespace-nowrap">
-                {view === "day" && format(selectedDate, "EEEE d MMMM yyyy", { locale: it })}
-                {view === "week" && `Settimana ${getWeek(currentDate, { locale: it })} - ${format(currentDate, "MMMM yyyy", { locale: it })}`}
-                {view === "month" && format(currentDate, "MMMM yyyy", { locale: it })}
-              </h2>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => navigateDate("next")}
-                className="flex-shrink-0"
-              >
-                <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
-              </Button>
+                <h2 className="font-serif text-xs sm:text-sm md:text-base font-semibold text-card-foreground capitalize truncate min-w-0">
+                  {view === "day" && format(selectedDate, "EEEE d MMMM yyyy", { locale: it })}
+                  {view === "week" && `Settimana ${getWeek(currentDate, { locale: it })} - ${format(currentDate, "MMMM yyyy", { locale: it })}`}
+                  {view === "month" && format(currentDate, "MMMM yyyy", { locale: it })}
+                </h2>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => navigateDate("next")}
+                  className="flex-shrink-0 h-9 w-9 sm:h-8 sm:w-8"
+                >
+                  <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
+                </Button>
+              </div>
+
+              {/* Action Buttons - Mobile: icon only, Desktop: with text */}
+              <div className="flex gap-2 flex-shrink-0">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setIsProductionDialogOpen(true)}
+                  className="h-9 w-9 sm:h-8 sm:w-8 sm:px-3 sm:w-auto"
+                  title="Nuova Produzione"
+                >
+                  <Factory className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Nuova Produzione</span>
+                </Button>
+                <Button
+                  size="icon"
+                  onClick={() => setIsActivityDialogOpen(true)}
+                  className="h-9 w-9 sm:h-8 sm:w-8 sm:px-3 sm:w-auto"
+                  title="Aggiungi Attività"
+                >
+                  <ClipboardList className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Aggiungi Attività</span>
+                </Button>
+              </div>
             </div>
 
-            {/* View Selector */}
-            <div className="flex gap-1 rounded-lg border border-border bg-muted/30 p-1 flex-shrink-0">
+            {/* Bottom Row: View Selector */}
+            <div className="flex gap-1 rounded-lg border border-border bg-muted/30 p-1">
               <Button
                 variant={view === "day" ? "default" : "ghost"}
                 size="sm"
                 onClick={() => handleViewChange("day")}
-                className="flex-1"
+                className="flex-1 h-9 sm:h-8 text-xs sm:text-sm"
               >
                 Giorno
               </Button>
@@ -595,38 +621,17 @@ export default function Calendario() {
                 variant={view === "week" ? "default" : "ghost"}
                 size="sm"
                 onClick={() => handleViewChange("week")}
-                className="flex-1"
+                className="flex-1 h-9 sm:h-8 text-xs sm:text-sm"
               >
                 Settimana
               </Button>
               <Button
                 variant={view === "month" ? "default" : "ghost"}
-                                size="sm"
+                size="sm"
                 onClick={() => handleViewChange("month")}
-                className="flex-1"
+                className="flex-1 h-9 sm:h-8 text-xs sm:text-sm"
               >
                 Mese
-              </Button>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-2 flex-shrink-0 ml-auto">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsProductionDialogOpen(true)}
-              >
-                <Factory className="mr-2 h-4 w-4" />
-                <span className="hidden sm:inline">Nuova Produzione</span>
-                <span className="sm:hidden">Produzione</span>
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => setIsActivityDialogOpen(true)}
-              >
-                <ClipboardList className="mr-2 h-4 w-4" />
-                <span className="hidden sm:inline">Aggiungi Attività</span>
-                <span className="sm:hidden">Attività</span>
               </Button>
             </div>
           </div>

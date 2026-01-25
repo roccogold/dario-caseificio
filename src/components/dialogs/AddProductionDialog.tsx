@@ -153,7 +153,7 @@ export function AddProductionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
+      <DialogContent className="max-h-[95vh] overflow-y-auto sm:max-w-md p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle className="font-serif">Nuova Produzione</DialogTitle>
           <DialogDescription>
@@ -163,7 +163,7 @@ export function AddProductionDialog({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Data e Numero */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="date">Data</Label>
               <Input
@@ -171,6 +171,7 @@ export function AddProductionDialog({
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
+                className="h-11 sm:h-10"
               />
             </div>
             <div className="space-y-2">
@@ -180,6 +181,7 @@ export function AddProductionDialog({
                 value={productionNumber}
                 onChange={(e) => setProductionNumber(e.target.value)}
                 placeholder="202401001"
+                className="h-11 sm:h-10"
               />
             </div>
           </div>
@@ -193,9 +195,9 @@ export function AddProductionDialog({
                 variant="ghost"
                 size="sm"
                 onClick={addCheeseEntry}
-                className="h-10 gap-1.5 text-sm"
+                className="h-11 sm:h-10 gap-1.5 text-sm"
               >
-                <Plus className="h-3 w-3" />
+                <Plus className="h-4 w-4 sm:h-3 sm:w-3" />
                 Aggiungi
               </Button>
             </div>
@@ -208,7 +210,7 @@ export function AddProductionDialog({
                     className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 p-2"
                   >
                     <select
-                      className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      className="flex-1 rounded-md border border-input bg-background px-3 py-2.5 sm:py-2 text-sm h-11 sm:h-10"
                       value={entry.cheeseTypeId || ""}
                       onChange={(e) =>
                         updateCheeseEntry(index, "cheeseTypeId", e.target.value)
@@ -227,7 +229,7 @@ export function AddProductionDialog({
                         type="number"
                         min="0.1"
                         step="0.1"
-                        className="w-20"
+                        className="w-20 h-11 sm:h-10"
                         value={entry.liters || ""}
                         onChange={(e) => {
                           const value = e.target.value;
@@ -248,10 +250,10 @@ export function AddProductionDialog({
                       variant="ghost"
                       size="icon"
                       onClick={() => removeCheeseEntry(index)}
-                      className="h-10 w-10 text-destructive"
+                      className="h-11 w-11 sm:h-10 sm:w-10 text-destructive"
                       disabled={cheeses.length === 1}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-5 w-5 sm:h-4 sm:w-4" />
                     </Button>
                   </div>
                 );
@@ -274,18 +276,20 @@ export function AddProductionDialog({
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Eventuali note sulla produzione..."
               rows={3}
+              className="min-h-[80px] sm:min-h-[60px] text-base sm:text-sm"
             />
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              className="h-11 sm:h-10 w-full sm:w-auto"
             >
               Annulla
             </Button>
-            <Button type="submit">Registra Produzione</Button>
+            <Button type="submit" className="h-11 sm:h-10 w-full sm:w-auto">Registra Produzione</Button>
           </DialogFooter>
         </form>
       </DialogContent>
