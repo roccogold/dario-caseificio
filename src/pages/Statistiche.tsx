@@ -327,7 +327,7 @@ export default function Statistiche() {
                   "flex items-center justify-center",
                   "min-w-0 flex-1 rounded-xl",
                   viewType === "annual"
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-[#BC714F] text-white"
                     : "bg-transparent text-[#8C7A6B]"
                 )}
                 style={{ 
@@ -351,7 +351,7 @@ export default function Statistiche() {
                   "flex items-center justify-center",
                   "min-w-0 flex-1 rounded-xl",
                   viewType === "monthly"
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-[#BC714F] text-white"
                     : "bg-transparent text-[#8C7A6B]"
                 )}
                 style={{ 
