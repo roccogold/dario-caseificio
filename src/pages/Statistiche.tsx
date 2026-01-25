@@ -19,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   BarChart,
   Bar,
@@ -318,40 +317,25 @@ export default function Statistiche() {
               </SelectContent>
             </Select>
 
-            {/* Monthly/Annual Toggle */}
-            <ToggleGroup
-              type="single"
-              value={viewType}
-              onValueChange={(value) => {
-                if (value) setViewType(value as "annual" | "monthly");
-              }}
-              className="border border-border rounded-lg bg-muted/30 p-0.5 gap-0"
-            >
-              <ToggleGroupItem
-                value="annual"
-                aria-label="Annual view"
-                className={cn(
-                  "px-3 py-1.5 text-xs sm:text-sm font-serif rounded-md transition-all",
-                  viewType === "annual"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "bg-transparent text-muted-foreground hover:text-foreground"
-                )}
+            {/* Monthly/Annual Toggle - Consistent with Calendar view selector */}
+            <div className="flex gap-1 rounded-lg border border-border bg-muted/30 p-1">
+              <Button
+                variant={viewType === "annual" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewType("annual")}
+                className="flex-1 text-xs sm:text-sm font-serif"
               >
                 Annuale
-              </ToggleGroupItem>
-              <ToggleGroupItem
-                value="monthly"
-                aria-label="Monthly view"
-                className={cn(
-                  "px-3 py-1.5 text-xs sm:text-sm font-serif rounded-md transition-all",
-                  viewType === "monthly"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "bg-transparent text-muted-foreground hover:text-foreground"
-                )}
+              </Button>
+              <Button
+                variant={viewType === "monthly" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewType("monthly")}
+                className="flex-1 text-xs sm:text-sm font-serif"
               >
                 Mensile
-              </ToggleGroupItem>
-            </ToggleGroup>
+              </Button>
+            </div>
           </div>
         </motion.div>
 
