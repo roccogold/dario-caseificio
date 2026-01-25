@@ -317,21 +317,14 @@ export default function Statistiche() {
               </SelectContent>
             </Select>
 
-            {/* Monthly/Annual Toggle - Elegant artisan style */}
-            <div className="relative flex rounded-full border border-border/50 bg-card p-1 shadow-sm">
-              {/* Sliding indicator */}
-              <div
-                className={cn(
-                  "absolute top-1 bottom-1 rounded-full bg-primary transition-all duration-300 ease-out",
-                  viewType === "annual" ? "left-1 w-[calc(50%-2px)]" : "left-[calc(50%+1px)] w-[calc(50%-2px)]"
-                )}
-              />
+            {/* Monthly/Annual Toggle - Segmented control style */}
+            <div className="inline-flex items-center rounded-lg bg-muted/50 p-0.5">
               <button
                 onClick={() => setViewType("annual")}
                 className={cn(
-                  "relative z-10 px-4 py-1.5 text-xs sm:text-sm font-serif font-medium rounded-full transition-colors duration-300",
+                  "relative px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-serif font-medium rounded-md transition-all duration-200",
                   viewType === "annual"
-                    ? "text-primary-foreground"
+                    ? "bg-card text-foreground shadow-sm ring-1 ring-border/50"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
@@ -340,9 +333,9 @@ export default function Statistiche() {
               <button
                 onClick={() => setViewType("monthly")}
                 className={cn(
-                  "relative z-10 px-4 py-1.5 text-xs sm:text-sm font-serif font-medium rounded-full transition-colors duration-300",
+                  "relative px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-serif font-medium rounded-md transition-all duration-200",
                   viewType === "monthly"
-                    ? "text-primary-foreground"
+                    ? "bg-card text-foreground shadow-sm ring-1 ring-border/50"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
