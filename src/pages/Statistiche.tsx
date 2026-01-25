@@ -258,7 +258,7 @@ export default function Statistiche() {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+          className="space-y-4"
         >
           <div>
             <h1 className="font-serif text-2xl sm:text-3xl font-semibold text-foreground">
@@ -269,29 +269,29 @@ export default function Statistiche() {
             </p>
           </div>
 
-          {/* Filters - Desktop: horizontal, Mobile: vertical */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          {/* Filters - Compact and consistent with other pages */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             {/* Year Selector */}
-            <div className="flex items-center justify-center sm:justify-start gap-2 rounded-lg border border-border bg-card p-1 w-full sm:w-auto">
+            <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-0.5">
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-10 w-10"
+                className="h-8 w-8"
                 onClick={() => setSelectedYear((y) => y - 1)}
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-3.5 w-3.5" />
               </Button>
-              <span className="min-w-[4rem] text-center font-serif font-semibold">
+              <span className="min-w-[3.5rem] text-center text-sm font-serif font-semibold px-2">
                 {selectedYear}
               </span>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-10 w-10"
+                className="h-8 w-8"
                 onClick={() => setSelectedYear((y) => y + 1)}
                 disabled={selectedYear >= new Date().getFullYear()}
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-3.5 w-3.5" />
               </Button>
             </div>
 
@@ -302,9 +302,9 @@ export default function Statistiche() {
                 setSelectedCheeseId(value === "all" ? null : value)
               }
             >
-              <SelectTrigger className="w-full sm:w-[180px] h-10">
-                <div className="flex items-center gap-2">
-                  <Milk className="h-4 w-4 text-muted-foreground" />
+              <SelectTrigger className="w-[160px] sm:w-[180px] h-9 text-sm">
+                <div className="flex items-center gap-1.5">
+                  <Milk className="h-3.5 w-3.5 text-muted-foreground" />
                   <SelectValue placeholder="Tutti i formaggi" />
                 </div>
               </SelectTrigger>
@@ -325,13 +325,13 @@ export default function Statistiche() {
               onValueChange={(value) => {
                 if (value) setViewType(value as "annual" | "monthly");
               }}
-              className="border border-border rounded-lg bg-muted/30 p-1 gap-0 w-full sm:w-auto"
+              className="border border-border rounded-lg bg-muted/30 p-0.5 gap-0"
             >
               <ToggleGroupItem
                 value="annual"
                 aria-label="Annual view"
                 className={cn(
-                  "px-4 py-2 font-serif rounded-md transition-all flex-1 sm:flex-none text-sm sm:text-base",
+                  "px-3 py-1.5 text-xs sm:text-sm font-serif rounded-md transition-all",
                   viewType === "annual"
                     ? "bg-background text-foreground shadow-sm"
                     : "bg-transparent text-muted-foreground hover:text-foreground"
@@ -343,7 +343,7 @@ export default function Statistiche() {
                 value="monthly"
                 aria-label="Monthly view"
                 className={cn(
-                  "px-4 py-2 font-serif rounded-md transition-all flex-1 sm:flex-none text-sm sm:text-base",
+                  "px-3 py-1.5 text-xs sm:text-sm font-serif rounded-md transition-all",
                   viewType === "monthly"
                     ? "bg-background text-foreground shadow-sm"
                     : "bg-transparent text-muted-foreground hover:text-foreground"
