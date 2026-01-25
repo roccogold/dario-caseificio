@@ -268,29 +268,29 @@ export default function Statistiche() {
             </p>
           </div>
 
-          {/* Filters - Compact and consistent with other pages */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          {/* Filters - Elegant artisan style */}
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
             {/* Year Selector */}
-            <div className="flex items-center gap-1 rounded-lg border border-border bg-background h-9 px-1">
+            <div className="flex items-center rounded-xl bg-card/80 backdrop-blur-sm border border-border/60 shadow-sm h-10 overflow-hidden">
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7"
+                className="h-10 w-10 rounded-none border-r border-border/40 hover:bg-accent/50 transition-colors"
                 onClick={() => setSelectedYear((y) => y - 1)}
               >
-                <ChevronLeft className="h-3.5 w-3.5" />
+                <ChevronLeft className="h-4 w-4 text-muted-foreground" />
               </Button>
-              <span className="min-w-[3.5rem] text-center text-sm font-serif font-semibold">
+              <span className="min-w-[4.5rem] text-center text-sm font-serif font-semibold px-3 text-foreground">
                 {selectedYear}
               </span>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7"
+                className="h-10 w-10 rounded-none border-l border-border/40 hover:bg-accent/50 transition-colors"
                 onClick={() => setSelectedYear((y) => y + 1)}
                 disabled={selectedYear >= new Date().getFullYear()}
               >
-                <ChevronRight className="h-3.5 w-3.5" />
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
               </Button>
             </div>
 
@@ -301,13 +301,13 @@ export default function Statistiche() {
                 setSelectedCheeseId(value === "all" ? null : value)
               }
             >
-              <SelectTrigger className="w-[160px] sm:w-[180px] h-9 text-sm rounded-lg">
-                <div className="flex items-center gap-1.5">
-                  <Milk className="h-3.5 w-3.5 text-muted-foreground" />
+              <SelectTrigger className="w-[180px] sm:w-[200px] h-10 text-sm rounded-xl bg-card/80 backdrop-blur-sm border-border/60 shadow-sm hover:bg-accent/30 transition-colors">
+                <div className="flex items-center gap-2">
+                  <Milk className="h-4 w-4 text-primary/70" />
                   <SelectValue placeholder="Tutti i formaggi" />
                 </div>
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="rounded-xl">
                 <SelectItem value="all">Tutti i formaggi</SelectItem>
                 {cheeseTypes.map((cheese) => (
                   <SelectItem key={cheese.id} value={cheese.id}>
@@ -317,15 +317,22 @@ export default function Statistiche() {
               </SelectContent>
             </Select>
 
-            {/* Monthly/Annual Toggle - Clean segmented control style */}
-            <div className="flex rounded-lg bg-background border border-border overflow-hidden h-9">
+            {/* Monthly/Annual Toggle - Pill style with smooth animation */}
+            <div className="relative flex rounded-xl bg-muted/40 backdrop-blur-sm border border-border/60 shadow-sm h-10 p-1">
+              {/* Sliding background indicator */}
+              <div
+                className={cn(
+                  "absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg bg-primary shadow-md transition-all duration-300 ease-out",
+                  viewType === "annual" ? "left-1" : "left-[calc(50%+2px)]"
+                )}
+              />
               <button
                 onClick={() => setViewType("annual")}
                 className={cn(
-                  "flex-1 px-4 text-sm font-serif transition-all h-full flex items-center justify-center",
+                  "relative z-10 flex-1 px-5 text-sm font-serif font-medium transition-colors duration-200 rounded-lg",
                   viewType === "annual"
-                    ? "bg-[#8B5A3C] text-[#F5E6D3]"
-                    : "bg-background text-muted-foreground hover:text-foreground"
+                    ? "text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 Annuale
@@ -333,10 +340,10 @@ export default function Statistiche() {
               <button
                 onClick={() => setViewType("monthly")}
                 className={cn(
-                  "flex-1 px-4 text-sm font-serif transition-all h-full flex items-center justify-center",
+                  "relative z-10 flex-1 px-5 text-sm font-serif font-medium transition-colors duration-200 rounded-lg",
                   viewType === "monthly"
-                    ? "bg-[#8B5A3C] text-[#F5E6D3]"
-                    : "bg-background text-muted-foreground hover:text-foreground"
+                    ? "text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 Mensile
