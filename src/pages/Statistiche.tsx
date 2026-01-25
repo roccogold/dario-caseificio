@@ -317,15 +317,29 @@ export default function Statistiche() {
               </SelectContent>
             </Select>
 
-            {/* Monthly/Annual Toggle - Clean segmented control style */}
-            <div className="flex rounded-full bg-[#F8F6F3] p-1 h-9">
+            {/* Monthly/Annual Toggle - Recreated from scratch */}
+            <div className="relative inline-flex rounded-full bg-muted/60 p-1 h-9 border border-border/50">
+              {/* Sliding indicator */}
+              <motion.div
+                className="absolute top-1 bottom-1 rounded-full bg-primary shadow-sm"
+                initial={false}
+                animate={{
+                  left: viewType === "annual" ? "4px" : "50%",
+                  width: viewType === "annual" ? "calc(50% - 4px)" : "calc(50% - 4px)",
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 500,
+                  damping: 30,
+                }}
+              />
               <button
                 onClick={() => setViewType("annual")}
                 className={cn(
-                  "flex-1 px-4 text-sm font-serif font-medium transition-all duration-200 flex items-center justify-center rounded-full",
+                  "relative z-10 flex-1 px-5 text-sm font-serif font-medium transition-colors duration-200 rounded-full",
                   viewType === "annual"
-                    ? "bg-[#7C5B47] text-[#F8F6F3]"
-                    : "bg-transparent text-[#7C5B47]"
+                    ? "text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 Annuale
@@ -333,10 +347,10 @@ export default function Statistiche() {
               <button
                 onClick={() => setViewType("monthly")}
                 className={cn(
-                  "flex-1 px-4 text-sm font-serif font-medium transition-all duration-200 flex items-center justify-center rounded-full",
+                  "relative z-10 flex-1 px-5 text-sm font-serif font-medium transition-colors duration-200 rounded-full",
                   viewType === "monthly"
-                    ? "bg-[#7C5B47] text-[#F8F6F3]"
-                    : "bg-transparent text-[#7C5B47]"
+                    ? "text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 Mensile
