@@ -290,7 +290,7 @@ export default function Calendario() {
                           key={prod.id}
                           className="rounded border-l-2 border-primary bg-background p-1.5 text-xs"
                         >
-                          <div className="font-medium">#{prod.productionNumber}</div>
+                          <div className="font-medium">Lotto #{prod.productionNumber}</div>
                           <div className="text-muted-foreground">
                             {prod.totalLiters}L
                           </div>

@@ -322,7 +322,7 @@ export default function Produzioni() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <span className="font-medium text-foreground">
-                            #{production.productionNumber}
+                            Lotto #{production.productionNumber}
                           </span>
                           {production.notes && (
                             <FileText className="h-4 w-4 text-muted-foreground" />

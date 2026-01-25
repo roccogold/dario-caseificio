@@ -14,7 +14,6 @@ import {
   FlaskConical,
   Leaf,
   Beaker,
-  Package,
   Factory,
   User,
   ShoppingCart,
@@ -391,9 +390,6 @@ export default function Formaggi() {
                         <div className="space-y-3">
                           {cheese.customFields.map((field, index) => (
                             <div key={index} className="flex items-start gap-2.5">
-                              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted flex-shrink-0">
-                                <Package className="h-4 w-4 text-muted-foreground" />
-                              </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs font-medium text-muted-foreground">
                                   {field.key || "Campo"}
