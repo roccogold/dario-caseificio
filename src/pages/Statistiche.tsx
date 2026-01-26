@@ -480,7 +480,9 @@ export default function Statistiche() {
           />
           <StatCard
             title="Valore Stimato"
-            value={Math.round(advancedStats.totalEstimatedValue)}
+            value={advancedStats.totalEstimatedValue % 1 === 0 
+              ? advancedStats.totalEstimatedValue 
+              : Math.round(advancedStats.totalEstimatedValue * 100) / 100}
             prefix="€ "
             icon={<Euro className="h-5 w-5 sm:h-6 sm:w-6" />}
             delay={300}
@@ -513,7 +515,9 @@ export default function Statistiche() {
                 <ShoppingCart className="h-4 w-4 text-muted-foreground" />
               </div>
               <p className="font-numbers text-2xl font-semibold text-foreground">
-                € {advancedStats.revenueByChannel.francoCaseificio.toFixed(2)}
+                € {advancedStats.revenueByChannel.francoCaseificio % 1 === 0 
+                  ? advancedStats.revenueByChannel.francoCaseificio.toFixed(0)
+                  : advancedStats.revenueByChannel.francoCaseificio.toFixed(2)}
               </p>
             </div>
             <div className="rounded-lg border border-border bg-background p-4">
@@ -524,7 +528,9 @@ export default function Statistiche() {
                 <ShoppingCart className="h-4 w-4 text-muted-foreground" />
               </div>
               <p className="font-numbers text-2xl font-semibold text-foreground">
-                € {advancedStats.revenueByChannel.francoCliente.toFixed(2)}
+                € {advancedStats.revenueByChannel.francoCliente % 1 === 0 
+                  ? advancedStats.revenueByChannel.francoCliente.toFixed(0)
+                  : advancedStats.revenueByChannel.francoCliente.toFixed(2)}
               </p>
             </div>
             <div className="rounded-lg border border-border bg-background p-4">
@@ -535,7 +541,9 @@ export default function Statistiche() {
                 <ShoppingCart className="h-4 w-4 text-muted-foreground" />
               </div>
               <p className="font-numbers text-2xl font-semibold text-foreground">
-                € {advancedStats.revenueByChannel.venditaDiretta.toFixed(2)}
+                € {advancedStats.revenueByChannel.venditaDiretta % 1 === 0 
+                  ? advancedStats.revenueByChannel.venditaDiretta.toFixed(0)
+                  : advancedStats.revenueByChannel.venditaDiretta.toFixed(2)}
               </p>
             </div>
           </div>
