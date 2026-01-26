@@ -318,21 +318,21 @@ export default function Statistiche() {
             </Select>
 
             {/* Monthly/Annual Toggle - Simple and clean */}
-            <div className="inline-flex rounded-2xl bg-[#F5F2ED] border border-border/60 h-9 p-0.5 gap-1">
+            <div className="inline-flex rounded-2xl bg-[#F5F2ED] border border-border/60 h-9 p-1">
               <button
                 type="button"
                 onClick={() => setViewType("annual")}
                 className={cn(
                   "px-5 text-sm font-serif font-medium transition-all duration-200",
                   "flex items-center justify-center",
-                  "min-w-0 flex-1 rounded-xl",
+                  "min-w-0 flex-1",
                   viewType === "annual"
-                    ? "bg-[#BC714F] text-white"
-                    : "bg-transparent text-[#8C7A6B]"
+                    ? "bg-[#BC714F] text-white rounded-xl"
+                    : "bg-transparent text-[#8C7A6B] rounded-xl"
                 )}
                 style={{ 
-                  height: '32px',
-                  minHeight: '32px',
+                  height: '28px',
+                  minHeight: '28px',
                   lineHeight: '1',
                   paddingTop: '0',
                   paddingBottom: '0',
@@ -349,14 +349,14 @@ export default function Statistiche() {
                 className={cn(
                   "px-5 text-sm font-serif font-medium transition-all duration-200",
                   "flex items-center justify-center",
-                  "min-w-0 flex-1 rounded-xl",
+                  "min-w-0 flex-1",
                   viewType === "monthly"
-                    ? "bg-[#BC714F] text-white"
-                    : "bg-transparent text-[#8C7A6B]"
+                    ? "bg-[#BC714F] text-white rounded-xl"
+                    : "bg-transparent text-[#8C7A6B] rounded-xl"
                 )}
                 style={{ 
-                  height: '32px',
-                  minHeight: '32px',
+                  height: '28px',
+                  minHeight: '28px',
                   lineHeight: '1',
                   paddingTop: '0',
                   paddingBottom: '0',
