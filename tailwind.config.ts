@@ -16,6 +16,7 @@ export default {
       fontFamily: {
             serif: ["'Playfair Display'", "'EB Garamond'", "Georgia", "serif"],
         sans: ["'EB Garamond'", "Georgia", "serif"],
+        numbers: ["'Lora'", "'EB Garamond'", "Georgia", "serif"],
       },
       colors: {
         border: "hsl(var(--border))",

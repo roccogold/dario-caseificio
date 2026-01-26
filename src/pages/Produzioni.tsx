@@ -301,7 +301,7 @@ export default function Produzioni() {
                       <div className="text-center">
                         {isValidDate(production.date) ? (
                           <>
-                            <div className="font-serif text-2xl font-semibold text-foreground">
+                            <div className="font-numbers text-2xl font-semibold text-foreground">
                               {format(production.date, "dd")}
                             </div>
                             <div className="text-xs uppercase text-muted-foreground">
@@ -360,7 +360,7 @@ export default function Produzioni() {
                     {/* Right Side */}
                     <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <div className="font-serif text-xl font-semibold text-foreground">
+                        <div className="font-numbers text-xl font-semibold text-foreground">
                           {production.totalLiters.toLocaleString("it-IT")} L
                         </div>
                         <div className="text-xs text-muted-foreground">

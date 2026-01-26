@@ -75,7 +75,7 @@ export function RecentProductions({
                 <div className="flex items-center gap-4">
                   {/* Date */}
                   <div className="text-center">
-                    <div className="font-serif text-2xl font-semibold text-foreground">
+                    <div className="font-numbers text-2xl font-semibold text-foreground">
                       {format(production.date, "dd")}
                     </div>
                     <div className="text-xs uppercase text-muted-foreground">
@@ -112,7 +112,7 @@ export function RecentProductions({
 
                 {/* Total */}
                 <div className="text-right">
-                  <div className="font-serif text-lg font-semibold text-foreground">
+                  <div className="font-numbers text-lg font-semibold text-foreground">
                     {production.totalLiters.toLocaleString("it-IT")} L
                   </div>
                   <div className="text-xs text-muted-foreground">totale</div>
