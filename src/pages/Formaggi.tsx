@@ -68,7 +68,7 @@ export default function Formaggi() {
         >
           <div>
             <h1 className="font-serif text-3xl font-semibold text-foreground">
-              Tipi di Formaggio
+              Formaggi
             </h1>
             <p className="mt-1 text-muted-foreground">
               {cheeseTypes.length} formaggi totali
