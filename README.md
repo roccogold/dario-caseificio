@@ -2,9 +2,7 @@
 
 > A modern, elegant web application built for [Corzano e Paterno](https://www.corzanoepaterno.com/), an artisan cheese farm in Tuscany, Italy.
 
-![DARIO Logo](./public/frog-logo.svg)
-
-**DARIO** is a comprehensive production management system designed specifically for artisanal cheese production. Built as a digital diary for tracking daily operations, managing cheese types, monitoring production batches, and organizing activities at the Corzano e Paterno farm.
+![DARIO Logo](./public/frog-logo.svg)**DARIO** is a comprehensive production management system designed specifically for artisanal cheese production. Built as a digital diary for tracking daily operations, managing cheese types, monitoring production batches, and organizing activities at the Corzano e Paterno farm.
 
 ## 🏡 About Corzano e Paterno
 
