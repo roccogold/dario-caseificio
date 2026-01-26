@@ -85,7 +85,7 @@ const CustomTooltip = ({ active, payload, cheeseTypes }: any) => {
               size="sm"
               className="text-xs"
             />
-            <span style={{ fontSize: "12px", color: "hsl(var(--muted-foreground))" }}>
+            <span style={{ fontSize: "12px", color: "hsl(var(--muted-foreground))", fontFamily: "'Lora', 'EB Garamond', Georgia, serif" }}>
               {entry.value} L
             </span>
           </div>
@@ -138,7 +138,7 @@ const CustomAreaTooltip = ({ active, payload, label, cheeseTypes }: any) => {
                 }}
               />
               <span style={{ fontSize: "12px", color: "hsl(var(--muted-foreground))" }}>
-                Totale: <span style={{ color: "hsl(var(--foreground))", fontWeight: 500 }}>{entry.value} L</span>
+                Totale: <span style={{ color: "hsl(var(--foreground))", fontWeight: 500, fontFamily: "'Lora', 'EB Garamond', Georgia, serif" }}>{entry.value} L</span>
               </span>
             </div>
           );
@@ -155,7 +155,7 @@ const CustomAreaTooltip = ({ active, payload, label, cheeseTypes }: any) => {
               size="sm"
               className="text-xs"
             />
-            <span style={{ fontSize: "12px", color: "hsl(var(--muted-foreground))" }}>
+            <span style={{ fontSize: "12px", color: "hsl(var(--muted-foreground))", fontFamily: "'Lora', 'EB Garamond', Georgia, serif" }}>
               {entry.value} L
             </span>
           </div>
@@ -414,12 +414,12 @@ export default function Statistiche() {
                     />
                     <XAxis
                       dataKey="month"
-                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12, fontFamily: "'Lora', 'EB Garamond', Georgia, serif" }}
                       axisLine={{ stroke: "hsl(var(--border))" }}
                       interval={0}
                     />
                     <YAxis
-                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12, fontFamily: "'Lora', 'EB Garamond', Georgia, serif" }}
                       axisLine={{ stroke: "hsl(var(--border))" }}
                       tickFormatter={(value) => `${value}L`}
                       width={40}
@@ -481,12 +481,12 @@ export default function Statistiche() {
                     />
                     <XAxis
                       dataKey="month"
-                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12, fontFamily: "'Lora', 'EB Garamond', Georgia, serif" }}
                       axisLine={{ stroke: "hsl(var(--border))" }}
                       interval={0}
                     />
                     <YAxis
-                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12, fontFamily: "'Lora', 'EB Garamond', Georgia, serif" }}
                       axisLine={{ stroke: "hsl(var(--border))" }}
                       tickFormatter={(value) => `${value}L`}
                       width={40}
