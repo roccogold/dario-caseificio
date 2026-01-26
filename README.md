@@ -229,7 +229,7 @@ The application uses Supabase (PostgreSQL) with the following main tables:
 
 - `formaggi` - Cheese types and their properties
 - `produzioni` - Production batches
-- `attivitia` - Activities and tasks
+- `attivita` - Activities and tasks
 - `users` - User authentication (managed by Supabase Auth)
 
 See `database/scripts/supabase-schema.sql` for the complete schema definition.
