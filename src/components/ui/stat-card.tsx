@@ -64,8 +64,8 @@ export function StatCard({
     >
       <div className="flex items-start justify-between">
         <div className="space-y-1.5 sm:space-y-2 flex-1 min-w-0">
-          <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">{title}</p>
-          <p className="font-numbers text-2xl sm:text-3xl font-semibold tracking-tight text-card-foreground">
+          <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate" title={title}>{title}</p>
+          <p className="font-numbers text-2xl sm:text-3xl font-semibold tracking-tight text-card-foreground whitespace-nowrap">
             {prefix}
             {displayValue.toLocaleString("it-IT")}
             {suffix}

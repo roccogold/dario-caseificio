@@ -457,7 +457,7 @@ export default function Statistiche() {
         </motion.div>
 
         {/* Stats Cards */}
-        <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           <StatCard
             title="Litri Totali"
             value={yearlyTotals.totalLiters}
@@ -509,12 +509,12 @@ export default function Statistiche() {
           <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
             <div className="rounded-lg border border-border bg-background p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-muted-foreground">
+                <span className="text-sm font-medium text-muted-foreground truncate" title="Franco Caseificio">
                   Franco Caseificio
                 </span>
-                <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+                <ShoppingCart className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               </div>
-              <p className="font-numbers text-2xl font-semibold text-foreground">
+              <p className="font-numbers text-2xl font-semibold text-foreground whitespace-nowrap">
                 € {advancedStats.revenueByChannel.francoCaseificio % 1 === 0 
                   ? advancedStats.revenueByChannel.francoCaseificio.toFixed(0)
                   : advancedStats.revenueByChannel.francoCaseificio.toFixed(2)}
@@ -522,12 +522,12 @@ export default function Statistiche() {
             </div>
             <div className="rounded-lg border border-border bg-background p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-muted-foreground">
+                <span className="text-sm font-medium text-muted-foreground truncate" title="Franco Cliente">
                   Franco Cliente
                 </span>
-                <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+                <ShoppingCart className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               </div>
-              <p className="font-numbers text-2xl font-semibold text-foreground">
+              <p className="font-numbers text-2xl font-semibold text-foreground whitespace-nowrap">
                 € {advancedStats.revenueByChannel.francoCliente % 1 === 0 
                   ? advancedStats.revenueByChannel.francoCliente.toFixed(0)
                   : advancedStats.revenueByChannel.francoCliente.toFixed(2)}
@@ -535,12 +535,12 @@ export default function Statistiche() {
             </div>
             <div className="rounded-lg border border-border bg-background p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-muted-foreground">
+                <span className="text-sm font-medium text-muted-foreground truncate" title="Vendita Diretta">
                   Vendita Diretta
                 </span>
-                <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+                <ShoppingCart className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               </div>
-              <p className="font-numbers text-2xl font-semibold text-foreground">
+              <p className="font-numbers text-2xl font-semibold text-foreground whitespace-nowrap">
                 € {advancedStats.revenueByChannel.venditaDiretta % 1 === 0 
                   ? advancedStats.revenueByChannel.venditaDiretta.toFixed(0)
                   : advancedStats.revenueByChannel.venditaDiretta.toFixed(2)}
