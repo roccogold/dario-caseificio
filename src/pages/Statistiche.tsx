@@ -462,20 +462,20 @@ export default function Statistiche() {
             title="Litri Totali"
             value={yearlyTotals.totalLiters}
             suffix=" L"
-            icon={<Droplets className="h-5 w-5 sm:h-6 sm:w-6" />}
+            icon={<Droplets className="h-4 w-4 sm:h-5 sm:w-5" />}
             delay={0}
           />
           <StatCard
             title="Produzioni"
             value={yearlyTotals.totalProductions}
-            icon={<Factory className="h-5 w-5 sm:h-6 sm:w-6" />}
+            icon={<Factory className="h-4 w-4 sm:h-5 sm:w-5" />}
             delay={100}
           />
           <StatCard
             title="Kg Prodotti"
             value={advancedStats.totalKg}
             suffix=" kg"
-            icon={<Scale className="h-5 w-5 sm:h-6 sm:w-6" />}
+            icon={<Scale className="h-4 w-4 sm:h-5 sm:w-5" />}
             delay={200}
           />
           <StatCard
@@ -484,14 +484,14 @@ export default function Statistiche() {
               ? advancedStats.totalEstimatedValue 
               : Math.round(advancedStats.totalEstimatedValue * 100) / 100}
             prefix="€ "
-            icon={<Euro className="h-5 w-5 sm:h-6 sm:w-6" />}
+            icon={<Euro className="h-4 w-4 sm:h-5 sm:w-5" />}
             delay={300}
           />
           <StatCard
             title="Resa Media"
             value={advancedStats.averageYield}
             suffix="%"
-            icon={<Percent className="h-5 w-5 sm:h-6 sm:w-6" />}
+            icon={<Percent className="h-4 w-4 sm:h-5 sm:w-5" />}
             delay={400}
           />
         </div>

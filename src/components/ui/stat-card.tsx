@@ -62,10 +62,10 @@ export function StatCard({
         className
       )}
     >
-      <div className="flex items-start justify-between">
-        <div className="space-y-1.5 sm:space-y-2 flex-1 min-w-0">
+      <div className="flex items-start justify-between gap-2">
+        <div className="space-y-1.5 sm:space-y-2 flex-1 min-w-0 overflow-hidden">
           <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate" title={title}>{title}</p>
-          <p className="font-numbers text-2xl sm:text-3xl font-semibold tracking-tight text-card-foreground whitespace-nowrap">
+          <p className="font-numbers text-2xl sm:text-3xl font-semibold tracking-tight text-card-foreground whitespace-nowrap overflow-hidden text-ellipsis">
             {prefix}
             {displayValue.toLocaleString("it-IT")}
             {suffix}
@@ -86,7 +86,7 @@ export function StatCard({
           )}
         </div>
         {icon && (
-          <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-muted/50 text-muted-foreground transition-colors group-hover:bg-primary/10 group-hover:text-primary flex-shrink-0 ml-2">
+          <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-muted/50 text-muted-foreground transition-colors group-hover:bg-primary/10 group-hover:text-primary flex-shrink-0">
             {icon}
           </div>
         )}
