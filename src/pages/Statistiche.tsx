@@ -11,6 +11,10 @@ import {
   ChevronRight,
   Milk,
   Filter,
+  Scale,
+  Euro,
+  ShoppingCart,
+  Percent,
 } from "lucide-react";
 import {
   Select,
@@ -224,6 +228,87 @@ export default function Statistiche() {
     return { totalLiters, totalProductions, avgPerMonth, bestMonth };
   }, [monthlyStats, selectedCheeseId, productions, selectedYear]);
 
+  // Calculate advanced statistics
+  const advancedStats = useMemo(() => {
+    // Filter productions by year and cheese if selected
+    const filteredProductions = productions.filter(p => {
+      const prodDate = new Date(p.date);
+      if (prodDate.getFullYear() !== selectedYear) return false;
+      if (selectedCheeseId) {
+        return p.cheeses.some(c => c.cheeseTypeId === selectedCheeseId);
+      }
+      return true;
+    });
+
+    let totalKg = 0;
+    let totalEstimatedValue = 0;
+    let revenueByChannel = {
+      francoCaseificio: 0,
+      francoCliente: 0,
+      venditaDiretta: 0,
+    };
+    let totalYield = 0;
+    let cheeseCount = 0;
+
+    filteredProductions.forEach(production => {
+      production.cheeses.forEach(prodCheese => {
+        const cheese = cheeseTypes.find(c => c.id === prodCheese.cheeseTypeId);
+        if (!cheese) return;
+
+        // Skip if filtering by cheese and this is not the selected one
+        if (selectedCheeseId && cheese.id !== selectedCheeseId) return;
+
+        const liters = prodCheese.liters;
+        const yieldPercentage = cheese.yieldPercentage || 0;
+        
+        // Calculate kg produced
+        const kg = liters * (yieldPercentage / 100);
+        totalKg += kg;
+
+        // Calculate average price (weighted by sales percentages)
+        let avgPrice = 0;
+        if (cheese.prices) {
+          const { price1, price2, price3, salesPercentage1, salesPercentage2, salesPercentage3 } = cheese.prices;
+          const totalPercentage = salesPercentage1 + salesPercentage2 + salesPercentage3;
+          if (totalPercentage > 0) {
+            avgPrice = (price1 * salesPercentage1 + price2 * salesPercentage2 + price3 * salesPercentage3) / totalPercentage;
+          } else {
+            avgPrice = price1 || 0;
+          }
+        } else if (cheese.pricePerKg) {
+          avgPrice = cheese.pricePerKg;
+        }
+
+        // Calculate estimated value
+        const estimatedValue = kg * avgPrice;
+        totalEstimatedValue += estimatedValue;
+
+        // Calculate revenue by channel
+        if (cheese.prices) {
+          const { price1, price2, price3, salesPercentage1, salesPercentage2, salesPercentage3 } = cheese.prices;
+          revenueByChannel.francoCaseificio += kg * price1 * (salesPercentage1 / 100);
+          revenueByChannel.francoCliente += kg * price2 * (salesPercentage2 / 100);
+          revenueByChannel.venditaDiretta += kg * price3 * (salesPercentage3 / 100);
+        }
+
+        // Calculate average yield
+        if (yieldPercentage > 0) {
+          totalYield += yieldPercentage;
+          cheeseCount++;
+        }
+      });
+    });
+
+    const averageYield = cheeseCount > 0 ? totalYield / cheeseCount : 0;
+
+    return {
+      totalKg: Math.round(totalKg * 10) / 10, // Round to 1 decimal
+      totalEstimatedValue: Math.round(totalEstimatedValue * 100) / 100, // Round to 2 decimals
+      revenueByChannel,
+      averageYield: Math.round(averageYield * 10) / 10, // Round to 1 decimal
+    };
+  }, [productions, cheeseTypes, selectedYear, selectedCheeseId]);
+
   // Prepare chart data - filtered by cheese if selected
   const chartData = useMemo(() => {
     const cheesesToShow = selectedCheeseId 
@@ -372,7 +457,7 @@ export default function Statistiche() {
         </motion.div>
 
         {/* Stats Cards */}
-        <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
           <StatCard
             title="Litri Totali"
             value={yearlyTotals.totalLiters}
@@ -386,7 +471,75 @@ export default function Statistiche() {
             icon={<Factory className="h-5 w-5 sm:h-6 sm:w-6" />}
             delay={100}
           />
+          <StatCard
+            title="Kg Prodotti"
+            value={advancedStats.totalKg}
+            suffix=" kg"
+            icon={<Scale className="h-5 w-5 sm:h-6 sm:w-6" />}
+            delay={200}
+          />
+          <StatCard
+            title="Valore Stimato"
+            value={Math.round(advancedStats.totalEstimatedValue)}
+            prefix="€ "
+            icon={<Euro className="h-5 w-5 sm:h-6 sm:w-6" />}
+            delay={300}
+          />
+          <StatCard
+            title="Resa Media"
+            value={advancedStats.averageYield}
+            suffix="%"
+            icon={<Percent className="h-5 w-5 sm:h-6 sm:w-6" />}
+            delay={400}
+          />
         </div>
+
+        {/* Revenue by Channel */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="rounded-xl border border-border bg-card p-4 sm:p-6 shadow-card"
+        >
+          <h2 className="mb-4 sm:mb-6 font-serif text-lg sm:text-xl font-semibold text-card-foreground">
+            Ricavi per Canale di Vendita
+          </h2>
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
+            <div className="rounded-lg border border-border bg-background p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-muted-foreground">
+                  Franco Caseificio
+                </span>
+                <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <p className="font-numbers text-2xl font-semibold text-foreground">
+                € {advancedStats.revenueByChannel.francoCaseificio.toFixed(2)}
+              </p>
+            </div>
+            <div className="rounded-lg border border-border bg-background p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-muted-foreground">
+                  Franco Cliente
+                </span>
+                <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <p className="font-numbers text-2xl font-semibold text-foreground">
+                € {advancedStats.revenueByChannel.francoCliente.toFixed(2)}
+              </p>
+            </div>
+            <div className="rounded-lg border border-border bg-background p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-muted-foreground">
+                  Vendita Diretta
+                </span>
+                <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <p className="font-numbers text-2xl font-semibold text-foreground">
+                € {advancedStats.revenueByChannel.venditaDiretta.toFixed(2)}
+              </p>
+            </div>
+          </div>
+        </motion.div>
 
         {/* Chart */}
         <motion.div
