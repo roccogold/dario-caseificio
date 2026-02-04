@@ -119,9 +119,12 @@ export function AddProductionDialog({
         cheeses: validCheeses,
         notes: notes.trim() || undefined,
       });
-      toast.success("Produzione registrata con successo!");
-      resetForm();
-      onOpenChange(false);
+      // Let React paint the updated list before closing the dialog so the new produzione is visible immediately
+      requestAnimationFrame(() => {
+        toast.success("Produzione registrata con successo!");
+        resetForm();
+        onOpenChange(false);
+      });
     } catch {
       // Error already shown by onAdd
     } finally {

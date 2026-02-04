@@ -146,6 +146,7 @@ const DataContext = createContext<ReturnType<typeof useDataState> | null>(null);
 function useDataState() {
   const [cheeseTypes, setCheeseTypes] = useState<CheeseType[]>([]);
   const [productions, setProductions] = useState<Production[]>([]);
+  const [productionsVersion, setProductionsVersion] = useState(0); // Bump so list re-renders immediately on add
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -645,13 +646,14 @@ function useDataState() {
         });
         
         // Update UI immediately so the new production appears without waiting for real-time.
-        // flushSync ensures the list re-renders before the dialog closes.
+        // flushSync + version bump so the list re-renders before the dialog closes.
         flushSync(() => {
           setProductions((prev) => {
             const exists = prev.some((p) => p.id === savedProduction.id);
             if (exists) return prev;
             return [...prev, savedProduction];
           });
+          setProductionsVersion((v) => v + 1);
         });
       } else {
         // Solo in sviluppo locale - qui genera l'ID
@@ -662,6 +664,7 @@ function useDataState() {
         logger.log('[addProduction] Using localStorage (development mode)');
         localProductions.add(productionWithId);
         setProductions((prev) => [...prev, productionWithId]);
+        setProductionsVersion((v) => v + 1);
         savedProduction = productionWithId;
       }
 
@@ -780,6 +783,7 @@ function useDataState() {
         toast.error('Errore nel salvataggio della produzione. Salvato in locale come fallback.');
         localProductions.add(productionWithId);
         setProductions((prev) => [...prev, productionWithId]);
+        setProductionsVersion((v) => v + 1);
         return productionWithId;
       }
     }
@@ -1113,7 +1117,10 @@ function useDataState() {
   }, [activities]);
 
   const getProductionsForDate = useCallback((date: Date) => {
-    return productions.filter((p) => isSameDay(p.date, date));
+    return productions.filter((p) => {
+      const pDate = p.date instanceof Date ? p.date : new Date(p.date as unknown as string);
+      return isSameDay(pDate, date);
+    });
   }, [productions]);
 
   const getProductionsForMonth = useCallback((date: Date) => {
@@ -1177,6 +1184,7 @@ function useDataState() {
     // Data
     cheeseTypes,
     productions,
+    productionsVersion,
     activities,
     isLoading,
 

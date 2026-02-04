@@ -44,6 +44,7 @@ import { ViewType, Activity } from "@/types";
 export default function Calendario() {
   const {
     productions,
+    productionsVersion,
     activities,
     cheeseTypes,
     getActivitiesForDate,
@@ -151,9 +152,9 @@ export default function Calendario() {
           </h2>
         </div>
 
-        {/* Productions */}
+        {/* Productions - key forces re-render when a new production is added */}
         {dayProductions.length > 0 && (
-          <div>
+          <div key={productionsVersion}>
             <h3 className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <Factory className="h-4 w-4" />
               Produzioni
