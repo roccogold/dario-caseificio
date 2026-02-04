@@ -110,8 +110,11 @@ export function AddProductionDialog({
 
     setIsSubmitting(true);
     try {
+      // Parse date as local YYYY-MM-DD so it matches the selected day (no UTC shift)
+      const [y, m, d] = date.split("-").map(Number);
+      const productionDate = new Date(y, m - 1, d);
       await onAdd({
-        date: new Date(date),
+        date: productionDate,
         productionNumber: productionNumber.trim(),
         cheeses: validCheeses,
         notes: notes.trim() || undefined,

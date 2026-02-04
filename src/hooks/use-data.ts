@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { flushSync } from "react-dom";
 import { CheeseType, Production, Activity, MonthlyStats } from "@/types";
 import {
   startOfMonth, 
@@ -640,11 +641,14 @@ export function useData() {
           savedIsDate: savedProduction.date instanceof Date
         });
         
-        // Update UI immediately so the new production appears without waiting for real-time
-        setProductions((prev) => {
-          const exists = prev.some((p) => p.id === savedProduction.id);
-          if (exists) return prev;
-          return [...prev, savedProduction];
+        // Update UI immediately so the new production appears without waiting for real-time.
+        // flushSync ensures the list re-renders before the dialog closes.
+        flushSync(() => {
+          setProductions((prev) => {
+            const exists = prev.some((p) => p.id === savedProduction.id);
+            if (exists) return prev;
+            return [...prev, savedProduction];
+          });
         });
       } else {
         // Solo in sviluppo locale - qui genera l'ID

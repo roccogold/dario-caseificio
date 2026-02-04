@@ -212,11 +212,12 @@ export async function saveProduction(production) {
   try {
     if (!production.id || production.id.startsWith('temp-') || typeof production.id === 'number') {
       // Nuova produzione
+      const toLocalDateString = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0')
       const { data, error } = await supabase
         .from('produzioni')
         .insert({
           production_number: production.productionNumber,
-          production_date: production.date ? (production.date instanceof Date ? production.date.toISOString().split('T')[0] : production.date) : new Date().toISOString().split('T')[0],
+          production_date: production.date ? (production.date instanceof Date ? toLocalDateString(production.date) : production.date) : toLocalDateString(new Date()),
           total_liters: production.totalLiters || 0,
           cheeses: production.cheeses || [],
           notes: production.notes || ''
@@ -244,11 +245,12 @@ export async function saveProduction(production) {
       }
     } else {
       // Update produzione esistente
+      const toLocalDateString = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0')
       const { data, error } = await supabase
         .from('produzioni')
         .update({
           production_number: production.productionNumber,
-          production_date: production.date ? (production.date instanceof Date ? production.date.toISOString().split('T')[0] : production.date) : new Date().toISOString().split('T')[0],
+          production_date: production.date ? (production.date instanceof Date ? toLocalDateString(production.date) : production.date) : toLocalDateString(new Date()),
           total_liters: production.totalLiters || 0,
           cheeses: production.cheeses || [],
           notes: production.notes || ''
