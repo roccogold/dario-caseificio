@@ -453,7 +453,7 @@ function useDataState() {
               activityDate.setHours(0, 0, 0, 0);
 
               const activityTitle = protocolStep.activity;
-              const activityDescription = `Lotto: ${production.productionNumber} | ${productionCheese.liters}Lt`;
+              const activityDescription = `Lotto #${production.productionNumber} | ${productionCheese.liters}Lt`;
 
               // ✅ NON includere id e createdAt - saveActivity li gestirà
               const protocolActivity: Omit<Activity, "id" | "createdAt"> = {
@@ -708,7 +708,7 @@ function useDataState() {
           activityDate.setHours(0, 0, 0, 0);
           
           const activityTitle = protocolStep.activity;
-          const activityDescription = `Lotto: ${production.productionNumber} | ${productionCheese.liters}Lt`;
+          const activityDescription = `Lotto #${production.productionNumber} | ${productionCheese.liters}Lt`;
 
           // ✅ NON includere id e createdAt - saveActivity li gestirà
           const protocolActivity: Omit<Activity, "id" | "createdAt"> = {

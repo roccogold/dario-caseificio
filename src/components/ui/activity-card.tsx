@@ -77,6 +77,7 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
               name={cheeseTypeName}
               color={cheeseColor}
               size="sm"
+              shape="square"
               className="flex-shrink-0"
             />
           )}
@@ -93,7 +94,7 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
             {activity.title}
           </span>
           
-          {/* Description */}
+          {/* Description (show "Lotto #10" not "Lotto: 10") */}
           {activity.description && (
             <>
               <span className="text-muted-foreground/40 hidden sm:inline">·</span>
@@ -101,7 +102,7 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(({
                 "text-xs sm:text-sm text-muted-foreground/70 transition-colors duration-200 truncate",
                 isCompleted && "text-muted-foreground/40"
               )}>
-                {activity.description}
+                {activity.description.replace(/^Lotto:\s*/i, "Lotto #")}
               </span>
             </>
           )}

@@ -5,6 +5,8 @@ interface CheeseBadgeProps {
   color: string;
   liters?: number;
   size?: "sm" | "md" | "lg";
+  /** "pill" = rounded-full (default), "square" = rounded-md for Attività etc. */
+  shape?: "pill" | "square";
   className?: string;
 }
 
@@ -13,6 +15,7 @@ export function CheeseBadge({
   color,
   liters,
   size = "md",
+  shape = "pill",
   className,
 }: CheeseBadgeProps) {
   // Determine if the color is light or dark for text contrast
@@ -30,7 +33,9 @@ export function CheeseBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full font-medium transition-transform hover:scale-105",
+        "inline-flex items-center gap-1.5 font-medium transition-transform hover:scale-105",
+        shape === "pill" && "rounded-full",
+        shape === "square" && "rounded-md",
         size === "sm" && "px-2 py-0.5 text-xs",
         size === "md" && "px-3 py-1 text-sm",
         size === "lg" && "px-4 py-1.5 text-base",
