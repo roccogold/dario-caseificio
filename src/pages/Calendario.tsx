@@ -163,40 +163,57 @@ export default function Calendario() {
               {dayProductions.map((prod) => (
                 <div
                   key={prod.id}
-                  className="rounded-lg border border-border bg-card p-4 shadow-card"
+                  className="rounded-lg border border-border bg-card p-4 shadow-card flex items-start justify-between gap-4"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
-                      #{prod.productionNumber}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
-                      {prod.totalLiters} Lt
-                    </span>
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {prod.cheeses.map((c) => {
-                      const type = getCheeseType(c.cheeseTypeId);
-                      return type ? (
-                        <CheeseBadge
-                          key={c.cheeseTypeId}
-                          name={type.name}
-                          color={type.color}
-                          liters={c.liters}
-                          size="sm"
-                        />
-                      ) : null;
-                    })}
-                  </div>
-                  {prod.notes && (
-                    <div className="mt-3 pt-3 border-t border-border">
-                      <p className="text-xs font-medium text-muted-foreground mb-1">
-                        Note
-                      </p>
-                      <p className="text-sm text-foreground whitespace-pre-wrap">
-                        {prod.notes}
-                      </p>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-foreground">
+                      Lotto #{prod.productionNumber}
                     </div>
-                  )}
+                    {/* Cheese list: one row per cheese (match Produzioni font) */}
+                    <div className="mt-2 flex flex-col gap-1.5">
+                      {prod.cheeses.map((c) => {
+                        const type = getCheeseType(c.cheeseTypeId);
+                        return type ? (
+                          <div
+                            key={c.cheeseTypeId}
+                            className="flex items-center gap-2"
+                          >
+                            <span
+                              className="inline-flex items-center px-2 py-1 rounded text-xs font-medium"
+                              style={{
+                                backgroundColor: type.color,
+                                color: "#000",
+                              }}
+                            >
+                              {type.name}
+                            </span>
+                            <span className="text-sm text-muted-foreground">
+                              {c.liters} Lt
+                            </span>
+                          </div>
+                        ) : null;
+                      })}
+                    </div>
+                    {prod.notes && (
+                      <div className="mt-3 pt-3 border-t border-border">
+                        <p className="text-xs font-medium text-muted-foreground mb-1">
+                          Note
+                        </p>
+                        <p className="text-sm text-foreground whitespace-pre-wrap">
+                          {prod.notes}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  {/* Total liters: padded from right edge (match Produzioni) */}
+                  <div className="flex-shrink-0 text-right pr-2 sm:pr-4">
+                    <div className="font-numbers text-xl font-semibold text-foreground">
+                      {prod.totalLiters.toLocaleString("it-IT")} Lt
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      totale
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
