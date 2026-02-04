@@ -42,7 +42,7 @@ export function CheeseBadge({
       {name}
       {liters !== undefined && (
         <span className={cn("opacity-80", size === "sm" ? "text-[10px]" : "text-xs")}>
-          {liters}L
+          {liters}Lt
         </span>
       )}
     </span>

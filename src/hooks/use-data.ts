@@ -448,7 +448,7 @@ export function useData() {
               activityDate.setHours(0, 0, 0, 0);
 
               const activityTitle = protocolStep.activity;
-              const activityDescription = `Lotto: ${production.productionNumber} | ${productionCheese.liters}L`;
+              const activityDescription = `Lotto: ${production.productionNumber} | ${productionCheese.liters}Lt`;
 
               // ✅ NON includere id e createdAt - saveActivity li gestirà
               const protocolActivity: Omit<Activity, "id" | "createdAt"> = {
@@ -640,8 +640,12 @@ export function useData() {
           savedIsDate: savedProduction.date instanceof Date
         });
         
-        // ❌ RIMOSSO: setProductions((prev) => [...prev, savedProduction]);
-        // La real-time subscription aggiungerà automaticamente la produzione
+        // Update UI immediately so the new production appears without waiting for real-time
+        setProductions((prev) => {
+          const exists = prev.some((p) => p.id === savedProduction.id);
+          if (exists) return prev;
+          return [...prev, savedProduction];
+        });
       } else {
         // Solo in sviluppo locale - qui genera l'ID
         const productionWithId = {
@@ -694,7 +698,7 @@ export function useData() {
           activityDate.setHours(0, 0, 0, 0);
           
           const activityTitle = protocolStep.activity;
-          const activityDescription = `Lotto: ${production.productionNumber} | ${productionCheese.liters}L`;
+          const activityDescription = `Lotto: ${production.productionNumber} | ${productionCheese.liters}Lt`;
 
           // ✅ NON includere id e createdAt - saveActivity li gestirà
           const protocolActivity: Omit<Activity, "id" | "createdAt"> = {

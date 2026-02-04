@@ -345,7 +345,7 @@ export default function Produzioni() {
                                   {type.name}
                                 </span>
                                 <span className="text-sm text-muted-foreground">
-                                  {cheese.liters}L
+                                  {cheese.liters}Lt
                                 </span>
                                 {idx < production.cheeses.length - 1 && (
                                   <span className="text-muted-foreground/50">•</span>
@@ -361,7 +361,7 @@ export default function Produzioni() {
                     <div className="flex items-center gap-4">
                       <div className="text-right">
                         <div className="font-numbers text-xl font-semibold text-foreground">
-                          {production.totalLiters.toLocaleString("it-IT")} L
+                          {production.totalLiters.toLocaleString("it-IT")} Lt
                         </div>
                         <div className="text-xs text-muted-foreground">
                           totale

@@ -83,7 +83,7 @@ export function CheeseRanking({ productions, cheeseTypes }: CheeseRankingProps) 
                     size="sm"
                   />
                   <span className="text-sm font-medium text-foreground">
-                    {stat.totalLiters.toLocaleString("it-IT")} L
+                    {stat.totalLiters.toLocaleString("it-IT")} Lt
                   </span>
                 </div>
                 <div className="h-2 w-full overflow-hidden rounded-full bg-muted">

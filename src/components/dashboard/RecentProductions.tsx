@@ -113,7 +113,7 @@ export function RecentProductions({
                 {/* Total */}
                 <div className="text-right">
                   <div className="font-numbers text-lg font-semibold text-foreground">
-                    {production.totalLiters.toLocaleString("it-IT")} L
+                    {production.totalLiters.toLocaleString("it-IT")} Lt
                   </div>
                   <div className="text-xs text-muted-foreground">totale</div>
                 </div>

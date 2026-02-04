@@ -51,7 +51,7 @@ export function QuickStats({ productions }: QuickStatsProps) {
       <StatCard
         title="Litri Questo Mese"
         value={currentMonthLiters}
-        suffix=" L"
+        suffix=" Lt"
         icon={<Droplets className="h-6 w-6" />}
         trend={
           litersTrend !== 0
@@ -73,7 +73,7 @@ export function QuickStats({ productions }: QuickStatsProps) {
       <StatCard
         title="Media per Produzione"
         value={avgPerProduction}
-        suffix=" L"
+        suffix=" Lt"
         icon={<TrendingUp className="h-6 w-6" />}
         delay={200}
       />

@@ -65,10 +65,10 @@ const fontOptions = [
 
 export default function NumberFontPreview() {
   const sampleNumbers = [
-    { label: "Litri Totali", value: 500, suffix: " L" },
+    { label: "Litri Totali", value: 500, suffix: " Lt" },
     { label: "Produzioni", value: 2 },
     { label: "Lotto", value: 23212 },
-    { label: "Litri", value: 450, suffix: "L" },
+    { label: "Litri", value: 450, suffix: "Lt" },
     { label: "Data", value: 26 },
     { label: "Anno", value: 2026 },
   ];
@@ -107,7 +107,7 @@ export default function NumberFontPreview() {
                     className="text-3xl font-semibold tracking-tight text-card-foreground"
                     style={{ fontFamily: font.fontFamily }}
                   >
-                    500 L
+                    500 Lt
                   </p>
                 </div>
                 <div className="rounded-xl border border-border bg-card p-6 shadow-card">
@@ -144,7 +144,7 @@ export default function NumberFontPreview() {
                     className="text-xl font-semibold text-foreground"
                     style={{ fontFamily: font.fontFamily }}
                   >
-                    50 L
+                    50 Lt
                   </div>
                 </div>
               </div>

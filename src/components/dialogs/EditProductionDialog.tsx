@@ -168,7 +168,6 @@ export function EditProductionDialog({
                 id="productionNumber"
                 value={productionNumber}
                 onChange={(e) => setProductionNumber(e.target.value)}
-                placeholder="202401001"
                 className="h-11 sm:h-10"
               />
             </div>
@@ -224,7 +223,7 @@ export function EditProductionDialog({
                           )
                         }
                       />
-                      <span className="text-sm text-muted-foreground">L</span>
+                      <span className="text-sm text-muted-foreground">Lt</span>
                     </div>
                     <Button
                       type="button"
@@ -243,7 +242,7 @@ export function EditProductionDialog({
             <div className="flex items-center justify-between rounded-lg bg-primary/10 px-3 py-2">
               <span className="text-sm font-medium">Totale Litri</span>
               <span className="text-lg font-semibold text-primary">
-                {totalLiters} L
+                {totalLiters} Lt
               </span>
             </div>
           </div>

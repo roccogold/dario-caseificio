@@ -90,7 +90,7 @@ const CustomTooltip = ({ active, payload, cheeseTypes }: any) => {
               className="text-xs"
             />
             <span style={{ fontSize: "12px", color: "hsl(var(--muted-foreground))", fontFamily: "'Lora', 'EB Garamond', Georgia, serif" }}>
-              {entry.value} L
+              {entry.value} Lt
             </span>
           </div>
         );
@@ -142,7 +142,7 @@ const CustomAreaTooltip = ({ active, payload, label, cheeseTypes }: any) => {
                 }}
               />
               <span style={{ fontSize: "12px", color: "hsl(var(--muted-foreground))" }}>
-                Totale: <span style={{ color: "hsl(var(--foreground))", fontWeight: 500, fontFamily: "'Lora', 'EB Garamond', Georgia, serif" }}>{entry.value} L</span>
+                Totale: <span style={{ color: "hsl(var(--foreground))", fontWeight: 500, fontFamily: "'Lora', 'EB Garamond', Georgia, serif" }}>{entry.value} Lt</span>
               </span>
             </div>
           );
@@ -160,7 +160,7 @@ const CustomAreaTooltip = ({ active, payload, label, cheeseTypes }: any) => {
               className="text-xs"
             />
             <span style={{ fontSize: "12px", color: "hsl(var(--muted-foreground))", fontFamily: "'Lora', 'EB Garamond', Georgia, serif" }}>
-              {entry.value} L
+              {entry.value} Lt
             </span>
           </div>
         );
@@ -461,7 +461,7 @@ export default function Statistiche() {
           <StatCard
             title="Litri Totali"
             value={yearlyTotals.totalLiters}
-            suffix=" L"
+            suffix=" Lt"
             icon={<Droplets className="h-4 w-4 sm:h-5 sm:w-5" />}
             delay={0}
           />
@@ -582,7 +582,7 @@ export default function Statistiche() {
                     <YAxis
                       tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12, fontFamily: "'Lora', 'EB Garamond', Georgia, serif" }}
                       axisLine={{ stroke: "hsl(var(--border))" }}
-                      tickFormatter={(value) => `${value}L`}
+                      tickFormatter={(value) => `${value}Lt`}
                       width={40}
                     />
                     <Tooltip
@@ -649,7 +649,7 @@ export default function Statistiche() {
                     <YAxis
                       tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12, fontFamily: "'Lora', 'EB Garamond', Georgia, serif" }}
                       axisLine={{ stroke: "hsl(var(--border))" }}
-                      tickFormatter={(value) => `${value}L`}
+                      tickFormatter={(value) => `${value}Lt`}
                       width={40}
                     />
                     <Tooltip

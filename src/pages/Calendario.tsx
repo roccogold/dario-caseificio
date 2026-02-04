@@ -169,7 +169,7 @@ export default function Calendario() {
                       #{prod.productionNumber}
                     </span>
                     <span className="text-sm text-muted-foreground">
-                      {prod.totalLiters} L
+                      {prod.totalLiters} Lt
                     </span>
                   </div>
                   <div className="mt-2 flex flex-wrap gap-1">
@@ -292,7 +292,7 @@ export default function Calendario() {
                         >
                           <div className="font-medium">Lotto #{prod.productionNumber}</div>
                           <div className="text-muted-foreground">
-                            {prod.totalLiters}L
+                            {prod.totalLiters}Lt
                           </div>
                           {prod.notes && (
                             <div className="mt-1 text-[10px] text-muted-foreground line-clamp-2">
