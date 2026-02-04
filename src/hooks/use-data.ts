@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, createContext, useContext, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 import { CheeseType, Production, Activity, MonthlyStats } from "@/types";
 import {
@@ -140,7 +140,10 @@ if (isProduction) {
   logger.log('[useData] Using Supabase:', useSupabase ? '✅ Yes' : '❌ No');
 }
 
-export function useData() {
+// Single source of truth: one state for the whole app so add/update reflects everywhere immediately
+const DataContext = createContext<ReturnType<typeof useDataState> | null>(null);
+
+function useDataState() {
   const [cheeseTypes, setCheeseTypes] = useState<CheeseType[]>([]);
   const [productions, setProductions] = useState<Production[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -1200,6 +1203,19 @@ export function useData() {
     // Stats
     getMonthlyStats,
   };
+}
+
+export function DataProvider({ children }: { children: ReactNode }) {
+  const value = useDataState();
+  return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
+}
+
+export function useData() {
+  const context = useContext(DataContext);
+  if (!context) {
+    throw new Error("useData must be used within DataProvider. Wrap your app with <DataProvider>.");
+  }
+  return context;
 }
 
 // Export default come fallback per compatibilità

@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Skeleton } from "@/components/ui/skeleton";
 import { KeyboardShortcutsProvider } from "@/components/KeyboardShortcuts";
+import { DataProvider } from "@/hooks/use-data";
 import Index from "./pages/Index";
 
 // Lazy load pages for code splitting
@@ -59,8 +60,9 @@ const App = () => (
           v7_relativeSplatPath: true,
         }}
       >
-        <KeyboardShortcutsProvider />
-        <Routes>
+        <DataProvider>
+          <KeyboardShortcutsProvider />
+          <Routes>
           <Route 
             path="/" 
             element={
@@ -149,6 +151,7 @@ const App = () => (
             } 
           />
         </Routes>
+        </DataProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
