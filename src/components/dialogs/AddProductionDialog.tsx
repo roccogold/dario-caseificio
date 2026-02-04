@@ -31,7 +31,7 @@ interface AddProductionDialogProps {
     productionNumber: string;
     cheeses: CheeseEntry[];
     notes?: string;
-  }) => void;
+  }) => void | Promise<void>;
   cheeseTypes: CheeseType[];
   selectedDate?: Date;
   existingProductions?: Array<{ id: string; productionNumber: string }>;
@@ -54,6 +54,7 @@ export function AddProductionDialog({
     return [{ cheeseTypeId: "", liters: 0 }];
   });
   const [notes, setNotes] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const resetForm = () => {
     setDate(format(selectedDate, "yyyy-MM-dd"));
@@ -66,7 +67,7 @@ export function AddProductionDialog({
     setNotes("");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!productionNumber.trim()) {
@@ -100,23 +101,29 @@ export function AddProductionDialog({
         return;
       }
     }
-    
+
     const validCheeses = cheeses.filter((c) => c.cheeseTypeId && c.liters > 0);
     if (validCheeses.length === 0) {
       toast.error("Aggiungi almeno un formaggio con quantità valida");
       return;
     }
 
-    onAdd({
-      date: new Date(date),
-      productionNumber: productionNumber.trim(),
-      cheeses: validCheeses,
-      notes: notes.trim() || undefined,
-    });
-
-    toast.success("Produzione registrata con successo!");
-    resetForm();
-    onOpenChange(false);
+    setIsSubmitting(true);
+    try {
+      await onAdd({
+        date: new Date(date),
+        productionNumber: productionNumber.trim(),
+        cheeses: validCheeses,
+        notes: notes.trim() || undefined,
+      });
+      toast.success("Produzione registrata con successo!");
+      resetForm();
+      onOpenChange(false);
+    } catch {
+      // Error already shown by onAdd
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const addCheeseEntry = () => {
@@ -288,7 +295,9 @@ export function AddProductionDialog({
             >
               Annulla
             </Button>
-            <Button type="submit" className="h-11 sm:h-10 w-full sm:w-auto">Registra Produzione</Button>
+            <Button type="submit" disabled={isSubmitting} className="h-11 sm:h-10 w-full sm:w-auto">
+              {isSubmitting ? "Salvataggio..." : "Registra Produzione"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
